@@ -1,2 +1,2 @@
-# palace-of-adamantine
+# palace
 A 3D grid-aligned adventure game.
