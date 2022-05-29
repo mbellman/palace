@@ -43,7 +43,7 @@ static void addGroundTiles(_ctx) {
   }
 }
 
-static void initScene(_ctx) {
+static void initGame(_ctx) {
   using namespace Gamma;
 
   auto& input = context->scene.input;

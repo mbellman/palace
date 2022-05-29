@@ -1,14 +1,14 @@
 #include "Gamma.h"
 
-#include "scene_init.cpp"
-#include "scene_update.cpp"
+#include "game_init.cpp"
+#include "game_update.cpp"
 
 int main(int argc, char* argv[]) {
   auto* context = Gm_CreateContext();
 
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
 
-  initScene(context);
+  initGame(context);
 
   while (!context->window.closed) {
     float dt = Gm_GetDeltaTime(context);
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     Gm_LogFrameStart(context);
     Gm_HandleEvents(context);
 
-    updateScene(context, dt);
+    updateGame(context, dt);
 
     Gm_RenderScene(context);
     Gm_LogFrameEnd(context);
