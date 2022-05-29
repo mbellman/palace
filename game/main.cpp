@@ -1,18 +1,9 @@
 #include "Gamma.h"
 
-static void initScene(_ctx) {
+static void addKeyHandlers(_ctx) {
   using namespace Gamma;
 
-  // Default camera control/window focus
   auto& input = context->scene.input;
-  auto& camera = context->scene.camera;
-
-  input.on<MouseMoveEvent>("mousemove", [&](const MouseMoveEvent& event) {
-    if (SDL_GetRelativeMouseMode()) {
-      camera.orientation.pitch += event.deltaY / 1000.0f;
-      camera.orientation.yaw += event.deltaX / 1000.0f;
-    }
-  });
 
   input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
     if (!SDL_GetRelativeMouseMode()) {
@@ -33,33 +24,48 @@ static void initScene(_ctx) {
       }
     }
   });
+}
 
-  // Default scene objects/lighting
-  addMesh("plane", 1, Mesh::Plane(5));
-  addMesh("cube", 1, Mesh::Cube());
+static void addGroundTiles(_ctx) {
+  using namespace Gamma;
 
-  auto& plane = createObjectFrom("plane");
-  auto& cube = createObjectFrom("cube");
+  addMesh("plane", 100, Mesh::Plane(2));
 
-  plane.scale = 1000.0f;
+  for (int i = -5; i < 5; i++) {
+    for (int j = -5; j < 5; j++) {
+      auto& plane = createObjectFrom("plane");
 
-  cube.scale = 20.0f;
-  cube.position.y = 20.0f;
-  cube.color = pVec4(255, 50, 50);
+      plane.position = Vec3f(i * 15.0f, 0, j * 15.0f);
+      plane.scale = 10.0f;
 
-  commit(plane);
-  commit(cube);
+      commit(plane);
+    }
+  }
+}
 
-  auto& light = createLight(LightType::SPOT_SHADOWCASTER);
+static void initScene(_ctx) {
+  using namespace Gamma;
 
-  light.position = cube.position + Vec3f(-30.0f, 30.0f, -30.0f);
-  light.direction = cube.position - light.position;
-  light.color = Vec3f(1.0f, 0.9f, 0.2f);
-  light.radius = 500.0f;
+  // Default camera control/window focus
+  auto& input = context->scene.input;
+  auto& camera = context->scene.camera;
 
-  camera.position = Vec3f(-100.0f, 75.0f, -150.0f);
+  input.on<MouseMoveEvent>("mousemove", [&](const MouseMoveEvent& event) {
+    if (SDL_GetRelativeMouseMode()) {
+      camera.orientation.pitch += event.deltaY / 1000.0f;
+      camera.orientation.yaw += event.deltaX / 1000.0f;
+    }
+  });
 
-  pointCamera(cube);
+  addKeyHandlers(context);
+  addGroundTiles(context);
+
+  auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
+
+  light.direction = Vec3f(0.5f, -1.0f, 1.0f);
+  light.color = Vec3f(1.0f, 1.0f, 0);
+
+  camera.position = objects("plane")[0].position + Vec3f(0, 20.0f, 0);
 }
 
 static void updateScene(_ctx, float dt) {
