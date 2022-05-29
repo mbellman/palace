@@ -67,8 +67,6 @@ static void updateScene(_ctx, float dt) {
 }
 
 int main(int argc, char* argv[]) {
-  using namespace Gamma;
-
   auto* context = Gm_CreateContext();
 
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
