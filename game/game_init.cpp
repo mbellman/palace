@@ -3,7 +3,7 @@
 static void addKeyHandlers(_ctx) {
   using namespace Gamma;
 
-  auto& input = context->scene.input;
+  auto& input = getInput();
 
   input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
     if (!SDL_GetRelativeMouseMode()) {
@@ -46,8 +46,8 @@ static void addGroundTiles(_ctx) {
 static void initGame(_ctx) {
   using namespace Gamma;
 
-  auto& input = context->scene.input;
-  auto& camera = context->scene.camera;
+  auto& input = getInput();
+  auto& camera = getCamera();
 
   input.on<MouseMoveEvent>("mousemove", [&](const MouseMoveEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
