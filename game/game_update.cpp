@@ -83,8 +83,6 @@ static void updateGame(args(), float dt) {
   auto gridDirection = getGridDirection(camera.orientation.getDirection());
   auto leftGridDirection = getGridDirection(camera.orientation.getLeftDirection());
 
-  // @todo implement a movement queue instead of
-  // allowing keys to affect velocity in real time
   MoveDirection move = MoveDirection::NONE;
 
   if (input.isKeyHeld(Key::W)) {
