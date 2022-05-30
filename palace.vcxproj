@@ -114,7 +114,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\game_init.cpp" />
+    <ClCompile Include="game\game_update.cpp" />
     <ClCompile Include="game\main.cpp" />
+    <ClCompile Include="game\move_queue.cpp" />
     <ClCompile Include="gamma\math\matrix.cpp" />
     <ClCompile Include="gamma\math\orientation.cpp" />
     <ClCompile Include="gamma\math\Quaternion.cpp" />
@@ -149,6 +152,7 @@
     <ClCompile Include="gamma\system\yaml_parser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="game\game_state.h" />
     <ClInclude Include="game\gamma_flags.h" />
     <ClInclude Include="external\glew\include\eglew.h" />
     <ClInclude Include="external\glew\include\glew.h" />
@@ -238,6 +242,7 @@
     <ClInclude Include="external\sdl2\include\SDL_video.h" />
     <ClInclude Include="external\sdl2\include\SDL_vulkan.h" />
     <ClInclude Include="external\sdl_image\include\SDL_image.h" />
+    <ClInclude Include="game\move_queue.h" />
     <ClInclude Include="gamma\Gamma.h" />
     <ClInclude Include="gamma\math\constants.h" />
     <ClInclude Include="gamma\math\geometry.h" />
