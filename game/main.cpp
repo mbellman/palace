@@ -12,8 +12,6 @@ int main(int argc, char* argv[]) {
 
   initGame(context);
 
-  state.lastPosition = getCamera().position;
-
   while (!context->window.closed) {
     float dt = Gm_GetDeltaTime(context);
 

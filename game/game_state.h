@@ -3,17 +3,21 @@
 #include "Gamma.h"
 
 struct GridCoordinates {
-  int x;
-  int y;
-  int z;
+  int x = 0;
+  int y = 0;
+  int z = 0;
+};
+
+struct SnapToGrid {
+  bool active = false;
+  float startTime = 0;
+  Gamma::Vec3f from;
+  Gamma::Vec3f to;
 };
 
 struct GameState {
-  bool isMoving = false;
-  float moveStartTime = 0;
-  // @todo replace with lastCoordinates/targetCoordinates
-  Gamma::Vec3f lastPosition;
-  Gamma::Vec3f targetPosition;
+  Gamma::Vec3f velocity;
+  SnapToGrid snap;
 };
 
 #define args() GmContext* context, GameState& state
