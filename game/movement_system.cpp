@@ -47,9 +47,9 @@ static void movePlayer(args(), float dt) {
   auto alpha = getRunningTime() - state.currentMove.startTime;
 
   if (state.currentMove.easing == EasingType::EASE_IN_OUT) {
-    alpha *= 3.0f;
+    alpha *= 3.f;
   } else if (state.currentMove.easing == EasingType::LINEAR) {
-    alpha *= 4.0f;
+    alpha *= 4.f;
   }
 
   if (alpha >= 1.f) {
@@ -110,16 +110,17 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   auto& input = getInput();
   auto gridDirection = worldDirectionToGridDirection(camera.orientation.getDirection());
   auto leftGridDirection = worldDirectionToGridDirection(camera.orientation.getLeftDirection());
-
   MoveDirection move = MoveDirection::NONE;
 
-  if (input.isKeyHeld(Key::W)) {
+  #define pressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
+
+  if (pressed(Key::W)) {
     move = getMoveDirection(gridDirection);
-  } else if (input.isKeyHeld(Key::S)) {
+  } else if (pressed(Key::S)) {
     move = getMoveDirection(gridDirection.invert());
-  } else if (input.isKeyHeld(Key::A)) {
+  } else if (pressed(Key::A)) {
     move = getMoveDirection(leftGridDirection);
-  } else if (input.isKeyHeld(Key::D)) {
+  } else if (pressed(Key::D)) {
     move = getMoveDirection(leftGridDirection.invert());
   }
 
@@ -132,31 +133,37 @@ static void updateCurrentMoveAction(args()) {
   auto nextMove = takeNextMove(state.moves);
   auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
   auto targetWorldPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
+  auto canExecuteNextMove = (runningTime - state.lastMovementInputTime) < 0.15f;
+  auto hasPausedMovement = (runningTime - state.currentMove.startTime) > 0.4f;
 
-  // @todo handle Y_UP + Y_DOWN
-  switch (nextMove) {
-    case Z_FORWARD:
-      targetWorldPosition.z += TILE_SIZE;
-      break;
-    case Z_BACKWARD:
-      targetWorldPosition.z -= TILE_SIZE;
-      break;
-    case X_LEFT:
-      targetWorldPosition.x -= TILE_SIZE;
-      break;
-    case X_RIGHT:
-      targetWorldPosition.x += TILE_SIZE;
-      break;
+  if (canExecuteNextMove) {    
+    // @todo handle Y_UP + Y_DOWN
+    switch (nextMove) {
+      case Z_FORWARD:
+        targetWorldPosition.z += TILE_SIZE;
+        break;
+      case Z_BACKWARD:
+        targetWorldPosition.z -= TILE_SIZE;
+        break;
+      case X_LEFT:
+        targetWorldPosition.x -= TILE_SIZE;
+        break;
+      case X_RIGHT:
+        targetWorldPosition.x += TILE_SIZE;
+        break;
+    }
   }
 
-  if (!state.moving) {
-    // First move
+  if (!state.moving || hasPausedMovement) {
+    // This is either a move entered while standing still,
+    // or after having sufficiently slowed down from a
+    // prior move sequence
     state.currentMove.easing = EasingType::EASE_IN_OUT;
   } else if (state.moves.size == 0) {
-    // Last move
+    // Last move in a sequence
     state.currentMove.easing = EasingType::EASE_OUT;
   } else if (state.moves.size >= 1) {
-    // More moves coming
+    // More moves ahead in the sequence
     state.currentMove.easing = EasingType::LINEAR;
   }
 
@@ -171,13 +178,18 @@ static void handlePlayerMovement(args(), float dt) {
   auto& input = getInput();
   auto runningTime = getRunningTime();
   auto move = getMoveDirectionFromKeyboardInput(params());
+  auto storeMoveTimeThreshold = checkNextMove(state.moves) == move ? 0.15f : 0.1f;
+
+  if (move != MoveDirection::NONE) {
+    state.lastMovementInputTime = runningTime;
+  }
 
   if (
     move != MoveDirection::NONE &&
-    (runningTime - state.currentMove.startTime) > 0.15f &&
+    (runningTime - state.currentMove.startTime) > storeMoveTimeThreshold &&
     checkNextMove(state.moves, 1) != move
   ) {
-    addMove(state.moves, move);
+    storeMove(state.moves, move);
   }
 
   if (
@@ -188,6 +200,6 @@ static void handlePlayerMovement(args(), float dt) {
   }
 
   if (state.moving) {
-    movePlayer(context, state, dt);
+    movePlayer(params(), dt);
   }
 }

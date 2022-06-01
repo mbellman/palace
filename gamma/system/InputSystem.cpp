@@ -51,6 +51,10 @@ namespace Gamma {
     { SDLK_TAB, Key::TAB }
   };
 
+  uint64 InputSystem::getLastKeyDown() const {
+    return lastKeyDown;
+  }
+
   void InputSystem::handleEvent(const SDL_Event& event) {
     switch (event.type) {
       case SDL_KEYDOWN:
@@ -75,6 +79,7 @@ namespace Gamma {
     if (keyMap.find(code) != keyMap.end()) {
       Key key = keyMap.at(code);
       keyState |= (uint64)key;
+      lastKeyDown = (uint64)key;
 
       signal("keydown", key);
     }

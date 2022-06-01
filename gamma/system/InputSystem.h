@@ -69,11 +69,13 @@ namespace Gamma {
 
   class InputSystem : public Signaler {
   public:
+    uint64 getLastKeyDown() const;
     void handleEvent(const SDL_Event& event);
     bool isKeyHeld(Key key);
 
   private:
     uint64 keyState = 0;
+    uint64 lastKeyDown = 0;
 
     void handleKeyDown(const SDL_Keycode& code);
     void handleKeyUp(const SDL_Keycode& code);

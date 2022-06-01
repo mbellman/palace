@@ -25,6 +25,6 @@ struct MoveQueue {
   Gamma::uint8 size = 0;
 };
 
-void addMove(MoveQueue& moves, MoveDirection move);
-MoveDirection checkNextMove(MoveQueue& moves, Gamma::uint8 moveCount = 0);
+void storeMove(MoveQueue& moves, MoveDirection move);
+MoveDirection checkNextMove(MoveQueue& moves, Gamma::uint8 movesAhead = 0);
 MoveDirection takeNextMove(MoveQueue& moves);
