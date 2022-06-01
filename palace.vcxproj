@@ -120,6 +120,7 @@
     <ClCompile Include="game\game_init.cpp" />
     <ClCompile Include="game\game_update.cpp" />
     <ClCompile Include="game\main.cpp" />
+    <ClCompile Include="game\movement_system.cpp" />
     <ClCompile Include="game\move_queue.cpp" />
     <ClCompile Include="gamma\math\matrix.cpp" />
     <ClCompile Include="gamma\math\orientation.cpp" />

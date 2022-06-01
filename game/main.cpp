@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     Gm_LogFrameStart(context);
     Gm_HandleEvents(context);
 
-    updateGame(context, state, dt);
+    updateGame(params(), dt);
 
     Gm_RenderScene(context);
     Gm_LogFrameEnd(context);

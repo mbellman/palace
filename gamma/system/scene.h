@@ -20,11 +20,13 @@
 #define createObjectFrom(meshName) Gm_CreateObjectFrom(context, meshName)
 #define commit(object) Gm_Commit(context, object)
 #define objects(meshName) Gm_GetObjects(context, meshName)
-#define getInput() context->scene.input
-#define getCamera() context->scene.camera
 #define pointCamera(...) Gm_PointCamera(context, __VA_ARGS__)
 #define useFrustumCulling(...) Gm_UseFrustumCulling(context, __VA_ARGS__)
 #define useLodByDistance(distance, ...) Gm_UseLodByDistance(context, distance, __VA_ARGS__)
+
+#define getInput() context->scene.input
+#define getCamera() context->scene.camera
+#define getRunningTime() context->scene.runningTime
 
 struct GmContext;
 

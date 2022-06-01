@@ -4,6 +4,9 @@
 
 #include "move_queue.h"
 
+#define args() GmContext* context, GameState& state
+#define params() context, state
+
 struct GridCoordinates {
   int x = 0;
   int y = 0;
@@ -22,5 +25,3 @@ struct GameState {
   MoveQueue moves;
   CurrentMove currentMove;
 };
-
-#define args() GmContext* context, GameState& state
