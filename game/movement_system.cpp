@@ -133,10 +133,14 @@ static void updateCurrentMoveAction(args()) {
   auto nextMove = takeNextMove(state.moves);
   auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
   auto targetWorldPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
-  auto canExecuteNextMove = (runningTime - state.lastMovementInputTime) < 0.15f;
-  auto hasPausedMovement = (runningTime - state.currentMove.startTime) > 0.4f;
+  auto timeSinceLastMoveInput = runningTime - state.lastMovementInputTime;
+  auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
 
-  if (canExecuteNextMove) {    
+  // Only advance the target world position along the
+  // next move direction if the last move input was
+  // sufficiently recent in time. This slightly reduces
+  // the incidence of overshot.
+  if (timeSinceLastMoveInput < 0.15f) {
     // @todo handle Y_UP + Y_DOWN
     switch (nextMove) {
       case Z_FORWARD:
@@ -154,16 +158,19 @@ static void updateCurrentMoveAction(args()) {
     }
   }
 
-  if (!state.moving || hasPausedMovement) {
-    // This is either a move entered while standing still,
+  if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
+    // The move was either entered while standing still,
     // or after having sufficiently slowed down from a
-    // prior move sequence
+    // prior move sequence. An in-out easing works best
+    // for single tile moves or the beginning of a move
+    // sequence, so we apply it in these cases.
     state.currentMove.easing = EasingType::EASE_IN_OUT;
   } else if (state.moves.size == 0) {
-    // Last move in a sequence
+    // Last move in a sequence, so slow down and stop
     state.currentMove.easing = EasingType::EASE_OUT;
   } else if (state.moves.size >= 1) {
-    // More moves ahead in the sequence
+    // More moves ahead in the sequence, so move
+    // at a constant rate
     state.currentMove.easing = EasingType::LINEAR;
   }
 
@@ -178,7 +185,8 @@ static void handlePlayerMovement(args(), float dt) {
   auto& input = getInput();
   auto runningTime = getRunningTime();
   auto move = getMoveDirectionFromKeyboardInput(params());
-  auto storeMoveTimeThreshold = checkNextMove(state.moves) == move ? 0.15f : 0.1f;
+  auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
+  auto nextStoredMoveTimeThreshold = checkNextMove(state.moves) == move ? 0.175f : 0.1f;
 
   if (move != MoveDirection::NONE) {
     state.lastMovementInputTime = runningTime;
@@ -186,7 +194,7 @@ static void handlePlayerMovement(args(), float dt) {
 
   if (
     move != MoveDirection::NONE &&
-    (runningTime - state.currentMove.startTime) > storeMoveTimeThreshold &&
+    timeSinceCurrentMoveBegan > nextStoredMoveTimeThreshold &&
     checkNextMove(state.moves, 1) != move
   ) {
     storeMove(state.moves, move);
@@ -194,7 +202,7 @@ static void handlePlayerMovement(args(), float dt) {
 
   if (
     state.moves.size > 0 &&
-    (runningTime - state.currentMove.startTime) > 0.2f
+    timeSinceCurrentMoveBegan > 0.2f
   ) {
     updateCurrentMoveAction(params());
   }
