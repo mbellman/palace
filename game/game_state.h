@@ -12,12 +12,12 @@ struct GridCoordinates {
 
 struct CurrentMove {
   float startTime = 0;
+  EasingType easing;
   Gamma::Vec3f from;
   Gamma::Vec3f to;
 };
 
 struct GameState {
-  Gamma::Vec3f velocity;
   bool moving = false;
   MoveQueue moves;
   CurrentMove currentMove;

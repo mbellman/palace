@@ -2,6 +2,8 @@
 
 #include "Gamma.h"
 
+#define MAX_MOVE_QUEUE_SIZE 3
+
 enum MoveDirection {
   NONE,
   Z_FORWARD,
@@ -12,11 +14,17 @@ enum MoveDirection {
   Y_DOWN
 };
 
-struct MoveQueue {
-  MoveDirection queue[5];
-  Gamma::uint8 size = 0;
-  float lastMoveTime = 0;
+enum EasingType {
+  EASE_IN_OUT,
+  LINEAR,
+  EASE_OUT
 };
 
-void addMove(MoveQueue& moves, MoveDirection move, float time);
+struct MoveQueue {
+  MoveDirection queue[MAX_MOVE_QUEUE_SIZE];
+  Gamma::uint8 size = 0;
+};
+
+void addMove(MoveQueue& moves, MoveDirection move);
+MoveDirection checkNextMove(MoveQueue& moves, Gamma::uint8 moveCount = 0);
 MoveDirection takeNextMove(MoveQueue& moves);
