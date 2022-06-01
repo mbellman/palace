@@ -1,8 +1,8 @@
 #include "Gamma.h"
 
-static void addKeyHandlers(_ctx) {
-  using namespace Gamma;
+using namespace Gamma;
 
+static void addKeyHandlers(_ctx) {
   auto& input = getInput();
 
   input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
@@ -27,8 +27,6 @@ static void addKeyHandlers(_ctx) {
 }
 
 static void addGroundTiles(_ctx) {
-  using namespace Gamma;
-
   addMesh("plane", 100, Mesh::Plane(2));
 
   for (int i = -5; i < 5; i++) {
@@ -36,16 +34,43 @@ static void addGroundTiles(_ctx) {
       auto& plane = createObjectFrom("plane");
 
       plane.position = Vec3f(i * 15.0f, 0, j * 15.0f);
-      plane.scale = 10.0f;
+      plane.scale = 14.0f;
+
+      plane.color = Vec3f(
+        Gm_Random(0.f, 0.3f),
+        Gm_Random(0.7f, 1.f),
+        Gm_Random(0.f, 0.5f)
+      );
 
       commit(plane);
     }
   }
 }
 
-static void initGame(_ctx) {
-  using namespace Gamma;
+static void addRocks(_ctx) {
+  addMesh("rock", 5, Mesh::Model("./game/models/rock.obj"));
 
+  auto randomPosition = []() {
+    return std::roundf(Gm_Random(-5.f, 4.f)) * 15.f;
+  };
+
+  for (uint8 i = 0; i < 5; i++) {
+    auto& rock = createObjectFrom("rock");
+
+    rock.position = Vec3f(
+      randomPosition(),
+      1.f,
+      randomPosition()
+    );
+
+    rock.rotation.y = Gm_Random(0.f, Gm_TAU);
+    rock.scale = 7.f;
+
+    commit(rock);
+  }
+}
+
+static void initGame(_ctx) {
   auto& input = getInput();
   auto& camera = getCamera();
 
@@ -58,6 +83,7 @@ static void initGame(_ctx) {
 
   addKeyHandlers(context);
   addGroundTiles(context);
+  addRocks(context);
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 

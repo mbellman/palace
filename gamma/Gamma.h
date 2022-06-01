@@ -9,4 +9,5 @@
 #include "system/entities.h"
 #include "system/flags.h"
 #include "system/macros.h"
+#include "system/random.h"
 #include "system/scene.h"
