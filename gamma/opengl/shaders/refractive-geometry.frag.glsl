@@ -65,11 +65,10 @@ void main() {
     refracted_color_and_depth.rgb = getSkyColor(direction);
   }
 
-  float grazing_factor = 1.0 - max(0, dot(normal, normalized_fragment_to_camera));
+  // Slightly darken fragments facing the camera more directly
+  float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);
 
   refracted_color_and_depth.rgb *= fragColor;
-  // Make geometry edges at grazing angles subtly brighter
-  refracted_color_and_depth.rgb += fragColor * grazing_factor * 0.05;
 
-  out_color_and_depth = vec4(refracted_color_and_depth.rgb, gl_FragCoord.z);
+  out_color_and_depth = vec4(refracted_color_and_depth.rgb * intensity, gl_FragCoord.z);
 }

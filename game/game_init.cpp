@@ -161,6 +161,18 @@ static void addLamps(_ctx) {
   }
 }
 
+static void addStatue(_ctx) {
+  addMesh("statue", 1, Mesh::Model("./game/models/statue/model.obj"));
+  mesh("statue")->type = MeshType::REFRACTIVE;
+
+  auto& statue = createObjectFrom("statue");
+
+  statue.scale = 7.5f;
+  statue.color = pVec4(200, 220, 255);
+
+  commit(statue);
+}
+
 static void initGame(_ctx) {
   auto& input = getInput();
   auto& camera = getCamera();
@@ -178,11 +190,12 @@ static void initGame(_ctx) {
   addParticles(context);
   addPlants(context);
   addLamps(context);
+  addStatue(context);
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 
-  light.direction = Vec3f(0.5f, -1.0f, 1.0f);
-  light.color = Vec3f(1.0f, 1.0f, 0);
+  light.direction = Vec3f(0.5f, -1.f, 1.f);
+  light.color = Vec3f(1.f, 0.8f, 0.4f);
 
   camera.position = objects("plane")[0].position + Vec3f(0, 15.f, 0);
 }
