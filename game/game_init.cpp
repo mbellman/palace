@@ -177,6 +177,36 @@ static void initGame(_ctx) {
   auto& input = getInput();
   auto& camera = getCamera();
 
+  // Normal
+  // pitch += deltaY
+  // yaw += deltaX
+  // roll = 0
+
+  // Upside-down
+  // pitch += deltaY
+  // yaw -= deltaX
+  // roll = 0
+
+  // Back
+  // pitch += deltaY
+  // roll -= deltaX
+  // yaw = 0
+
+  // Forward
+  // pitch += deltaY
+  // roll += deltaX
+  // yaw = 0
+
+  // Left
+  // pitch += deltaY
+  // yaw += deltaX
+  // roll = PI / 2
+
+  // Right
+  // pitch += deltaY
+  // yaw += deltaX
+  // roll = -PI / 2
+
   input.on<MouseMoveEvent>("mousemove", [&](const MouseMoveEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
       camera.orientation.pitch += event.deltaY / 1000.0f;

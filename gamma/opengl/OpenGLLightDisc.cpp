@@ -101,6 +101,7 @@ namespace Gamma {
     // @todo
   }
 
+  // @bug roll produces incorrect screen projection of the light disc
   void OpenGLLightDisc::configureDisc(Disc& disc, const Light& light, const Matrix4f& matProjection, const Matrix4f& matView, float resolutionAspectRatio) {
     Vec3f localLightPosition = (matView * light.position).toVec3f();
 
