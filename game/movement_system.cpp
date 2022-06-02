@@ -9,7 +9,7 @@ constexpr static float TILE_SIZE = 15.f;
 
 static float easeOut(float a, float b, float alpha) {
   const float delta = b - a;
-  const float t = 1.f - std::powf(2, -10.f * alpha);
+  const float t = 1.f - (1.f - alpha) * (1.f - alpha);
 
   return a + delta * t;
 }
@@ -59,6 +59,8 @@ static void movePlayer(args(), float dt) {
     alpha *= 3.f;
   } else if (state.currentMove.easing == EasingType::LINEAR) {
     alpha *= 4.f;
+  } else if (state.currentMove.easing == EasingType::EASE_OUT) {
+    alpha *= 2.f;
   }
 
   if (alpha >= 1.f) {
