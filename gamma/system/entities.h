@@ -163,15 +163,15 @@ namespace Gamma {
    */
   struct ParticleSystem {
     Vec3f spawn;
-    float spread;
-    float minimumRadius;
-    float medianSpeed;
-    float speedVariation;
-    float medianSize;
-    float sizeVariation;
-    float deviation;
+    float spread = 100.f;
+    float minimumRadius = 1.f;
+    float medianSpeed = 1.f;
+    float speedVariation = 0.f;
+    float medianSize = 1.f;
+    float sizeVariation = 0.f;
+    float deviation = 0.f;
     std::vector<Vec3f> path;
-    bool isCircuit;
+    bool isCircuit = true;
   };
 
   /**

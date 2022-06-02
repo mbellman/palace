@@ -64,10 +64,22 @@ static void addRocks(_ctx) {
     );
 
     rock.rotation.y = Gm_Random(0.f, Gm_TAU);
-    rock.scale = 7.f;
+    rock.scale = Gm_Random(6.f, 9.f);
 
     commit(rock);
   }
+}
+
+static void addParticles(_ctx) {
+  addMesh("particles", 1000, Mesh::Particles());
+
+  auto& particles = mesh("particles")->particleSystem;
+
+  particles.spread = 100.f;
+  particles.speedVariation = 5.f;
+  particles.deviation = 10.f;
+  particles.sizeVariation = 10.f;
+  particles.medianSize = 5.f;
 }
 
 static void initGame(_ctx) {
@@ -84,6 +96,7 @@ static void initGame(_ctx) {
   addKeyHandlers(context);
   addGroundTiles(context);
   addRocks(context);
+  addParticles(context);
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 

@@ -162,7 +162,7 @@ void main() {
 
   // @hack invert Z
   gl_Position = matProjection * matView * glVec4(position);
-  gl_PointSize = scale;
+  gl_PointSize = 50.0 * scale / gl_Position.z;
 
   fragUv = vertexUv;
   // @todo make color configurable

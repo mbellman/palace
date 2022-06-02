@@ -19,6 +19,7 @@
 #define createLight(type) Gm_CreateLight(context, type)
 #define createObjectFrom(meshName) Gm_CreateObjectFrom(context, meshName)
 #define commit(object) Gm_Commit(context, object)
+#define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
 #define pointCamera(...) Gm_PointCamera(context, __VA_ARGS__)
 #define useFrustumCulling(...) Gm_UseFrustumCulling(context, __VA_ARGS__)
