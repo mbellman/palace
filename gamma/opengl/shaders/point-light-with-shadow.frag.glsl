@@ -29,18 +29,20 @@ layout (location = 0) out vec4 out_colorAndDepth;
 #include "utils/helpers.glsl";
 
 vec3 rotatedVogelDisc(int samples, int index) {
-  float rotation = noise(1.0) * 3.141592;
+  const float PI = 3.141592;
+
+  float rotation = noise(1.0) * PI;
   float theta = 2.4 * index + rotation;
   float radius = sqrt(float(index) + 0.5) / sqrt(float(samples));
 
-  return radius * vec3(cos(theta), sin(theta), 0.0);
+  return radius * vec3(cos(theta), sin(theta), cos(theta + PI / 2.0));
 }
 
 float getLightFactor(vec3 light_to_surface, float light_distance, float incidence) {
   #if USE_VARIABLE_PENUMBRA_SIZE == 1
     const float max_spread = 200.0;
     const float max_spread_distance = 1000.0;
-    float spread = 0.5 + pow(saturate(light_distance / max_spread_distance), 2) * max_spread;
+    float spread = 0.2 + pow(saturate(light_distance / max_spread_distance), 2) * max_spread;
   #else
     float spread = 0.5;
   #endif

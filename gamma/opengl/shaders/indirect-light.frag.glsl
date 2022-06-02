@@ -47,7 +47,12 @@ const vec3[] ssao_sample_points = {
 vec2 texel_size = 1.0 / screenSize;
 
 vec2 rotatedVogelDisc(int samples, int index) {
-  float f = frame % 4;
+  #if USE_DENOISING == 1
+    float f = frame % 4;
+  #else
+    float f = 0;
+  #endif
+
   float rotation = noise(1.0 + f) * 3.141592 * 2.0;
   float theta = 2.4 * index + rotation;
   float radius = sqrt(float(index) + 0.5) / sqrt(float(samples));
@@ -63,7 +68,12 @@ float getScreenSpaceAmbientOcclusionContribution(float fragment_depth, vec3 frag
   float linearized_fragment_depth = getLinearizedDepth(fragment_depth);
   float occlusion = 0.0;
 
-  float f = frame % 4;
+  #if USE_DENOISING == 1
+    float f = frame % 4;
+  #else
+    float f = 0;
+  #endif
+
   vec3 random_vector = vec3(noise(1.0 + f), noise(2.0 + f), noise(3.0 + f));
   vec3 tangent = normalize(random_vector - fragment_normal * dot(random_vector, fragment_normal));
   vec3 bitangent = cross(fragment_normal, tangent);

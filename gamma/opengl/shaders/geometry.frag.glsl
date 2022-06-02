@@ -15,7 +15,7 @@ layout (location = 0) out vec4 out_color_and_depth;
 layout (location = 1) out vec4 out_normal_and_emissivity;
 
 vec3 getNormal() {
-  vec3 n_fragNormal = normalize(fragNormal);
+  vec3 normalized_frag_normal = normalize(fragNormal);
 
   if (hasNormalMap) {
     vec3 mappedNormal = texture(meshNormalMap, fragUv).rgb * 2.0 - vec3(1.0);
@@ -23,12 +23,12 @@ vec3 getNormal() {
     mat3 tangentMatrix = mat3(
       normalize(fragTangent),
       normalize(fragBitangent),
-      n_fragNormal
+      normalized_frag_normal
     );
 
     return normalize(tangentMatrix * mappedNormal);
   } else {
-    return n_fragNormal;
+    return normalized_frag_normal;
   }
 }
 

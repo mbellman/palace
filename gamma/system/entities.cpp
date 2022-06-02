@@ -53,6 +53,10 @@ namespace Gamma {
     auto& vertices = mesh->vertices;
     auto& faceElements = mesh->faceElements;
 
+    for (auto& vertex : vertices) {
+      vertex.normal = Vec3f(0.f);
+    }
+
     for (uint32 i = 0; i < faceElements.size(); i += 3) {
       Vertex& v1 = vertices[faceElements[i]];
       Vertex& v2 = vertices[faceElements[i + 1]];
@@ -155,7 +159,7 @@ namespace Gamma {
           auto indexRecord = vertexTupleToIndexMap.find(vertexTuple);
 
           if (indexRecord != vertexTupleToIndexMap.end()) {
-            // Vertex tupple already exists, so we can just
+            // Vertex tuple already exists, so we can just
             // add the stored face element index
             faceElements.push_back(indexRecord->second);
           } else {
@@ -163,6 +167,10 @@ namespace Gamma {
             Vertex vertex;
             uint32 index = vertices.size();
 
+            // @todo Have the option to run through existing vertices,
+            // compare position, and re-use any which are within a minuscule
+            // distance threshold of this one to avoid duplicates. Certain
+            // obj files may do this on purpose, so it should be opt-in.
             vertex.position = obj.vertices[std::get<0>(vertexTuple)];
 
             if (obj.textureCoordinates.size() > 0) {

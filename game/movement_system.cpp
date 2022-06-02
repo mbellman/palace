@@ -44,7 +44,16 @@ static void movePlayer(args(), float dt) {
   auto& camera = getCamera();
   auto& from = state.currentMove.from;
   auto& to = state.currentMove.to;
-  auto alpha = getRunningTime() - state.currentMove.startTime;
+
+  // Add dt to the easing alpha value to ensure that
+  // the camera is always in motion while executing
+  // movement. Since the 'from' position of the current
+  // move represents where the camera was when the
+  // move started, and since we run this routine on
+  // the same frame as updating the current move,
+  // we don't want to wait a frame to start moving
+  // the camera, as this produces a jarring stutter.
+  auto alpha = (getRunningTime() - state.currentMove.startTime) + dt;
 
   if (state.currentMove.easing == EasingType::EASE_IN_OUT) {
     alpha *= 3.f;

@@ -38,8 +38,8 @@ static void addGroundTiles(_ctx) {
 
       plane.color = Vec3f(
         Gm_Random(0.f, 0.3f),
-        Gm_Random(0.7f, 1.f),
-        Gm_Random(0.f, 0.5f)
+        Gm_Random(0.5f, 1.f),
+        Gm_Random(0.f, 0.7f)
       );
 
       commit(plane);
@@ -48,7 +48,7 @@ static void addGroundTiles(_ctx) {
 }
 
 static void addRocks(_ctx) {
-  addMesh("rock", 5, Mesh::Model("./game/models/rock.obj"));
+  addMesh("rock", 5, Mesh::Model("./game/models/rock/model.obj"));
 
   auto randomPosition = []() {
     return std::roundf(Gm_Random(-5.f, 4.f)) * 15.f;
@@ -78,8 +78,87 @@ static void addParticles(_ctx) {
   particles.spread = 100.f;
   particles.speedVariation = 5.f;
   particles.deviation = 10.f;
-  particles.sizeVariation = 10.f;
+  particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
+}
+
+static void addPlants(_ctx) {
+  addMesh("grass", 200, Mesh::Model("./game/models/grass/model.obj"));
+  addMesh("flower-stalk", 100, Mesh::Model("./game/models/flower/stalk.obj"));
+  addMesh("flower-petals", 100, Mesh::Model("./game/models/flower/petals.obj"));
+
+  mesh("flower-petals")->normalMap = "./game/models/flower/petals-normals.png";
+
+  for (uint8 i = 0; i < 200; i++) {
+    auto& grass = createObjectFrom("grass");
+
+    grass.position = Vec3f(
+      Gm_Random(-70.f, 70.f),
+      0.f,
+      Gm_Random(-70.f, 70.f)
+    );
+
+    grass.scale = Gm_Random(1.f, 3.f);
+    grass.color = pVec4(0, 255, 0);
+    grass.rotation.y = Gm_Random(0.f, Gm_TAU);
+
+    commit(grass);
+  }
+
+  for (uint8 i = 0; i < 100; i++) {
+    auto& stalk = createObjectFrom("flower-stalk");
+    auto& petals = createObjectFrom("flower-petals");
+
+    Vec3f position = Vec3f(
+      Gm_Random(-70.f, 70.f),
+      0.f,
+      Gm_Random(-70.f, 70.f)
+    );
+
+    stalk.position = petals.position = position;
+    stalk.scale = petals.scale = Gm_Random(1.f, 2.f);
+    stalk.rotation.y = petals.rotation.y = Gm_Random(0.f, Gm_TAU);
+
+    stalk.color = pVec4(0, 255, 0);
+    petals.color = Vec3f(Gm_Random(0.f, 1.f), Gm_Random(0.f, 1.f), Gm_Random(0.f, 1.f));
+
+    commit(stalk);
+    commit(petals);
+  }
+}
+
+static void addLamps(_ctx) {
+  addMesh("lamp", 5, Mesh::Model("./game/models/lamp/model.obj"));
+
+  mesh("lamp")->texture = "./game/models/lamp/texture.png";
+  mesh("lamp")->normalMap = "./game/models/lamp/normals.png";
+
+  auto randomPosition = []() {
+    return std::roundf(Gm_Random(-5.f, 4.f)) * 15.f;
+  };
+
+  for (uint8 i = 0; i < 5; i++) {
+    auto& lamp = createObjectFrom("lamp");
+
+    lamp.position = Vec3f(
+      randomPosition(),
+      25.f,
+      randomPosition()
+    );
+
+    lamp.rotation.y = Gm_Random(0.f, Gm_TAU);
+    lamp.scale = 5.f;
+
+    commit(lamp);
+
+    auto& light = createLight(LightType::POINT_SHADOWCASTER);
+
+    light.color = Vec3f(1.f, 0.3f, 0.1f);
+    light.position = lamp.position - Vec3f(0, 15.f, 0);
+    light.power = 2.f;
+    light.radius = 20.f;
+    light.isStatic = true;
+  }
 }
 
 static void initGame(_ctx) {
@@ -97,11 +176,13 @@ static void initGame(_ctx) {
   addGroundTiles(context);
   addRocks(context);
   addParticles(context);
+  addPlants(context);
+  addLamps(context);
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 
   light.direction = Vec3f(0.5f, -1.0f, 1.0f);
   light.color = Vec3f(1.0f, 1.0f, 0);
 
-  camera.position = objects("plane")[0].position + Vec3f(0, 20.0f, 0);
+  camera.position = objects("plane")[0].position + Vec3f(0, 15.f, 0);
 }
