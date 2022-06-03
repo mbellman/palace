@@ -1,7 +1,6 @@
 #include "Gamma.h"
 
 #include "game_init.h"
-#include "game_state.h"
 
 using namespace Gamma;
 

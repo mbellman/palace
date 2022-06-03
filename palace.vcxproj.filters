@@ -542,5 +542,8 @@
     <ClInclude Include="game\movement_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\game_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

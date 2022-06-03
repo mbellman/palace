@@ -3,6 +3,7 @@
 #include "game_state.h"
 #include "game_init.h"
 #include "game_update.h"
+#include "game_macros.h"
 
 int main(int argc, char* argv[]) {
   GameState state;

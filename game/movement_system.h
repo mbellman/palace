@@ -1,5 +1,5 @@
 #pragma once
 
-#include "game_state.h"
+#include "game_macros.h"
 
 void handlePlayerMovement(args(), float dt);

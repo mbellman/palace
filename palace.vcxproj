@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\game_init.h" />
+    <ClInclude Include="game\game_macros.h" />
     <ClInclude Include="game\game_state.h" />
     <ClInclude Include="game\game_update.h" />
     <ClInclude Include="game\gamma_flags.h" />
