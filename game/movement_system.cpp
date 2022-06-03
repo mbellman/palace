@@ -69,7 +69,7 @@ static Vec3f worldDirectionToGridDirection(const Vec3f& vector) {
 }
 
 // @todo support Y_UP + Y_DOWN
-static MoveDirection getMoveDirection(const Vec3f& gridDirection) {
+static MoveDirection gridDirectionToMoveDirection(const Vec3f& gridDirection) {
   if (gridDirection.x > 0.0f) {
     return MoveDirection::X_RIGHT;
   } else if (gridDirection.x < 0.0f) {
@@ -88,18 +88,18 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   auto& input = getInput();
   auto gridDirection = worldDirectionToGridDirection(camera.orientation.getDirection());
   auto leftGridDirection = worldDirectionToGridDirection(camera.orientation.getLeftDirection());
-  MoveDirection move = MoveDirection::NONE;
+  auto move = MoveDirection::NONE;
 
-  #define pressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
+  #define keyPressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
 
-  if (pressed(Key::W)) {
-    move = getMoveDirection(gridDirection);
-  } else if (pressed(Key::S)) {
-    move = getMoveDirection(gridDirection.invert());
-  } else if (pressed(Key::A)) {
-    move = getMoveDirection(leftGridDirection);
-  } else if (pressed(Key::D)) {
-    move = getMoveDirection(leftGridDirection.invert());
+  if (keyPressed(Key::W)) {
+    move = gridDirectionToMoveDirection(gridDirection);
+  } else if (keyPressed(Key::S)) {
+    move = gridDirectionToMoveDirection(gridDirection.invert());
+  } else if (keyPressed(Key::A)) {
+    move = gridDirectionToMoveDirection(leftGridDirection);
+  } else if (keyPressed(Key::D)) {
+    move = gridDirectionToMoveDirection(leftGridDirection.invert());
   }
 
   return move;
@@ -111,7 +111,7 @@ static void updateCurrentMoveAction(args()) {
   auto nextMove = takeNextMove(state.moves);
   auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
   auto targetWorldPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
-  auto timeSinceLastMoveInput = runningTime - state.lastMovementInputTime;
+  auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
 
   // Only advance the target world position along the
@@ -164,18 +164,18 @@ void handlePlayerMovement(args(), float dt) {
   auto runningTime = getRunningTime();
   auto move = getMoveDirectionFromKeyboardInput(params());
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
-  auto nextStoredMoveTimeThreshold = checkNextMove(state.moves) == move ? 0.175f : 0.1f;
+  auto commitMoveTimeDelay = checkNextMove(state.moves) == move ? 0.175f : 0.1f;
 
   if (move != MoveDirection::NONE) {
-    state.lastMovementInputTime = runningTime;
+    state.lastMoveInputTime = runningTime;
   }
 
   if (
     move != MoveDirection::NONE &&
-    timeSinceCurrentMoveBegan > nextStoredMoveTimeThreshold &&
+    timeSinceCurrentMoveBegan > commitMoveTimeDelay &&
     checkNextMove(state.moves, 1) != move
   ) {
-    storeMove(state.moves, move);
+    commitMove(state.moves, move);
   }
 
   if (

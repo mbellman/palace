@@ -19,7 +19,7 @@ struct CurrentMove {
 
 struct GameState {
   bool moving = false;
-  float lastMovementInputTime = 0;
+  float lastMoveInputTime = 0;
   MoveQueue moves;
   CurrentMove currentMove;
 };

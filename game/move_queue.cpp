@@ -2,7 +2,7 @@
 
 using namespace Gamma;
 
-void storeMove(MoveQueue& moves, MoveDirection move) {
+void commitMove(MoveQueue& moves, MoveDirection move) {
   using namespace Gamma;
 
   if (moves.size > 0 && move != moves.queue[0]) {
