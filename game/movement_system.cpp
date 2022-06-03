@@ -1,45 +1,11 @@
 #include "Gamma.h"
 
 #include "movement_system.h"
-#include "game_state.h"
+#include "easing_utilities.h"
+#include "grid_utilities.h"
 #include "move_queue.h"
 
 using namespace Gamma;
-
-constexpr static float TILE_SIZE = 15.f;
-
-static float easeOut(float a, float b, float alpha) {
-  const float delta = b - a;
-  const float t = 1.f - (1.f - alpha) * (1.f - alpha);
-
-  return a + delta * t;
-}
-
-static float easeInOut(float a, float b, float alpha) {
-  const float delta = b - a;
-
-  const float t = alpha < 0.5f
-    ? 2.f * alpha * alpha
-    : 1.f - std::powf(-2.f * alpha + 2.f, 2.f) / 2.f;
-
-  return a + delta * t;
-}
-
-static Vec3f gridCoordinatesToWorldPosition(const GridCoordinates& coordinates) {
-  return {
-    coordinates.x * TILE_SIZE,
-    coordinates.y * TILE_SIZE,
-    coordinates.z * TILE_SIZE
-  };
-}
-
-static GridCoordinates worldPositionToGridCoordinates(const Vec3f& position) {
-  return {
-    int(std::roundf(position.x / TILE_SIZE)),
-    int(std::roundf(position.y / TILE_SIZE)),
-    int(std::roundf(position.z / TILE_SIZE))
-  };
-}
 
 static void movePlayer(args(), float dt) {
   auto& camera = getCamera();

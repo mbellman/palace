@@ -545,5 +545,11 @@
     <ClInclude Include="game\game_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\easing_utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\grid_utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
