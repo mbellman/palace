@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
 
-  initGame(context);
+  initGame(params());
 
   while (!context->window.closed) {
     float dt = Gm_GetDeltaTime(context);

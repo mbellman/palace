@@ -1,8 +1,10 @@
 #include "Gamma.h"
 
+#include "game_state.h"
+
 using namespace Gamma;
 
-static void addKeyHandlers(_ctx) {
+static void addKeyHandlers(args()) {
   auto& input = getInput();
 
   input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
@@ -26,7 +28,7 @@ static void addKeyHandlers(_ctx) {
   });
 }
 
-static void addGroundTiles(_ctx) {
+static void addGroundTiles(args()) {
   addMesh("plane", 100, Mesh::Plane(2));
 
   for (int i = -5; i < 5; i++) {
@@ -47,7 +49,7 @@ static void addGroundTiles(_ctx) {
   }
 }
 
-static void addRocks(_ctx) {
+static void addRocks(args()) {
   addMesh("rock", 5, Mesh::Model("./game/models/rock/model.obj"));
 
   auto randomPosition = []() {
@@ -70,7 +72,7 @@ static void addRocks(_ctx) {
   }
 }
 
-static void addParticles(_ctx) {
+static void addParticles(args()) {
   addMesh("particles", 1000, Mesh::Particles());
 
   auto& particles = mesh("particles")->particleSystem;
@@ -82,7 +84,7 @@ static void addParticles(_ctx) {
   particles.medianSize = 5.f;
 }
 
-static void addPlants(_ctx) {
+static void addPlants(args()) {
   addMesh("grass", 200, Mesh::Model("./game/models/grass/model.obj"));
   addMesh("flower-stalk", 100, Mesh::Model("./game/models/flower/stalk.obj"));
   addMesh("flower-petals", 100, Mesh::Model("./game/models/flower/petals.obj"));
@@ -127,7 +129,7 @@ static void addPlants(_ctx) {
   }
 }
 
-static void addLamps(_ctx) {
+static void addLamps(args()) {
   addMesh("lamp", 5, Mesh::Model("./game/models/lamp/model.obj"));
 
   mesh("lamp")->texture = "./game/models/lamp/texture.png";
@@ -161,7 +163,7 @@ static void addLamps(_ctx) {
   }
 }
 
-static void addStatue(_ctx) {
+static void addStatue(args()) {
   addMesh("statue", 1, Mesh::Model("./game/models/statue/model.obj"));
   mesh("statue")->type = MeshType::REFRACTIVE;
 
@@ -173,7 +175,7 @@ static void addStatue(_ctx) {
   commit(statue);
 }
 
-static void initGame(_ctx) {
+static void initGame(args()) {
   auto& input = getInput();
   auto& camera = getCamera();
 
@@ -214,13 +216,13 @@ static void initGame(_ctx) {
     }
   });
 
-  addKeyHandlers(context);
-  addGroundTiles(context);
-  addRocks(context);
-  addParticles(context);
-  addPlants(context);
-  addLamps(context);
-  addStatue(context);
+  addKeyHandlers(params());
+  addGroundTiles(params());
+  addRocks(params());
+  addParticles(params());
+  addPlants(params());
+  addLamps(params());
+  addStatue(params());
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 
