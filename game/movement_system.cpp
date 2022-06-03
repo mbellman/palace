@@ -86,16 +86,16 @@ static MoveDirection gridDirectionToMoveDirection(const Vec3f& gridDirection) {
 static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   auto& camera = getCamera();
   auto& input = getInput();
-  auto gridDirection = worldDirectionToGridDirection(camera.orientation.getDirection());
+  auto forwardGridDirection = worldDirectionToGridDirection(camera.orientation.getDirection());
   auto leftGridDirection = worldDirectionToGridDirection(camera.orientation.getLeftDirection());
   auto move = MoveDirection::NONE;
 
   #define keyPressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
 
   if (keyPressed(Key::W)) {
-    move = gridDirectionToMoveDirection(gridDirection);
+    move = gridDirectionToMoveDirection(forwardGridDirection);
   } else if (keyPressed(Key::S)) {
-    move = gridDirectionToMoveDirection(gridDirection.invert());
+    move = gridDirectionToMoveDirection(forwardGridDirection.invert());
   } else if (keyPressed(Key::A)) {
     move = gridDirectionToMoveDirection(leftGridDirection);
   } else if (keyPressed(Key::D)) {
