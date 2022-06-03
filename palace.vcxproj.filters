@@ -533,5 +533,14 @@
     <ClInclude Include="gamma\system\random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\game_init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\game_update.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\movement_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

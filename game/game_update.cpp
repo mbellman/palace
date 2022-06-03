@@ -1,8 +1,9 @@
 #include "Gamma.h"
 
-#include "movement_system.cpp"
+#include "game_update.h"
+#include "movement_system.h"
 
-static void updateGame(args(), float dt) {
+void updateGame(args(), float dt) {
   handlePlayerMovement(params(), dt);
   // Gm_HandleFreeCameraMode(context, dt);
 

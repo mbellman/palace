@@ -1,5 +1,6 @@
 #include "Gamma.h"
 
+#include "movement_system.h"
 #include "game_state.h"
 #include "move_queue.h"
 
@@ -191,7 +192,7 @@ static void updateCurrentMoveAction(args()) {
   state.currentMove.to = targetWorldPosition;
 }
 
-static void handlePlayerMovement(args(), float dt) {
+void handlePlayerMovement(args(), float dt) {
   auto& camera = getCamera();
   auto& input = getInput();
   auto runningTime = getRunningTime();

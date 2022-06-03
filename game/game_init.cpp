@@ -1,5 +1,6 @@
 #include "Gamma.h"
 
+#include "game_init.h"
 #include "game_state.h"
 
 using namespace Gamma;
@@ -175,7 +176,7 @@ static void addStatue(args()) {
   commit(statue);
 }
 
-static void initGame(args()) {
+void initializeGame(args()) {
   auto& input = getInput();
   auto& camera = getCamera();
 

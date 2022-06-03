@@ -1,8 +1,8 @@
 #include "Gamma.h"
 
 #include "game_state.h"
-#include "game_init.cpp"
-#include "game_update.cpp"
+#include "game_init.h"
+#include "game_update.h"
 
 int main(int argc, char* argv[]) {
   GameState state;
@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
 
-  initGame(params());
+  initializeGame(params());
 
   while (!context->window.closed) {
     float dt = Gm_GetDeltaTime(context);
