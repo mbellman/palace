@@ -5,6 +5,7 @@
 #include "math/vector.h"
 
 namespace Gamma {
+  // @bug this doesn't take roll into account
   Vec3f Orientation::getDirection() const {
     return Vec3f(
       sinf(yaw) * cosf(pitch),

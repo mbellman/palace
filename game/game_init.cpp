@@ -175,44 +175,60 @@ static void addStatue(args()) {
   commit(statue);
 }
 
+// @todo create orientation_system.h/cpp?
+static void handleMouseMoveEvent(args(), const MouseMoveEvent& event) {
+  auto& camera = getCamera();
+  auto mDeltaY = event.deltaY / 1000.f;
+  auto mDeltaX = event.deltaX / 1000.f;
+
+  switch (state.orientation.current) {
+    case POSITIVE_Y_UP:
+    case POSITIVE_X_UP:
+    case NEGATIVE_X_UP:
+      camera.orientation.pitch += mDeltaY;
+      camera.orientation.yaw += mDeltaX;
+      break;
+    case NEGATIVE_Y_UP:
+      camera.orientation.pitch += mDeltaY;
+      camera.orientation.yaw -= mDeltaX;
+      break;
+    case POSITIVE_Z_UP:
+      camera.orientation.pitch += mDeltaY;
+      camera.orientation.roll -= mDeltaX;
+      break;
+    case NEGATIVE_Z_UP:
+      camera.orientation.pitch += mDeltaY;
+      camera.orientation.roll += mDeltaX;
+      break;
+  }
+}
+
 void initializeGame(args()) {
   auto& input = getInput();
   auto& camera = getCamera();
 
-  // Normal
-  // pitch += deltaY
-  // yaw += deltaX
-  // roll = 0
-
-  // Upside-down
-  // pitch += deltaY
-  // yaw -= deltaX
-  // roll = 0
-
-  // Back
-  // pitch += deltaY
-  // roll -= deltaX
-  // yaw = 0
-
-  // Forward
-  // pitch += deltaY
-  // roll += deltaX
-  // yaw = 0
-
-  // Left
-  // pitch += deltaY
-  // yaw += deltaX
-  // roll = PI / 2
-
-  // Right
-  // pitch += deltaY
-  // yaw += deltaX
-  // roll = -PI / 2
-
-  input.on<MouseMoveEvent>("mousemove", [&](const MouseMoveEvent& event) {
+  input.on<MouseMoveEvent>("mousemove", [context, &state](const MouseMoveEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
-      camera.orientation.pitch += event.deltaY / 1000.0f;
-      camera.orientation.yaw += event.deltaX / 1000.0f;
+      handleMouseMoveEvent(params(), event);
+    }
+  });
+
+  // @temporary
+  input.on<KeyboardEvent>("keydown", [&](const KeyboardEvent& event) {
+    auto key = event.key;
+
+    if (key == Key::NUM_1) {
+      state.orientation.current = POSITIVE_Y_UP;
+    } else if (key == Key::NUM_2) {
+      state.orientation.current = NEGATIVE_Y_UP;
+    } else if (key == Key::NUM_3) {
+      state.orientation.current = POSITIVE_Z_UP;
+    } else if (key == Key::NUM_4) {
+      state.orientation.current = NEGATIVE_Z_UP;
+    } else if (key == Key::NUM_5) {
+      state.orientation.current = POSITIVE_X_UP;
+    } else if (key == Key::NUM_6) {
+      state.orientation.current = NEGATIVE_X_UP;
     }
   });
 
