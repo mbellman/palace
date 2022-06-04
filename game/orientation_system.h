@@ -15,9 +15,8 @@ enum PlayerOrientation {
 
 struct PlayerOrientationState {
   float startTime = 0.f;
-  PlayerOrientation previous;
-  PlayerOrientation current = POSITIVE_Y_UP;
   float from = 0.f;
+  PlayerOrientation orientation = POSITIVE_Y_UP;
 };
 
 void updateCameraFromMouseMoveEvent(GmContext* context, GameState& state, const Gamma::MouseMoveEvent& event);

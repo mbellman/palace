@@ -9,7 +9,7 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   auto mDeltaY = event.deltaY / 1000.f;
   auto mDeltaX = event.deltaX / 1000.f;
 
-  switch (state.orientationState.current) {
+  switch (state.orientationState.orientation) {
     case POSITIVE_Y_UP:
     case POSITIVE_X_UP:
     case NEGATIVE_X_UP:
@@ -40,12 +40,11 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
 
 void setPlayerOrientation(args(), PlayerOrientation orientation) {
   auto& camera = getCamera();
-  auto previous = state.orientationState.previous = state.orientationState.current;
-  auto current = state.orientationState.current = orientation;
 
   state.orientationState.startTime = getRunningTime();
+  state.orientationState.orientation = orientation;
 
-  switch (current) {
+  switch (orientation) {
     case POSITIVE_Y_UP:
     case POSITIVE_X_UP:
     case NEGATIVE_Y_UP:
@@ -71,7 +70,7 @@ void handlePlayerOrientation(args(), float dt) {
   }
 
   // @todo shortest-path easing
-  switch (state.orientationState.current) {
+  switch (state.orientationState.orientation) {
     case POSITIVE_Y_UP:
     case NEGATIVE_Y_UP:
       camera.orientation.roll = easeOut(from, 0.f, alpha);
