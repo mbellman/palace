@@ -13,9 +13,7 @@ enum WorldOrientation {
 
 struct WorldOrientationState {
   float startTime = 0.f;
-  float from_deprecated = 0.f;  // @todo remove
   Gamma::Orientation from;
-  Gamma::Orientation to;
   WorldOrientation orientation = POSITIVE_Y_UP;
 };
 

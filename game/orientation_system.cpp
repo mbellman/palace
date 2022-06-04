@@ -10,7 +10,7 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   auto mDeltaY = event.deltaY / 1000.f;
   auto mDeltaX = event.deltaX / 1000.f;
 
-  switch (state.orientationState.orientation) {
+  switch (state.worldOrientationState.orientation) {
     case POSITIVE_Y_UP:
     case POSITIVE_X_UP:
     case NEGATIVE_X_UP:
@@ -42,49 +42,50 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
 void setWorldOrientation(args(), WorldOrientation orientation) {
   auto& camera = getCamera();
 
-  state.orientationState.startTime = getRunningTime();
-  state.orientationState.orientation = orientation;
-
-  switch (orientation) {
-    case POSITIVE_Y_UP:
-    case POSITIVE_X_UP:
-    case NEGATIVE_Y_UP:
-    case NEGATIVE_X_UP:
-      state.orientationState.from_deprecated = camera.orientation.roll;
-      break;
-    case POSITIVE_Z_UP:
-    case NEGATIVE_Z_UP:
-      state.orientationState.from_deprecated = camera.orientation.yaw;
-      break;
-  }
+  state.worldOrientationState.startTime = getRunningTime();
+  state.worldOrientationState.orientation = orientation;
+  state.worldOrientationState.from = camera.orientation;
 }
 
 void handleWorldOrientation(args(), float dt) {
   auto& camera = getCamera();
-  auto alpha = getRunningTime() - state.orientationState.startTime;
-  auto from = state.orientationState.from_deprecated;
+  auto alpha = getRunningTime() - state.worldOrientationState.startTime;
+  auto from = state.worldOrientationState.from;
 
   alpha *= 2.f;
 
   if (alpha >= 1.f) {
-    alpha = 1.f;
+    // @todo investigate whether there are any issues
+    // with the final tweened orientation being off,
+    // since we don't perform easing at alpha = 1.f
+    return;
   }
 
   // @todo shortest-path easing
-  switch (state.orientationState.orientation) {
+  switch (state.worldOrientationState.orientation) {
     case POSITIVE_Y_UP:
+      camera.orientation.pitch = easeOut(from.pitch, 0.f, alpha);
+      camera.orientation.roll = easeOut(from.roll, 0.f, alpha);
+      break;
     case NEGATIVE_Y_UP:
-      camera.orientation.roll = easeOut(from, 0.f, alpha);
+      camera.orientation.pitch = easeOut(from.pitch, -Gm_PI, alpha);
+      camera.orientation.roll = easeOut(from.roll, 0.f, alpha);
       break;
     case POSITIVE_Z_UP:
+      camera.orientation.pitch = easeOut(from.pitch, Gm_PI / 2.f, alpha);
+      camera.orientation.yaw = easeOut(from.yaw, 0.f, alpha);
+      break;
     case NEGATIVE_Z_UP:
-      camera.orientation.yaw = easeOut(from, 0.f, alpha);
+      camera.orientation.pitch = easeOut(from.pitch, -Gm_PI / 2.f, alpha);
+      camera.orientation.yaw = easeOut(from.yaw, 0.f, alpha);
       break;
     case POSITIVE_X_UP:
-      camera.orientation.roll = easeOut(from, Gm_PI / 2.f, alpha);
+      camera.orientation.pitch = easeOut(from.pitch, 0.f, alpha);
+      camera.orientation.roll = easeOut(from.roll, Gm_PI / 2.f, alpha);
       break;
     case NEGATIVE_X_UP:
-      camera.orientation.roll = easeOut(from, -Gm_PI / 2.f, alpha);
+      camera.orientation.pitch = easeOut(from.pitch, Gm_PI, alpha);
+      camera.orientation.roll = easeOut(from.roll, -Gm_PI / 2.f, alpha);
       break;
   }
 }

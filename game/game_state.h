@@ -18,5 +18,5 @@ struct GameState {
   float lastMoveInputTime = 0.f;
   MoveQueue moves;
   CurrentMove currentMove;
-  WorldOrientationState orientationState;
+  WorldOrientationState worldOrientationState;
 };
