@@ -53,31 +53,36 @@ static void movePlayer(args(), float dt) {
   }
 }
 
-// @todo support y axis directions
-static Vec3f worldDirectionToGridDirection(const Vec3f& vector) {
-  #define abs(n) (n < 0.0f ? -n : n)
+static Vec3f worldDirectionToGridDirection(const Vec3f& worldDirection) {
+  #define abs(n) (n < 0.f ? -n : n)
 
-  auto direction = vector.xz();
+  // @todo flatten to a plane based on the player orientation
+  auto absX = abs(worldDirection.x);
+  auto absY = abs(worldDirection.y);
+  auto absZ = abs(worldDirection.z);
 
-  if (abs(direction.x) > abs(direction.z)) {
-    direction.z = 0.0f;
+  if (absX > absY && absX > absZ) {
+    return Vec3f(worldDirection.x, 0, 0).unit();
+  } else if (absY > absX && absY > absZ) {
+    return Vec3f(0, worldDirection.y, 0).unit();
   } else {
-    direction.x = 0.0f;
+    return Vec3f(0, 0, worldDirection.z).unit();
   }
-
-  return direction.unit();
 }
 
-// @todo support Y_UP + Y_DOWN
 static MoveDirection gridDirectionToMoveDirection(const Vec3f& gridDirection) {
-  if (gridDirection.x > 0.0f) {
+  if (gridDirection.x > 0.f) {
     return MoveDirection::X_RIGHT;
-  } else if (gridDirection.x < 0.0f) {
+  } else if (gridDirection.x < 0.f) {
     return MoveDirection::X_LEFT;
-  } else if (gridDirection.z > 0.0f) {
+  } else if (gridDirection.z > 0.f) {
     return MoveDirection::Z_FORWARD;
-  } else if (gridDirection.z < 0.0f) {
+  } else if (gridDirection.z < 0.f) {
     return MoveDirection::Z_BACKWARD;
+  } else if (gridDirection.y > 0.f) {
+    return MoveDirection::Y_UP;
+  } else if (gridDirection.y < 0.f) {
+    return MoveDirection::Y_DOWN;
   }
 
   return MoveDirection::NONE;
@@ -119,7 +124,6 @@ static void updateCurrentMoveAction(args()) {
   // sufficiently recent in time. This slightly reduces
   // the incidence of overshot.
   if (timeSinceLastMoveInput < 0.15f) {
-    // @todo handle Y_UP + Y_DOWN
     switch (nextMove) {
       case Z_FORWARD:
         targetWorldPosition.z += TILE_SIZE;
@@ -132,6 +136,12 @@ static void updateCurrentMoveAction(args()) {
         break;
       case X_RIGHT:
         targetWorldPosition.x += TILE_SIZE;
+        break;
+      case Y_UP:
+        targetWorldPosition.y += TILE_SIZE;
+        break;
+      case Y_DOWN:
+        targetWorldPosition.y -= TILE_SIZE;
         break;
     }
   }

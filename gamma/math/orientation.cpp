@@ -2,16 +2,19 @@
 
 #include "math/constants.h"
 #include "math/orientation.h"
+#include "math/Quaternion.h"
+#include "math/matrix.h"
 #include "math/vector.h"
 
 namespace Gamma {
-  // @bug this doesn't take roll into account
   Vec3f Orientation::getDirection() const {
-    return Vec3f(
-      sinf(yaw) * cosf(pitch),
-      -sinf(pitch),
-      cosf(yaw) * cosf(pitch)
-    ).unit();
+    static Vec3f forward = Vec3f(0, 0, 1.f);
+    Quaternion qPitch = Quaternion::fromAxisAngle(pitch, 1.0f, 0.0f, 0.0f);
+    Quaternion qYaw = Quaternion::fromAxisAngle(yaw, 0.0f, 1.0f, 0.0f);
+    Quaternion qRoll = Quaternion::fromAxisAngle(-roll, 0.0f, 0.0f, 1.0f);
+    Matrix4f rotation = (qRoll * qYaw * qPitch).toMatrix4f();
+
+    return (rotation * forward).toVec3f();
   }
 
   Vec3f Orientation::getLeftDirection() const {
@@ -23,7 +26,7 @@ namespace Gamma {
   }
 
   Vec3f Orientation::getUpDirection() const {
-    return Orientation(roll, pitch - PI / 2.0f, yaw).getDirection();
+    return Orientation(roll, (pitch - PI / 2.0f), yaw).getDirection();
   }
 
   void Orientation::face(const Vec3f& forward, const Vec3f& up) {

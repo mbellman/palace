@@ -204,6 +204,8 @@ static void handleMouseMoveEvent(args(), const MouseMoveEvent& event) {
 }
 
 void initializeGame(args()) {
+  Gm_EnableFlags(GammaFlags::VSYNC);
+
   auto& input = getInput();
   auto& camera = getCamera();
 

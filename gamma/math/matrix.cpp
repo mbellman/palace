@@ -3,6 +3,7 @@
 
 #include "math/constants.h"
 #include "math/matrix.h"
+#include "math/orientation.h"
 #include "math/Quaternion.h"
 
 namespace Gamma {
@@ -114,10 +115,9 @@ namespace Gamma {
   }
 
   Matrix4f Matrix4f::rotation(const Orientation& orientation) {
-    Vec3f rotation = orientation.toVec3f();
-    Quaternion pitch = Quaternion::fromAxisAngle(rotation.x, 1.0f, 0.0f, 0.0f);
-    Quaternion yaw = Quaternion::fromAxisAngle(rotation.y, 0.0f, 1.0f, 0.0f);
-    Quaternion roll = Quaternion::fromAxisAngle(rotation.z, 0.0f, 0.0f, 1.0f);
+    Quaternion pitch = Quaternion::fromAxisAngle(orientation.pitch, 1.0f, 0.0f, 0.0f);
+    Quaternion yaw = Quaternion::fromAxisAngle(orientation.yaw, 0.0f, 1.0f, 0.0f);
+    Quaternion roll = Quaternion::fromAxisAngle(orientation.roll, 0.0f, 0.0f, 1.0f);
 
     return (pitch * yaw * roll).toMatrix4f();
   }
