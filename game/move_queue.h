@@ -14,12 +14,6 @@ enum MoveDirection {
   Y_DOWN
 };
 
-enum EasingType {
-  EASE_IN_OUT,
-  LINEAR,
-  EASE_OUT
-};
-
 struct MoveQueue {
   MoveDirection queue[MAX_MOVE_QUEUE_SIZE];
   Gamma::uint8 size = 0;

@@ -2,6 +2,8 @@
 
 #include "game_init.h"
 #include "orientation_system.h"
+#include "game_macros.h"
+#include "game_state.h"
 
 using namespace Gamma;
 

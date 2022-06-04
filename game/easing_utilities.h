@@ -2,6 +2,12 @@
 
 #include <cmath>
 
+enum EasingType {
+  EASE_IN_OUT,
+  LINEAR,
+  EASE_OUT
+};
+
 inline float easeOut(float a, float b, float alpha) {
   const float t = 1.f - (1.f - alpha) * (1.f - alpha);
 

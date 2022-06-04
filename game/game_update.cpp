@@ -3,6 +3,7 @@
 #include "game_update.h"
 #include "movement_system.h"
 #include "orientation_system.h"
+#include "game_macros.h"
 
 using namespace Gamma;
 

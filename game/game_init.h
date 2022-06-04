@@ -1,5 +1,5 @@
 #pragma once
 
-#include "game_macros.h"
+struct GameState;
 
-void initializeGame(args());
+void initializeGame(GmContext* context, GameState& state);

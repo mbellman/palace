@@ -1,5 +1,6 @@
 #include "orientation_system.h"
 #include "easing_utilities.h"
+#include "game_state.h"
 #include "game_macros.h"
 
 using namespace Gamma;
@@ -49,11 +50,11 @@ void setWorldOrientation(args(), WorldOrientation orientation) {
     case POSITIVE_X_UP:
     case NEGATIVE_Y_UP:
     case NEGATIVE_X_UP:
-      state.orientationState.from = camera.orientation.roll;
+      state.orientationState.from_deprecated = camera.orientation.roll;
       break;
     case POSITIVE_Z_UP:
     case NEGATIVE_Z_UP:
-      state.orientationState.from = camera.orientation.yaw;
+      state.orientationState.from_deprecated = camera.orientation.yaw;
       break;
   }
 }
@@ -61,7 +62,7 @@ void setWorldOrientation(args(), WorldOrientation orientation) {
 void handleWorldOrientation(args(), float dt) {
   auto& camera = getCamera();
   auto alpha = getRunningTime() - state.orientationState.startTime;
-  auto from = state.orientationState.from;
+  auto from = state.orientationState.from_deprecated;
 
   alpha *= 2.f;
 

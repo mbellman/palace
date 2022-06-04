@@ -4,6 +4,8 @@
 #include "easing_utilities.h"
 #include "grid_utilities.h"
 #include "move_queue.h"
+#include "game_state.h"
+#include "game_macros.h"
 
 using namespace Gamma;
 

@@ -2,8 +2,6 @@
 
 #include "Gamma.h"
 
-struct GameState;
-
 enum WorldOrientation {
   POSITIVE_Y_UP,
   NEGATIVE_Y_UP,
@@ -15,9 +13,13 @@ enum WorldOrientation {
 
 struct WorldOrientationState {
   float startTime = 0.f;
-  float from = 0.f;
+  float from_deprecated = 0.f;  // @todo remove
+  Gamma::Orientation from;
+  Gamma::Orientation to;
   WorldOrientation orientation = POSITIVE_Y_UP;
 };
+
+struct GameState;
 
 void updateCameraFromMouseMoveEvent(GmContext* context, GameState& state, const Gamma::MouseMoveEvent& event);
 void setWorldOrientation(GmContext* context, GameState& state, WorldOrientation orientation);

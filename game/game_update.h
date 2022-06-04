@@ -1,5 +1,5 @@
 #pragma once
 
-#include "game_macros.h"
+struct GameState;
 
-void updateGame(args(), float dt);
+void updateGame(GmContext* context, GameState& state, float dt);
