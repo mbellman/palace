@@ -56,7 +56,7 @@ static void movePlayer(args(), float dt) {
 static Vec3f worldDirectionToGridDirection(const Vec3f& worldDirection) {
   #define abs(n) (n < 0.f ? -n : n)
 
-  // @todo flatten to a plane based on the player orientation
+  // @todo flatten to a plane based on the world orientation
   auto absX = abs(worldDirection.x);
   auto absY = abs(worldDirection.y);
   auto absZ = abs(worldDirection.z);

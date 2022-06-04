@@ -38,7 +38,7 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   restrict(camera.orientation.roll);
 }
 
-void setPlayerOrientation(args(), PlayerOrientation orientation) {
+void setWorldOrientation(args(), WorldOrientation orientation) {
   auto& camera = getCamera();
 
   state.orientationState.startTime = getRunningTime();
@@ -58,7 +58,7 @@ void setPlayerOrientation(args(), PlayerOrientation orientation) {
   }
 }
 
-void handlePlayerOrientation(args(), float dt) {
+void handleWorldOrientation(args(), float dt) {
   auto& camera = getCamera();
   auto alpha = getRunningTime() - state.orientationState.startTime;
   auto from = state.orientationState.from;

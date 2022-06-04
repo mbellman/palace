@@ -193,17 +193,17 @@ void initializeGame(args()) {
     auto key = event.key;
 
     if (key == Key::NUM_1) {
-      setPlayerOrientation(params(), POSITIVE_Y_UP);
+      setWorldOrientation(params(), POSITIVE_Y_UP);
     } else if (key == Key::NUM_2) {
-      setPlayerOrientation(params(), NEGATIVE_Y_UP);
+      setWorldOrientation(params(), NEGATIVE_Y_UP);
     } else if (key == Key::NUM_3) {
-      setPlayerOrientation(params(), POSITIVE_Z_UP);
+      setWorldOrientation(params(), POSITIVE_Z_UP);
     } else if (key == Key::NUM_4) {
-      setPlayerOrientation(params(), NEGATIVE_Z_UP);
+      setWorldOrientation(params(), NEGATIVE_Z_UP);
     } else if (key == Key::NUM_5) {
-      setPlayerOrientation(params(), POSITIVE_X_UP);
+      setWorldOrientation(params(), POSITIVE_X_UP);
     } else if (key == Key::NUM_6) {
-      setPlayerOrientation(params(), NEGATIVE_X_UP);
+      setWorldOrientation(params(), NEGATIVE_X_UP);
     }
   });
 

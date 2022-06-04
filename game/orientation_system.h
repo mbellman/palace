@@ -4,7 +4,7 @@
 
 struct GameState;
 
-enum PlayerOrientation {
+enum WorldOrientation {
   POSITIVE_Y_UP,
   NEGATIVE_Y_UP,
   POSITIVE_X_UP,
@@ -13,12 +13,12 @@ enum PlayerOrientation {
   NEGATIVE_Z_UP
 };
 
-struct PlayerOrientationState {
+struct WorldOrientationState {
   float startTime = 0.f;
   float from = 0.f;
-  PlayerOrientation orientation = POSITIVE_Y_UP;
+  WorldOrientation orientation = POSITIVE_Y_UP;
 };
 
 void updateCameraFromMouseMoveEvent(GmContext* context, GameState& state, const Gamma::MouseMoveEvent& event);
-void setPlayerOrientation(GmContext* context, GameState& state, PlayerOrientation orientation);
-void handlePlayerOrientation(GmContext* context, GameState& state, float dt);
+void setWorldOrientation(GmContext* context, GameState& state, WorldOrientation orientation);
+void handleWorldOrientation(GmContext* context, GameState& state, float dt);

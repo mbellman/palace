@@ -8,7 +8,7 @@ using namespace Gamma;
 
 void updateGame(args(), float dt) {
   handlePlayerMovement(params(), dt);
-  handlePlayerOrientation(params(), dt);
+  handleWorldOrientation(params(), dt);
   // Gm_HandleFreeCameraMode(context, dt);
 
   for (auto& lamp : objects("lamp")) {
