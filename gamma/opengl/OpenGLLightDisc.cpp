@@ -1,12 +1,12 @@
 #include <cmath>
 
+#include "glew.h"
+
+#include "opengl/OpenGLLightDisc.h"
 #include "math/constants.h"
 #include "math/matrix.h"
-#include "opengl/OpenGLLightDisc.h"
 #include "system/camera.h"
 #include "system/console.h"
-
-#include "glew.h"
 
 namespace Gamma {
   constexpr static uint32 DISC_SLICES = 16;
@@ -27,6 +27,21 @@ namespace Gamma {
     DISC_LIGHT_DIRECTION,
     DISC_LIGHT_FOV
   };
+
+  static inline Matrix4f getLightViewMatrix(const Camera& camera) {
+    Orientation viewOrientation = camera.orientation.invert();
+
+    viewOrientation.roll *= -1.f;  // @hack
+
+    return (
+      Matrix4f::rotation(viewOrientation) *
+      Matrix4f::translation(camera.position.invert())
+    );
+  }
+
+  static inline Matrix4f getLightProjectionMatrix(const Area<uint32>& resolution) {
+    return Matrix4f::glPerspective(resolution, 90.0f * 0.5f, 1.0f, 10000.0f);
+  }
 
   void OpenGLLightDisc::init() {
     glGenVertexArrays(1, &vao);
@@ -101,7 +116,6 @@ namespace Gamma {
     // @todo
   }
 
-  // @bug roll produces incorrect screen projection of the light disc
   void OpenGLLightDisc::configureDisc(Disc& disc, const Light& light, const Matrix4f& matProjection, const Matrix4f& matView, float resolutionAspectRatio) {
     Vec3f localLightPosition = (matView * light.position).toVec3f();
 
@@ -130,12 +144,8 @@ namespace Gamma {
     Disc discs[1];
     auto& disc = discs[0];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
-    Matrix4f matProjection = Matrix4f::glPerspective(resolution, 90.0f * 0.5f, 1.0f, 10000.0f);
-
-    Matrix4f matView = (
-      Matrix4f::rotation(camera.orientation.invert()) *
-      Matrix4f::translation(camera.position.invert())
-    );
+    Matrix4f matProjection = getLightProjectionMatrix(resolution);
+    Matrix4f matView = getLightViewMatrix(camera);
 
     configureDisc(disc, light, matProjection, matView, aspectRatio);
 
@@ -150,12 +160,8 @@ namespace Gamma {
     // @todo avoid reallocating/freeing the disc array on each draw
     Disc* discs = new Disc[lights.size()];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
-    Matrix4f matProjection = Matrix4f::glPerspective(resolution, 90.0f * 0.5f, 1.0f, 10000.0f);
-
-    Matrix4f matView = (
-      Matrix4f::rotation(camera.orientation.invert()) *
-      Matrix4f::translation(camera.position.invert())
-    );
+    Matrix4f matProjection = getLightProjectionMatrix(resolution);
+    Matrix4f matView = getLightViewMatrix(camera);
 
     for (uint32 i = 0; i < lights.size(); i++) {
       auto& light = lights[i];
