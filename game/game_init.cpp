@@ -1,6 +1,7 @@
 #include "Gamma.h"
 
 #include "game_init.h"
+#include "orientation_system.h"
 
 using namespace Gamma;
 
@@ -175,34 +176,6 @@ static void addStatue(args()) {
   commit(statue);
 }
 
-// @todo create orientation_system.h/cpp?
-static void handleMouseMoveEvent(args(), const MouseMoveEvent& event) {
-  auto& camera = getCamera();
-  auto mDeltaY = event.deltaY / 1000.f;
-  auto mDeltaX = event.deltaX / 1000.f;
-
-  switch (state.orientation.current) {
-    case POSITIVE_Y_UP:
-    case POSITIVE_X_UP:
-    case NEGATIVE_X_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.yaw += mDeltaX;
-      break;
-    case NEGATIVE_Y_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.yaw -= mDeltaX;
-      break;
-    case POSITIVE_Z_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.roll -= mDeltaX;
-      break;
-    case NEGATIVE_Z_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.roll += mDeltaX;
-      break;
-  }
-}
-
 void initializeGame(args()) {
   Gm_EnableFlags(GammaFlags::VSYNC);
 
@@ -211,26 +184,26 @@ void initializeGame(args()) {
 
   input.on<MouseMoveEvent>("mousemove", [context, &state](const MouseMoveEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
-      handleMouseMoveEvent(params(), event);
+      updateCameraFromMouseMoveEvent(params(), event);
     }
   });
 
   // @temporary
-  input.on<KeyboardEvent>("keydown", [&](const KeyboardEvent& event) {
+  input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
     auto key = event.key;
 
     if (key == Key::NUM_1) {
-      state.orientation.current = POSITIVE_Y_UP;
+      setPlayerOrientation(params(), POSITIVE_Y_UP);
     } else if (key == Key::NUM_2) {
-      state.orientation.current = NEGATIVE_Y_UP;
+      setPlayerOrientation(params(), NEGATIVE_Y_UP);
     } else if (key == Key::NUM_3) {
-      state.orientation.current = POSITIVE_Z_UP;
+      setPlayerOrientation(params(), POSITIVE_Z_UP);
     } else if (key == Key::NUM_4) {
-      state.orientation.current = NEGATIVE_Z_UP;
+      setPlayerOrientation(params(), NEGATIVE_Z_UP);
     } else if (key == Key::NUM_5) {
-      state.orientation.current = POSITIVE_X_UP;
+      setPlayerOrientation(params(), POSITIVE_X_UP);
     } else if (key == Key::NUM_6) {
-      state.orientation.current = NEGATIVE_X_UP;
+      setPlayerOrientation(params(), NEGATIVE_X_UP);
     }
   });
 

@@ -129,6 +129,9 @@
     <ClCompile Include="gamma\system\random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\orientation_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\glew\include\eglew.h">
@@ -549,6 +552,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\grid_utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\orientation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
