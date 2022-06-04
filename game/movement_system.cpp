@@ -146,6 +146,8 @@ static void updateCurrentMoveAction(args()) {
     }
   }
 
+  // @todo reduce tween time based on proximity to the target position
+
   if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
     // or after having sufficiently slowed down from a

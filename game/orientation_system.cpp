@@ -29,6 +29,13 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
       camera.orientation.roll += mDeltaX;
       break;
   }
+
+  // Restrict orientation values within the [0, TAU] range
+  #define restrict(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
+
+  restrict(camera.orientation.pitch);
+  restrict(camera.orientation.yaw);
+  restrict(camera.orientation.roll);
 }
 
 void setPlayerOrientation(args(), PlayerOrientation orientation) {
@@ -63,6 +70,7 @@ void handlePlayerOrientation(args(), float dt) {
     alpha = 1.f;
   }
 
+  // @todo shortest-path easing
   switch (state.orientationState.current) {
     case POSITIVE_Y_UP:
     case NEGATIVE_Y_UP:
