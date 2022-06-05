@@ -78,6 +78,7 @@ static void addStaircase(args()) {
   commit(s1);
   commit(s2);
 
+  // @todo define a property way of delegating entities
   state.staircases[0] = { { 0, 1, 2 }, POSITIVE_Y_UP };
   state.staircases[1] = { { 0, 0, 1}, NEGATIVE_Z_UP };
 
