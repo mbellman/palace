@@ -77,6 +77,12 @@ static void addStaircase(args()) {
 
   commit(s1);
   commit(s2);
+
+  state.staircases[0] = { { 0, 1, 2 }, POSITIVE_Y_UP };
+  state.staircases[1] = { { 0, 0, 1}, NEGATIVE_Z_UP };
+
+  state.worldOrientationChanges[0] = { { 0, 0, 2 }, POSITIVE_Y_UP };
+  state.worldOrientationChanges[1] = { { 0, -1, 1 }, NEGATIVE_Z_UP };
 }
 
 static void addRocks(args()) {

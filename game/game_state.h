@@ -5,12 +5,7 @@
 #include "move_queue.h"
 #include "movement_system.h"
 #include "orientation_system.h"
-
-struct GridCoordinates {
-  int x = 0;
-  int y = 0;
-  int z = 0;
-};
+#include "entities.h"
 
 struct GameState {
   // @todo this is a function of currentMove.startTime, and can be removed
@@ -19,4 +14,7 @@ struct GameState {
   MoveQueue moves;
   CurrentMove currentMove;
   WorldOrientationState worldOrientationState;
+  // @todo define an EntityManager struct for pooling/allocating entities
+  Staircase staircases[2];
+  WorldOrientationChange worldOrientationChanges[2];
 };

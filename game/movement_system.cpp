@@ -148,7 +148,9 @@ static void updateCurrentMoveAction(args()) {
     }
   }
 
-  // @todo handle staircases/other uneven terrain
+  // @todo handle entities at the target grid coordinates
+  auto targetGridCoordinates = worldPositionToGridCoordinates(targetWorldPosition);
+
   // @todo reduce tween time based on proximity to the target position
 
   if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
