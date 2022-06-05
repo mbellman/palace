@@ -62,30 +62,31 @@ void handleWorldOrientation(args(), float dt) {
   }
 
   // @todo shortest-path easing
+  // @todo control for initial facing direction
   switch (state.worldOrientationState.orientation) {
     case POSITIVE_Y_UP:
-      camera.orientation.pitch = easeOut(from.pitch, 0.f, alpha);
-      camera.orientation.roll = easeOut(from.roll, 0.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, 0.f, alpha);
+      camera.orientation.roll = easeOutCircular(from.roll, 0.f, alpha);
       break;
     case NEGATIVE_Y_UP:
-      camera.orientation.pitch = easeOut(from.pitch, -Gm_PI, alpha);
-      camera.orientation.roll = easeOut(from.roll, 0.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, -Gm_PI, alpha);
+      camera.orientation.roll = easeOutCircular(from.roll, 0.f, alpha);
       break;
     case POSITIVE_Z_UP:
-      camera.orientation.pitch = easeOut(from.pitch, Gm_PI / 2.f, alpha);
-      camera.orientation.yaw = easeOut(from.yaw, 0.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI / 2.f, alpha);
+      camera.orientation.yaw = easeOutCircular(from.yaw, 0.f, alpha);
       break;
     case NEGATIVE_Z_UP:
-      camera.orientation.pitch = easeOut(from.pitch, -Gm_PI / 2.f, alpha);
-      camera.orientation.yaw = easeOut(from.yaw, 0.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI / 2.f, alpha);
+      camera.orientation.yaw = easeOutCircular(from.yaw, Gm_PI, alpha);
       break;
     case POSITIVE_X_UP:
-      camera.orientation.pitch = easeOut(from.pitch, 0.f, alpha);
-      camera.orientation.roll = easeOut(from.roll, Gm_PI / 2.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, 0.f, alpha);
+      camera.orientation.roll = easeOutCircular(from.roll, Gm_PI / 2.f, alpha);
       break;
     case NEGATIVE_X_UP:
-      camera.orientation.pitch = easeOut(from.pitch, Gm_PI, alpha);
-      camera.orientation.roll = easeOut(from.roll, -Gm_PI / 2.f, alpha);
+      camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI, alpha);
+      camera.orientation.roll = easeOutCircular(from.roll, -Gm_PI / 2.f, alpha);
       break;
   }
 }

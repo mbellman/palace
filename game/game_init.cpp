@@ -2,6 +2,7 @@
 
 #include "game_init.h"
 #include "orientation_system.h"
+#include "grid_utilities.h"
 #include "game_macros.h"
 #include "game_state.h"
 
@@ -32,13 +33,17 @@ static void addKeyHandlers(args()) {
 }
 
 static void addGroundTiles(args()) {
-  addMesh("plane", 100, Mesh::Plane(2));
+  addMesh("plane", 98, Mesh::Plane(2));
 
   for (int i = -5; i < 5; i++) {
     for (int j = -5; j < 5; j++) {
+      if (i == 0 && (j == 1 || j == 2)) {
+        continue;
+      }
+
       auto& plane = createObjectFrom("plane");
 
-      plane.position = Vec3f(i * 15.0f, 0, j * 15.0f);
+      plane.position = gridCoordinatesToWorldPosition({ i, 0, j });
       plane.scale = 14.0f;
 
       plane.color = Vec3f(
@@ -174,6 +179,7 @@ static void addStatue(args()) {
 
   statue.scale = 7.5f;
   statue.color = pVec4(200, 220, 255);
+  statue.rotation.y = Gm_PI;
 
   commit(statue);
 }
@@ -222,5 +228,5 @@ void initializeGame(args()) {
   light.direction = Vec3f(0.5f, -1.f, 1.f);
   light.color = Vec3f(1.f, 0.8f, 0.4f);
 
-  camera.position = objects("plane")[0].position + Vec3f(0, 15.f, 0);
+  camera.position = gridCoordinatesToWorldPosition({ 0, 1, -5 });
 }

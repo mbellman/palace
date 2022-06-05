@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "Gamma.h"
+
 enum EasingType {
   EASE_IN_OUT,
   LINEAR,
@@ -10,6 +12,21 @@ enum EasingType {
 
 inline float easeOut(float a, float b, float alpha) {
   const float t = 1.f - (1.f - alpha) * (1.f - alpha);
+
+  return a + (b - a) * t;
+}
+
+inline float easeOutCircular(float a, float b, float alpha) {
+  using namespace Gamma;
+
+  float range = b - a;
+  const float t = 1.f - (1.f - alpha) * (1.f - alpha);
+
+  if (range > Gm_PI) {
+    a += Gm_TAU;
+  } else if (range < -Gm_PI) {
+    a -= Gm_TAU;
+  }
 
   return a + (b - a) * t;
 }
