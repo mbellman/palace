@@ -10,5 +10,5 @@ struct Staircase {
 
 struct WorldOrientationChange {
   GridCoordinates coordinates;
-  WorldOrientation target;
+  WorldOrientation targetWorldOrientation;
 };

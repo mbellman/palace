@@ -15,6 +15,10 @@ struct GridCoordinates {
   int x = 0;
   int y = 0;
   int z = 0;
+
+  bool GridCoordinates::operator==(const GridCoordinates& comparison) {
+    return x == comparison.x && y == comparison.y && z == comparison.z;
+  }
 };
 
 inline Gamma::Vec3f gridCoordinatesToWorldPosition(const GridCoordinates& coordinates) {

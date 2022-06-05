@@ -61,7 +61,6 @@ void handleWorldOrientation(args(), float dt) {
     return;
   }
 
-  // @todo shortest-path easing
   // @todo control for initial facing direction
   switch (state.worldOrientationState.orientation) {
     case POSITIVE_Y_UP:

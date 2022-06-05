@@ -1,9 +1,10 @@
 #include "Gamma.h"
 
 #include "movement_system.h"
+#include "orientation_system.h"
+#include "move_queue.h"
 #include "easing_utilities.h"
 #include "grid_utilities.h"
-#include "move_queue.h"
 #include "game_state.h"
 #include "game_macros.h"
 
@@ -148,11 +149,6 @@ static void updateCurrentMoveAction(args()) {
     }
   }
 
-  // @todo handle entities at the target grid coordinates
-  auto targetGridCoordinates = worldPositionToGridCoordinates(targetWorldPosition);
-
-  // @todo reduce tween time based on proximity to the target position
-
   if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
     // or after having sufficiently slowed down from a
@@ -173,6 +169,26 @@ static void updateCurrentMoveAction(args()) {
   state.currentMove.startTime = runningTime;
   state.currentMove.from = camera.position;
   state.currentMove.to = targetWorldPosition;
+
+  // @todo create a separate entity behavior system module
+  auto targetGridCoordinates = worldPositionToGridCoordinates(targetWorldPosition);
+
+  // @todo handle forward/backward movement along staircases
+  for (auto& entity : state.staircases) {
+    if (targetGridCoordinates == entity.coordinates) {
+      state.currentMove.to.y -= TILE_SIZE;
+    }
+  }
+
+  targetGridCoordinates = worldPositionToGridCoordinates(state.currentMove.to);
+
+  for (auto& entity : state.worldOrientationChanges) {
+    if (targetGridCoordinates == entity.coordinates) {
+      setWorldOrientation(params(), entity.targetWorldOrientation);
+    }
+  }
+
+  // @todo reduce tween time based on proximity to the target position
 }
 
 void handlePlayerMovement(args(), float dt) {
