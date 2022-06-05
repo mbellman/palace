@@ -79,8 +79,12 @@ static void addStaircase(args()) {
   commit(s2);
 
   // @todo define a property way of delegating entities
-  state.staircases[0] = { { 0, 1, 2 }, POSITIVE_Y_UP };
-  state.staircases[1] = { { 0, 0, 1}, NEGATIVE_Z_UP };
+  // @todo in debug mode, render colored cubes to represent entity types
+  state.staircases[0] = { { 0, 1, 2 }, { 0, -TILE_SIZE, 0 } };
+  state.staircases[1] = { { 0, 0, 3 }, { 0, TILE_SIZE, 0 } };
+
+  state.staircases[2] = { { 0, 0, 1 }, { 0, -TILE_SIZE, 0 } };
+  state.staircases[3] = { { 0, -2, 1 }, { 0, 0, -TILE_SIZE } };
 
   state.worldOrientationChanges[0] = { { 0, 0, 2 }, POSITIVE_Y_UP };
   state.worldOrientationChanges[1] = { { 0, -1, 1 }, NEGATIVE_Z_UP };

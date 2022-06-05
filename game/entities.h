@@ -5,7 +5,8 @@
 
 struct Staircase {
   GridCoordinates coordinates;
-  WorldOrientation orientation;
+  // @todo define a StaircaseDirection struct to control the offset
+  Gamma::Vec3f offset;
 };
 
 struct WorldOrientationChange {

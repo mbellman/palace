@@ -173,10 +173,9 @@ static void updateCurrentMoveAction(args()) {
   // @todo create a separate entity behavior system module
   auto targetGridCoordinates = worldPositionToGridCoordinates(targetWorldPosition);
 
-  // @todo handle forward/backward movement along staircases
   for (auto& entity : state.staircases) {
     if (targetGridCoordinates == entity.coordinates) {
-      state.currentMove.to.y -= TILE_SIZE;
+      state.currentMove.to += entity.offset;
     }
   }
 
