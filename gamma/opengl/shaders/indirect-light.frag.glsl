@@ -183,16 +183,19 @@ void main() {
       sample_sum += weight;
     // }
 
+    const float spatial_spread_size = 4.0;
+    const float spatial_spread_weight = 0.3;
+
     for (int x = -2; x <= 2; x++) {
       for (int y = -2; y <= 2; y++) {
-        vec2 offset = vec2(x, y) * texel_size * 3.0;
+        vec2 offset = vec2(x, y) * texel_size * spatial_spread_size;
         vec2 sample_uv = frag_uv_t1 + offset;
         float sample_depth = textureLod(texColorAndDepth, sample_uv, 1).w;
         float linear_sample_depth = getLinearizedDepth(sample_depth);
 
         // if (distance(linearized_fragment_depth, linear_sample_depth) < 2.0) {
-          out_gi_and_ao += texture(texIndirectLightT1, sample_uv) * weight * 0.2;
-          sample_sum += weight * 0.2;
+          out_gi_and_ao += texture(texIndirectLightT1, sample_uv) * weight * spatial_spread_weight;
+          sample_sum += weight * spatial_spread_weight;
         // }
       }
     }

@@ -44,7 +44,7 @@ static void addGroundTiles(args()) {
       auto& plane = createObjectFrom("plane");
 
       plane.position = gridCoordinatesToWorldPosition({ i, 0, j });
-      plane.scale = 14.0f;
+      plane.scale = 15.f;
 
       plane.color = Vec3f(
         Gm_Random(0.f, 0.3f),
@@ -55,6 +55,28 @@ static void addGroundTiles(args()) {
       commit(plane);
     }
   }
+}
+
+static void addStaircase(args()) {
+  addMesh("stairs", 2, Mesh::Model("./game/models/staircase/model.obj"));
+
+  auto& s1 = createObjectFrom("stairs");
+  auto& s2 = createObjectFrom("stairs");
+
+  s1.position = gridCoordinatesToWorldPosition({ 0, 0, 2 });
+  s1.position.y -= 7.5f;
+  s1.scale = 7.5f;
+  s1.color = Vec3f(0.5f);
+  s1.rotation.y = -Gm_PI / 2.f;
+
+  s2.position = gridCoordinatesToWorldPosition({ 0, -1, 1 });
+  s2.position.y -= 7.5f;
+  s2.scale = 7.5f;
+  s2.color = Vec3f(0.5f);
+  s2.rotation.y = -Gm_PI / 2.f;
+
+  commit(s1);
+  commit(s2);
 }
 
 static void addRocks(args()) {
@@ -217,6 +239,7 @@ void initializeGame(args()) {
 
   addKeyHandlers(params());
   addGroundTiles(params());
+  addStaircase(params());
   addRocks(params());
   addParticles(params());
   addPlants(params());
