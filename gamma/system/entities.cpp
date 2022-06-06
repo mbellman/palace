@@ -324,27 +324,31 @@ namespace Gamma {
     auto& vertices = mesh->vertices;
     auto& faceElements = mesh->faceElements;
 
-    // @bug size should represent the total number of
-    // tiles across the plane, not the total vertices
-    for (uint32 x = 0; x < size; x++) {
-      for (uint32 z = 0; z < size; z++) {
-        Vertex vertex;
+    // Front + back face vertices
+    for (uint8 i = 0; i < 2; i++) {
+      // @bug size should represent the total number of
+      // tiles across the plane, not the total vertices
+      for (uint32 x = 0; x < size; x++) {
+        for (uint32 z = 0; z < size; z++) {
+          Vertex vertex;
 
-        float xr = (float)x / (float)(size - 1);
-        float zr = (float)z / (float)(size - 1);
+          float xr = (float)x / (float)(size - 1);
+          float zr = (float)z / (float)(size - 1);
 
-        vertex.position = Vec3f(xr - 0.5f, 0.0f, -zr + 0.5f);
+          vertex.position = Vec3f(xr - 0.5f, 0.f, -zr + 0.5f);
 
-        if (useLoopingTexture) {
-          vertex.uv = Vec2f((float)x, (float)z);
-        } else {
-          vertex.uv = Vec2f(xr, 1.0f - zr);
+          if (useLoopingTexture) {
+            vertex.uv = Vec2f((float)x, (float)z);
+          } else {
+            vertex.uv = Vec2f(xr, 1.f - zr);
+          }
+
+          vertices.push_back(vertex);
         }
-
-        vertices.push_back(vertex);
       }
     }
 
+    // Front face
     for (uint32 z = 0; z < size - 1; z++) {
       for (uint32 x = 0; x < size - 1; x++) {
         uint32 offset = z * size + x;
@@ -356,6 +360,23 @@ namespace Gamma {
         faceElements.push_back(offset);
         faceElements.push_back(offset + size);
         faceElements.push_back(offset + 1 + size);
+      }
+    }
+
+    // Back face
+    auto startingOffset = size * size;
+
+    for (uint32 z = 0; z < size - 1; z++) {
+      for (uint32 x = 0; x < size - 1; x++) {
+        uint32 offset = startingOffset + z * size + x;
+
+        faceElements.push_back(offset);
+        faceElements.push_back(offset + 1);
+        faceElements.push_back(offset + 1 + size);
+
+        faceElements.push_back(offset);
+        faceElements.push_back(offset + 1 + size);
+        faceElements.push_back(offset + size);
       }
     }
 

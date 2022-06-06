@@ -45,6 +45,25 @@ void setWorldOrientation(args(), WorldOrientation orientation) {
   state.worldOrientationState.startTime = getRunningTime();
   state.worldOrientationState.orientation = orientation;
   state.worldOrientationState.from = camera.orientation;
+
+  switch (orientation) {
+    case POSITIVE_Y_UP:
+    case NEGATIVE_Y_UP:
+      state.worldOrientationState.cameraOffset = Vec3f(0);
+      state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
+      break;
+    case POSITIVE_Z_UP:
+    case NEGATIVE_Z_UP:
+      state.worldOrientationState.cameraOffset = Vec3f(0, 7.5f, -7.5f);
+      state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
+      break;
+    case POSITIVE_X_UP:
+    case NEGATIVE_X_UP:
+      // @todo check for correctness
+      state.worldOrientationState.cameraOffset = Vec3f(-7.5f, 0, 7.5f);
+      state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
+      break;
+  }
 }
 
 void handleWorldOrientation(args(), float dt) {

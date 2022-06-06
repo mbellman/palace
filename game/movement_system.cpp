@@ -56,13 +56,14 @@ static void movePlayer(args(), float dt) {
   }
 }
 
-static Vec3f worldDirectionToGridDirection(const Vec3f& worldDirection) {
+static Vec3f worldDirectionToGridDirection(args(), const Vec3f& worldDirection) {
   #define abs(n) (n < 0.f ? -n : n)
 
-  // @todo flatten to a plane based on the world orientation
-  auto absX = abs(worldDirection.x);
-  auto absY = abs(worldDirection.y);
-  auto absZ = abs(worldDirection.z);
+  Vec3f movementPlaneAlignedWorldDirection = worldDirection * state.worldOrientationState.movementPlane;
+
+  auto absX = abs(movementPlaneAlignedWorldDirection.x);
+  auto absY = abs(movementPlaneAlignedWorldDirection.y);
+  auto absZ = abs(movementPlaneAlignedWorldDirection.z);
 
   if (absX > absY && absX > absZ) {
     return Vec3f(worldDirection.x, 0, 0).unit();
@@ -94,8 +95,8 @@ static MoveDirection gridDirectionToMoveDirection(const Vec3f& gridDirection) {
 static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   auto& camera = getCamera();
   auto& input = getInput();
-  auto forwardGridDirection = worldDirectionToGridDirection(camera.orientation.getDirection());
-  auto leftGridDirection = worldDirectionToGridDirection(camera.orientation.getLeftDirection());
+  auto forwardGridDirection = worldDirectionToGridDirection(params(), camera.orientation.getDirection());
+  auto leftGridDirection = worldDirectionToGridDirection(params(), camera.orientation.getLeftDirection());
   auto move = MoveDirection::NONE;
 
   #define keyPressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
@@ -117,8 +118,8 @@ static void updateCurrentMoveAction(args()) {
   auto& camera = getCamera();
   auto runningTime = getRunningTime();
   auto nextMove = takeNextMove(state.moves);
-  auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
-  auto targetWorldPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
+  auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position - state.worldOrientationState.cameraOffset);
+  auto targetCameraPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
 
@@ -129,22 +130,22 @@ static void updateCurrentMoveAction(args()) {
   if (timeSinceLastMoveInput < 0.15f) {
     switch (nextMove) {
       case Z_FORWARD:
-        targetWorldPosition.z += TILE_SIZE;
+        targetCameraPosition.z += TILE_SIZE;
         break;
       case Z_BACKWARD:
-        targetWorldPosition.z -= TILE_SIZE;
+        targetCameraPosition.z -= TILE_SIZE;
         break;
       case X_LEFT:
-        targetWorldPosition.x -= TILE_SIZE;
+        targetCameraPosition.x -= TILE_SIZE;
         break;
       case X_RIGHT:
-        targetWorldPosition.x += TILE_SIZE;
+        targetCameraPosition.x += TILE_SIZE;
         break;
       case Y_UP:
-        targetWorldPosition.y += TILE_SIZE;
+        targetCameraPosition.y += TILE_SIZE;
         break;
       case Y_DOWN:
-        targetWorldPosition.y -= TILE_SIZE;
+        targetCameraPosition.y -= TILE_SIZE;
         break;
     }
   }
@@ -165,21 +166,16 @@ static void updateCurrentMoveAction(args()) {
     state.currentMove.easing = EasingType::LINEAR;
   }
 
-  state.moving = true;
-  state.currentMove.startTime = runningTime;
-  state.currentMove.from = camera.position;
-  state.currentMove.to = targetWorldPosition;
-
   // @todo create a separate entity behavior system module
-  auto targetGridCoordinates = worldPositionToGridCoordinates(targetWorldPosition);
+  auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
   for (auto& entity : state.staircases) {
     if (targetGridCoordinates == entity.coordinates) {
-      state.currentMove.to += entity.offset;
+      targetCameraPosition += entity.offset;
     }
   }
 
-  targetGridCoordinates = worldPositionToGridCoordinates(state.currentMove.to);
+  targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
   for (auto& entity : state.worldOrientationChanges) {
     if (targetGridCoordinates == entity.coordinates) {
@@ -187,6 +183,12 @@ static void updateCurrentMoveAction(args()) {
     }
   }
 
+  targetCameraPosition += state.worldOrientationState.cameraOffset;
+
+  state.moving = true;
+  state.currentMove.startTime = runningTime;
+  state.currentMove.from = camera.position;
+  state.currentMove.to = targetCameraPosition;
   // @todo reduce tween time based on proximity to the target position
 }
 

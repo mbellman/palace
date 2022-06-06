@@ -33,7 +33,7 @@ static void addKeyHandlers(args()) {
 }
 
 static void addGroundTiles(args()) {
-  addMesh("plane", 98, Mesh::Plane(2));
+  addMesh("plane", 196, Mesh::Plane(2));
 
   for (int i = -5; i < 5; i++) {
     for (int j = -5; j < 5; j++) {
@@ -50,6 +50,28 @@ static void addGroundTiles(args()) {
         Gm_Random(0.f, 0.3f),
         Gm_Random(0.5f, 1.f),
         Gm_Random(0.f, 0.7f)
+      );
+
+      commit(plane);
+    }
+  }
+
+  for (int i = -5; i < 5; i++) {
+    for (int j = -5; j < 5; j++) {
+      if (i == 0 && (j == 3 || j == 4)) {
+        continue;
+      }
+
+      auto& plane = createObjectFrom("plane");
+
+      plane.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 }) + Vec3f(0, 7.5f, -7.5f);
+      plane.scale = 15.f;
+      plane.rotation.x = -Gm_PI / 2.f;
+
+      plane.color = Vec3f(
+        Gm_Random(0.5f, 1.f),
+        Gm_Random(0.f, 0.3f),
+        Gm_Random(0.1f, 0.4f)
       );
 
       commit(plane);
@@ -259,7 +281,7 @@ void initializeGame(args()) {
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 
-  light.direction = Vec3f(0.5f, -1.f, 1.f);
+  light.direction = Vec3f(0.3f, 0.5f, -1.0f).invert();
   light.color = Vec3f(1.f, 0.8f, 0.4f);
 
   camera.position = gridCoordinatesToWorldPosition({ 0, 1, -5 });
