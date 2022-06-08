@@ -3,9 +3,10 @@
 #include "grid_utilities.h"
 #include "orientation_system.h"
 
-struct Staircase {
-  GridCoordinates coordinates;
-  // @todo define a StaircaseDirection struct to control the offset
+struct StaircaseMover {
+  GridCoordinates previousCoordinates;
+  GridCoordinates activeCoordinates;
+  // @todo change to MoveDirection
   Gamma::Vec3f offset;
 };
 

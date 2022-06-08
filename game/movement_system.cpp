@@ -10,6 +10,8 @@
 
 using namespace Gamma;
 
+#define abs(n) (n < 0.f ? -n : n)
+
 static void movePlayer(args(), float dt) {
   auto& camera = getCamera();
   auto& from = state.currentMove.from;
@@ -36,6 +38,10 @@ static void movePlayer(args(), float dt) {
   if (alpha >= 1.f) {
     camera.position = to;
     state.moving = false;
+
+    auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
+
+    Console::log(currentGridCoordinates.x, currentGridCoordinates.y, currentGridCoordinates.z);
   } else {
     #define easeCamera(easingFn)\
       camera.position.x = easingFn(from.x, to.x, alpha);\
@@ -57,8 +63,6 @@ static void movePlayer(args(), float dt) {
 }
 
 static Vec3f worldDirectionToGridDirection(args(), const Vec3f& worldDirection) {
-  #define abs(n) (n < 0.f ? -n : n)
-
   Vec3f movementPlaneAlignedWorldDirection = worldDirection * state.worldOrientationState.movementPlane;
 
   auto absX = abs(movementPlaneAlignedWorldDirection.x);
@@ -118,7 +122,7 @@ static void updateCurrentMoveAction(args()) {
   auto& camera = getCamera();
   auto runningTime = getRunningTime();
   auto nextMove = takeNextMove(state.moves);
-  auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position - state.worldOrientationState.cameraOffset);
+  auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
   auto targetCameraPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
@@ -166,11 +170,16 @@ static void updateCurrentMoveAction(args()) {
     state.currentMove.easing = EasingType::LINEAR;
   }
 
-  // @todo create a separate entity behavior system module
   auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
-  for (auto& entity : state.staircases) {
-    if (targetGridCoordinates == entity.coordinates) {
+  // @todo create a separate entity behavior system module
+  // @todo distinguish between entities that trigger ahead
+  // of moving to their grid coordinates vs. after
+  for (auto& entity : state.staircaseMovers) {
+    if (
+      currentGridCoordinates == entity.previousCoordinates &&
+      targetGridCoordinates == entity.activeCoordinates
+    ) {
       targetCameraPosition += entity.offset;
     }
   }
@@ -182,8 +191,6 @@ static void updateCurrentMoveAction(args()) {
       setWorldOrientation(params(), entity.targetWorldOrientation);
     }
   }
-
-  targetCameraPosition += state.worldOrientationState.cameraOffset;
 
   state.moving = true;
   state.currentMove.startTime = runningTime;

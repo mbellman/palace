@@ -43,8 +43,8 @@ static void addGroundTiles(args()) {
 
       auto& plane = createObjectFrom("plane");
 
-      plane.position = gridCoordinatesToWorldPosition({ i, 0, j });
-      plane.scale = 15.f;
+      plane.position = gridCoordinatesToWorldPosition({ i, 0, j }) + Vec3f(0, -HALF_TILE_SIZE, 0);
+      plane.scale = TILE_SIZE;
 
       plane.color = Vec3f(
         Gm_Random(0.f, 0.3f),
@@ -64,8 +64,8 @@ static void addGroundTiles(args()) {
 
       auto& plane = createObjectFrom("plane");
 
-      plane.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 }) + Vec3f(0, 7.5f, -7.5f);
-      plane.scale = 15.f;
+      plane.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 }) + Vec3f(0, 0, -HALF_TILE_SIZE);
+      plane.scale = TILE_SIZE;
       plane.rotation.x = -Gm_PI / 2.f;
 
       plane.color = Vec3f(
@@ -85,13 +85,13 @@ static void addStaircase(args()) {
   auto& s1 = createObjectFrom("stairs");
   auto& s2 = createObjectFrom("stairs");
 
-  s1.position = gridCoordinatesToWorldPosition({ 0, 0, 2 });
+  s1.position = gridCoordinatesToWorldPosition({ 0, 0, 2 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
   s1.position.y -= 7.5f;
   s1.scale = 7.5f;
   s1.color = Vec3f(0.5f);
   s1.rotation.y = -Gm_PI / 2.f;
 
-  s2.position = gridCoordinatesToWorldPosition({ 0, -1, 1 });
+  s2.position = gridCoordinatesToWorldPosition({ 0, -1, 1 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
   s2.position.y -= 7.5f;
   s2.scale = 7.5f;
   s2.color = Vec3f(0.5f);
@@ -100,23 +100,27 @@ static void addStaircase(args()) {
   commit(s1);
   commit(s2);
 
-  // @todo define a property way of delegating entities
+  // @todo define a proper way of creating entities
   // @todo in debug mode, render colored cubes to represent entity types
-  state.staircases[0] = { { 0, 1, 2 }, { 0, -TILE_SIZE, 0 } };
-  state.staircases[1] = { { 0, 0, 3 }, { 0, TILE_SIZE, 0 } };
+  state.staircaseMovers[0] = {{0,1,3}, {0,1,2}, Vec3f(0, -TILE_SIZE, 0)};
+  state.staircaseMovers[1] = {{0,0,2}, {0,0,1}, Vec3f(0, -TILE_SIZE, 0)};
+  state.staircaseMovers[2] = {{0,-1,1}, {0,-1,0}, Vec3f(0, -TILE_SIZE, 0)};
+  state.staircaseMovers[3] = {{0,-2,0}, {0,-2,-1}, Vec3f(0, -TILE_SIZE, 0)};
 
-  state.staircases[2] = { { 0, 0, 1 }, { 0, -TILE_SIZE, 0 } };
-  state.staircases[3] = { { 0, -2, 1 }, { 0, 0, -TILE_SIZE } };
+  state.staircaseMovers[4] = {{0,-3,-1}, {0,-2,-1}, Vec3f(0, 0, TILE_SIZE)};
+  state.staircaseMovers[5] = {{0,-2,0}, {0,-1,0}, Vec3f(0, 0, TILE_SIZE)};
+  state.staircaseMovers[6] = {{0,-1,1}, {0,0,1}, Vec3f(0, 0, TILE_SIZE)};
+  state.staircaseMovers[7] = {{0,0,2}, {0,1,2}, Vec3f(0, 0, TILE_SIZE)};
 
-  state.worldOrientationChanges[0] = { { 0, 0, 2 }, POSITIVE_Y_UP };
-  state.worldOrientationChanges[1] = { { 0, -1, 1 }, NEGATIVE_Z_UP };
+  state.worldOrientationChanges[0] = {{0,1,3}, POSITIVE_Y_UP};
+  state.worldOrientationChanges[1] = {{0,-3,-1}, NEGATIVE_Z_UP};
 }
 
 static void addRocks(args()) {
   addMesh("rock", 5, Mesh::Model("./game/models/rock/model.obj"));
 
   auto randomPosition = []() {
-    return std::roundf(Gm_Random(-5.f, 4.f)) * 15.f;
+    return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
   };
 
   for (uint8 i = 0; i < 5; i++) {
@@ -130,6 +134,7 @@ static void addRocks(args()) {
 
     rock.rotation.y = Gm_Random(0.f, Gm_TAU);
     rock.scale = Gm_Random(6.f, 9.f);
+    rock.scale.y *= 1.5f;
 
     commit(rock);
   }
@@ -199,7 +204,7 @@ static void addLamps(args()) {
   mesh("lamp")->normalMap = "./game/models/lamp/normals.png";
 
   auto randomPosition = []() {
-    return std::roundf(Gm_Random(-5.f, 4.f)) * 15.f;
+    return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
   };
 
   for (uint8 i = 0; i < 5; i++) {
@@ -219,7 +224,7 @@ static void addLamps(args()) {
     auto& light = createLight(LightType::POINT_SHADOWCASTER);
 
     light.color = Vec3f(1.f, 0.3f, 0.1f);
-    light.position = lamp.position - Vec3f(0, 15.f, 0);
+    light.position = lamp.position - Vec3f(0, TILE_SIZE, 0);
     light.power = 2.f;
     light.radius = 20.f;
     light.isStatic = true;
@@ -232,7 +237,8 @@ static void addStatue(args()) {
 
   auto& statue = createObjectFrom("statue");
 
-  statue.scale = 7.5f;
+  statue.position = gridCoordinatesToWorldPosition({ 0, 0, 0 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
+  statue.scale = HALF_TILE_SIZE;
   statue.color = pVec4(200, 220, 255);
   statue.rotation.y = Gm_PI;
 

@@ -557,5 +557,8 @@
     <ClInclude Include="game\orientation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\entities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

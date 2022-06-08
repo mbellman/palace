@@ -15,6 +15,6 @@ struct GameState {
   CurrentMove currentMove;
   WorldOrientationState worldOrientationState;
   // @todo define an EntityManager struct for pooling/allocating entities
-  Staircase staircases[4];
+  StaircaseMover staircaseMovers[8];
   WorldOrientationChange worldOrientationChanges[2];
 };
