@@ -118,10 +118,9 @@ void handleWorldOrientation(args(), float dt) {
     return;
   }
 
-  // @todo apply in-out easing
   camera.rotation = Quaternion::slerp(
     orientationFrom.toQuaternion(),
     orientationTo.toQuaternion(),
-    alpha
+    easeInOut(0.f, 1.f, alpha)
   );
 }

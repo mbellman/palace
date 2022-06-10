@@ -53,9 +53,11 @@ namespace Gamma {
   }
 
   void Vec3f::operator*=(float scalar) {
-    x *= scalar;
-    y *= scalar;
-    z *= scalar;
+    *this = *this * scalar;
+  }
+
+  void Vec3f::operator*=(const Vec3f& vector) {
+    *this = *this * vector;
   }
 
   Vec3f Vec3f::operator/(float divisor) const {

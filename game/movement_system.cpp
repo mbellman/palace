@@ -126,6 +126,7 @@ static void updateCurrentMoveAction(args()) {
   auto targetCameraPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
+  Vec3f moveDelta = Vec3f(0);
 
   // Only advance the target world position along the
   // next move direction if the last move input was
@@ -134,41 +135,30 @@ static void updateCurrentMoveAction(args()) {
   if (timeSinceLastMoveInput < 0.15f) {
     switch (nextMove) {
       case Z_FORWARD:
-        targetCameraPosition.z += TILE_SIZE;
+        moveDelta.z += TILE_SIZE;
         break;
       case Z_BACKWARD:
-        targetCameraPosition.z -= TILE_SIZE;
+        moveDelta.z -= TILE_SIZE;
         break;
       case X_LEFT:
-        targetCameraPosition.x -= TILE_SIZE;
+        moveDelta.x -= TILE_SIZE;
         break;
       case X_RIGHT:
-        targetCameraPosition.x += TILE_SIZE;
+        moveDelta.x += TILE_SIZE;
         break;
       case Y_UP:
-        targetCameraPosition.y += TILE_SIZE;
+        moveDelta.y += TILE_SIZE;
         break;
       case Y_DOWN:
-        targetCameraPosition.y -= TILE_SIZE;
+        moveDelta.y -= TILE_SIZE;
         break;
     }
   }
 
-  if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
-    // The move was either entered while standing still,
-    // or after having sufficiently slowed down from a
-    // prior move sequence. An in-out easing works best
-    // for single tile moves or the beginning of a move
-    // sequence, so we apply it in these cases.
-    state.currentMove.easing = EasingType::EASE_IN_OUT;
-  } else if (state.moves.size == 0) {
-    // Last move in a sequence, so slow down and stop
-    state.currentMove.easing = EasingType::EASE_OUT;
-  } else if (state.moves.size >= 1) {
-    // More moves ahead in the sequence, so move
-    // at a constant rate
-    state.currentMove.easing = EasingType::LINEAR;
-  }
+  // Ensure that moves queued just before a world orientation change
+  // don't produce movement off the new world orientation's movement plane
+  moveDelta *= state.worldOrientationState.movementPlane;
+  targetCameraPosition += moveDelta;
 
   auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
@@ -190,6 +180,22 @@ static void updateCurrentMoveAction(args()) {
     if (targetGridCoordinates == entity.coordinates) {
       setWorldOrientation(params(), entity.targetWorldOrientation);
     }
+  }
+
+  if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
+    // The move was either entered while standing still,
+    // or after having sufficiently slowed down from a
+    // prior move sequence. An in-out easing works best
+    // for single tile moves or the beginning of a move
+    // sequence, so we apply it in these cases.
+    state.currentMove.easing = EasingType::EASE_IN_OUT;
+  } else if (state.moves.size == 0) {
+    // Last move in a sequence, so slow down and stop
+    state.currentMove.easing = EasingType::EASE_OUT;
+  } else if (state.moves.size >= 1) {
+    // More moves ahead in the sequence, so move
+    // at a constant rate
+    state.currentMove.easing = EasingType::LINEAR;
   }
 
   state.moving = true;
