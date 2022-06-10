@@ -13,7 +13,7 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   auto mDeltaY = event.deltaY / 1000.f;
   auto mDeltaX = event.deltaX / 1000.f;
 
-  switch (state.worldOrientationState.orientation) {
+  switch (state.worldOrientationState.worldOrientation) {
     case POSITIVE_Y_UP:
     case POSITIVE_X_UP:
     case NEGATIVE_X_UP:
@@ -39,14 +39,14 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   wrap(camera.orientation.roll);
 }
 
-void setWorldOrientation(args(), WorldOrientation orientation) {
+void setWorldOrientation(args(), WorldOrientation worldOrientation) {
   auto& camera = getCamera();
 
-  if (state.worldOrientationState.orientation == orientation) {
+  if (state.worldOrientationState.worldOrientation == worldOrientation) {
     return;
   }
 
-  switch (orientation) {
+  switch (worldOrientation) {
     case POSITIVE_Y_UP:
     case NEGATIVE_Y_UP: {
       // @todo cleanup
@@ -92,7 +92,7 @@ void setWorldOrientation(args(), WorldOrientation orientation) {
   //   break;
 
   state.worldOrientationState.startTime = getRunningTime();
-  state.worldOrientationState.orientation = orientation;
+  state.worldOrientationState.worldOrientation = worldOrientation;
   state.worldOrientationState.orientationFrom = camera.orientation;
 }
 

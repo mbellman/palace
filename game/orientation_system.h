@@ -16,11 +16,11 @@ struct WorldOrientationState {
   Gamma::Orientation orientationFrom;
   Gamma::Orientation orientationTo;
   Gamma::Vec3f movementPlane = Gamma::Vec3f(1.f, 0, 1.f);
-  WorldOrientation orientation = POSITIVE_Y_UP;
+  WorldOrientation worldOrientation = POSITIVE_Y_UP;
 };
 
 struct GameState;
 
 void updateCameraFromMouseMoveEvent(GmContext* context, GameState& state, const Gamma::MouseMoveEvent& event);
-void setWorldOrientation(GmContext* context, GameState& state, WorldOrientation orientation);
+void setWorldOrientation(GmContext* context, GameState& state, WorldOrientation worldOrientation);
 void handleWorldOrientation(GmContext* context, GameState& state, float dt);
