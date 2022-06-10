@@ -3,6 +3,7 @@
 uniform bool hasTexture = false;
 uniform bool hasNormalMap = false;
 uniform vec3 cameraPosition;
+uniform vec3 probePosition;
 uniform sampler2D meshTexture;
 uniform sampler2D meshNormalMap;
 uniform samplerCube probeMap;
@@ -16,6 +17,8 @@ in vec2 fragUv;
 
 layout (location = 0) out vec4 out_color_and_depth;
 layout (location = 1) out vec4 out_normal_and_emissivity;
+
+#include "utils/gl.glsl";
 
 vec3 getNormal() {
   vec3 n_fragNormal = normalize(fragNormal);
@@ -35,13 +38,15 @@ vec3 getNormal() {
   }
 }
 
+// @todo implement parallax correction
 void main() {
   vec3 color = hasTexture ? texture(meshTexture, fragUv).rgb * fragColor : fragColor;
   vec3 position = fragPosition;
   vec3 normal = getNormal();
 
-  vec3 incident_vector = normalize(position - cameraPosition);
-  vec3 reflection_vector = reflect(incident_vector, normal);
+  vec3 incident_vector = position - cameraPosition;
+  vec3 reflection_vector = glVec3(reflect(incident_vector, normal));
+
   // @todo support roughness
   vec3 probe_reflector_color = color * texture(probeMap, reflection_vector).rgb;
 

@@ -123,7 +123,7 @@ static void addRocks(args()) {
     return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
   };
 
-  for (uint8 i = 0; i < 5; i++) {
+  for loop(uint8, 0, 5) {
     auto& rock = createObjectFrom("rock");
 
     rock.position = Vec3f(
@@ -159,7 +159,7 @@ static void addPlants(args()) {
 
   mesh("flower-petals")->normalMap = "./game/models/flower/petals-normals.png";
 
-  for (uint8 i = 0; i < 200; i++) {
+  for loop(uint8, 0, 200) {
     auto& grass = createObjectFrom("grass");
 
     grass.position = Vec3f(
@@ -175,7 +175,7 @@ static void addPlants(args()) {
     commit(grass);
   }
 
-  for (uint8 i = 0; i < 100; i++) {
+  for loop(uint8, 0, 100) {
     auto& stalk = createObjectFrom("flower-stalk");
     auto& petals = createObjectFrom("flower-petals");
 
@@ -197,6 +197,32 @@ static void addPlants(args()) {
   }
 }
 
+static void addCacti(args()) {
+  addMesh("cactus", 5, Mesh::Model("./game/models/cactus/model.obj"));
+
+  auto randomPosition = [](float low, float high) {
+    return std::roundf(Gm_Random(low, high)) * TILE_SIZE + HALF_TILE_SIZE;
+  };
+
+  for loop(uint8, 0, 5) {
+    auto& cactus = createObjectFrom("cactus");
+
+    cactus.color = Vec3f(0.6f, 1.f, 0.3f);
+    cactus.scale = Gm_Random(8.f, 12.f);
+
+    cactus.position = Vec3f(
+      randomPosition(-5.f, 4.f),
+      randomPosition(-10.f, -3.f),
+      1.f * TILE_SIZE
+    );
+
+    cactus.rotation.x = -Gm_PI / 2.f;
+    cactus.rotation.z = Gm_Random(0, Gm_PI);
+
+    commit(cactus);
+  }
+}
+
 static void addLamps(args()) {
   addMesh("lamp", 5, Mesh::Model("./game/models/lamp/model.obj"));
 
@@ -207,7 +233,7 @@ static void addLamps(args()) {
     return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
   };
 
-  for (uint8 i = 0; i < 5; i++) {
+  for loop(uint8, 0, 5) {
     auto& lamp = createObjectFrom("lamp");
 
     lamp.position = Vec3f(
@@ -231,7 +257,7 @@ static void addLamps(args()) {
   }
 }
 
-static void addStatue(args()) {
+static void addStatues(args()) {
   addMesh("statue", 1, Mesh::Model("./game/models/statue/model.obj"));
   mesh("statue")->type = MeshType::REFRACTIVE;
 
@@ -243,6 +269,21 @@ static void addStatue(args()) {
   statue.rotation.y = Gm_PI;
 
   commit(statue);
+
+  addMesh("anubis", 1, Mesh::Model("./game/models/anubis/model.obj"));
+  mesh("anubis")->type = MeshType::PROBE_REFLECTOR;
+  mesh("anubis")->probe = "anubis-probe";
+
+  auto& anubis = createObjectFrom("anubis");
+
+  anubis.position = gridCoordinatesToWorldPosition({ 0, -10, 0 }) + Vec3f(0, 0, HALF_TILE_SIZE);
+  anubis.scale = TILE_SIZE;
+  anubis.rotation = Vec3f(-Gm_PI / 2.f, 0, Gm_PI / 2.f);
+  anubis.color = Vec3f(0.4f, 0.6f, 1.f);
+
+  commit(anubis);
+
+  addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -10.f));
 }
 
 void initializeGame(args()) {
@@ -282,8 +323,9 @@ void initializeGame(args()) {
   addRocks(params());
   addParticles(params());
   addPlants(params());
+  addCacti(params());
   addLamps(params());
-  addStatue(params());
+  addStatues(params());
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 

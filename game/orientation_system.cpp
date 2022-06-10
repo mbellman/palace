@@ -67,7 +67,8 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
 
       Orientation t;
       t.roll = atan2f(dir.y, dir.x) - Gm_PI / 2.f;
-      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f;
+      // @hack add 0.1f to avoid a pitch drifting error
+      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f + 0.1f;
       t.yaw = 0.f;
 
       state.worldOrientationState.orientationTo = t;
@@ -118,6 +119,8 @@ void handleWorldOrientation(args(), float dt) {
     return;
   }
 
+  // @bug this breaks light disc projection, causing lights to occasionally
+  // disappear during the world orientation transition
   camera.rotation = Quaternion::slerp(
     orientationFrom.toQuaternion(),
     orientationTo.toQuaternion(),

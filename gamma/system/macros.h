@@ -16,9 +16,3 @@ struct _Gm_defer {
  * -----
  */
 #define defer(code) _Gm_defer _d([&](){ code; });
-
-/**
- * loop
- * ----
- */
-#define loop(total) for (unsigned int idx = 0; idx < total; idx++)

@@ -486,10 +486,12 @@ namespace Gamma {
 
       for (auto* glMesh : glMeshes) {
         if (glMesh->isMeshType(MeshType::PROBE_REFLECTOR)) {
+          auto& probeName = glMesh->getSourceMesh()->probe;
+          auto& position = gmContext->scene.probeMap[probeName];
+
           shaders.probeReflector.setBool("hasTexture", glMesh->hasTexture());
           shaders.probeReflector.setBool("hasNormalMap", glMesh->hasNormalMap());
-
-          auto& probeName = glMesh->getSourceMesh()->probe;
+          shaders.probeReflector.setVec3f("probePosition", position);
 
           if (glProbes.find(probeName) != glProbes.end()) {
             glProbes[probeName]->read();
