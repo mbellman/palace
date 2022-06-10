@@ -13,7 +13,8 @@ enum WorldOrientation {
 
 struct WorldOrientationState {
   float startTime = 0.f;
-  Gamma::Orientation from;
+  Gamma::Orientation orientationFrom;
+  Gamma::Orientation orientationTo;
   Gamma::Vec3f movementPlane = Gamma::Vec3f(1.f, 0, 1.f);
   WorldOrientation orientation = POSITIVE_Y_UP;
 };

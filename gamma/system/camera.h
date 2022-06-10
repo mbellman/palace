@@ -2,12 +2,14 @@
 
 #include "math/matrix.h"
 #include "math/orientation.h"
+#include "math/Quaternion.h"
 #include "math/vector.h"
 
 namespace Gamma {
   struct Camera {
     Vec3f position;
     Orientation orientation;
+    Quaternion rotation = Orientation(0, 0, 0).toQuaternion();
   };
 
   struct ThirdPersonCamera {

@@ -48,63 +48,80 @@ void setWorldOrientation(args(), WorldOrientation orientation) {
 
   switch (orientation) {
     case POSITIVE_Y_UP:
-    case NEGATIVE_Y_UP:
+    case NEGATIVE_Y_UP: {
+      // @todo cleanup
+      Orientation o = camera.orientation;
+      o.face(o.getDirection(), o.getUpDirection());
+      o.roll = 0.f;
+
+      state.worldOrientationState.orientationTo = o;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
+
       break;
+    }
     case POSITIVE_Z_UP:
-    case NEGATIVE_Z_UP:
+    case NEGATIVE_Z_UP: {
+      // @todo cleanup
+      Orientation o = camera.orientation;
+      Vec3f dir = o.getDirection();
+
+      Orientation t;
+      t.roll = atan2f(dir.y, dir.x) - Gm_PI / 2.f;
+      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f;
+      t.yaw = 0.f;
+
+      state.worldOrientationState.orientationTo = t;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
+
       break;
+    }
     case POSITIVE_X_UP:
-    case NEGATIVE_X_UP:
+    case NEGATIVE_X_UP: {
+      // @todo define orientationTo
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
       break;
+    }
   }
+
+  // @todo use above
+  // case POSITIVE_X_UP:
+  //   camera.orientation.roll = Gm_PI / 2.f;
+  //   break;
+  // case NEGATIVE_X_UP:
+  //   camera.orientation.roll = -Gm_PI / 2.f;
+  //   break;
 
   state.worldOrientationState.startTime = getRunningTime();
   state.worldOrientationState.orientation = orientation;
-  state.worldOrientationState.from = camera.orientation;
+  state.worldOrientationState.orientationFrom = camera.orientation;
 }
 
 void handleWorldOrientation(args(), float dt) {
   auto& camera = getCamera();
-  auto& from = state.worldOrientationState.from;
+  auto& orientationFrom = state.worldOrientationState.orientationFrom;
+  auto& orientationTo = state.worldOrientationState.orientationTo;
   auto alpha = getRunningTime() - state.worldOrientationState.startTime;
 
+  // @todo change easing time based on rotation proximity
   alpha *= 2.f;
 
-  if (alpha >= 1.f) {
-    // @todo investigate whether there are any issues
-    // with the final tweened orientation being off,
-    // since we don't perform easing at alpha = 1.f
+  if (state.worldOrientationState.startTime == 0.f) {
+    camera.rotation = camera.orientation.toQuaternion();
+
     return;
   }
 
-  // @todo control for initial facing direction
-  switch (state.worldOrientationState.orientation) {
-    case POSITIVE_Y_UP:
-      // camera.orientation.pitch = easeOut(from.pitch, 0.f, alpha);
-      camera.orientation.roll = easeOutCircular(from.roll, 0.f, alpha);
-      break;
-    case NEGATIVE_Y_UP:
-      camera.orientation.pitch = easeOutCircular(from.pitch, -Gm_PI, alpha);
-      camera.orientation.roll = easeOutCircular(from.roll, 0.f, alpha);
-      break;
-    case POSITIVE_Z_UP:
-      camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI / 2.f, alpha);
-      camera.orientation.yaw = easeOutCircular(from.yaw, 0.f, alpha);
-      break;
-    case NEGATIVE_Z_UP:
-      // camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI / 2.f, alpha);
-      camera.orientation.yaw = easeOutCircular(from.yaw, Gm_PI, alpha);
-      break;
-    case POSITIVE_X_UP:
-      camera.orientation.pitch = easeOutCircular(from.pitch, 0.f, alpha);
-      camera.orientation.roll = easeOutCircular(from.roll, Gm_PI / 2.f, alpha);
-      break;
-    case NEGATIVE_X_UP:
-      camera.orientation.pitch = easeOutCircular(from.pitch, Gm_PI, alpha);
-      camera.orientation.roll = easeOutCircular(from.roll, -Gm_PI / 2.f, alpha);
-      break;
+  if (alpha >= 1.f) {
+    camera.orientation = orientationTo;
+    state.worldOrientationState.startTime = 0.f;
+
+    return;
   }
+
+  // @todo apply in-out easing
+  camera.rotation = Quaternion::slerp(
+    orientationFrom.toQuaternion(),
+    orientationTo.toQuaternion(),
+    alpha
+  );
 }

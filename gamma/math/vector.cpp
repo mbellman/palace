@@ -122,6 +122,7 @@ namespace Gamma {
     return Vec3f(x / w, y / w, z / w);
   }
 
+  // @todo rename xyz()
   Vec3f Vec4f::toVec3f() const {
     return Vec3f(x, y, z);
   }

@@ -2,14 +2,12 @@
 
 namespace Gamma {
   struct Matrix4f;
+  struct Orientation;
+  struct Vec3f;
 
   /**
    * Quaternion
    * ----------
-   *
-   * A struct implementing basic quaternion math,
-   * used for managing rotations without degeneracies
-   * like gimbal lock.
    */
   struct Quaternion {
     float w;
@@ -18,8 +16,17 @@ namespace Gamma {
     float z;
 
     static Quaternion fromAxisAngle(float angle, float x, float y, float z);
+    static Quaternion slerp(const Quaternion& q1, const Quaternion& q2, float alpha);
 
-    Matrix4f toMatrix4f() const;
     Quaternion operator*(const Quaternion& q2) const;
+    void operator*=(const Quaternion& q2);
+
+    void debug() const;
+    Vec3f getDirection() const;
+    Vec3f getLeftDirection() const;
+    Vec3f getUpDirection() const;
+    void rotateAboutAxis(const Vec3f& axis, float angle);
+    Matrix4f toMatrix4f() const;
+    Quaternion unit() const;
   };
 }
