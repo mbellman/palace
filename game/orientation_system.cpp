@@ -127,3 +127,39 @@ void handleWorldOrientation(args(), float dt) {
     easeInOut(0.f, 1.f, alpha)
   );
 }
+
+GridCoordinates getUpGridCoordinates(WorldOrientation worldOrientation) {
+  switch (worldOrientation) {
+    default:
+    case POSITIVE_Y_UP:
+      return GridCoordinates(0, 1, 0);
+    case NEGATIVE_Y_UP:
+      return GridCoordinates(0, -1, 0);
+    case POSITIVE_Z_UP:
+      return GridCoordinates(0, 0, 1);
+    case NEGATIVE_Z_UP:
+      return GridCoordinates(0, 0, -1);
+    case POSITIVE_X_UP:
+      return GridCoordinates(1, 0, 0);
+    case NEGATIVE_X_UP:
+      return GridCoordinates(-1, 0, 0);
+  }
+}
+
+GridCoordinates getDownGridCoordinates(WorldOrientation worldOrientation) {
+  switch (worldOrientation) {
+    default:
+    case POSITIVE_Y_UP:
+      return GridCoordinates(0, -1, 0);
+    case NEGATIVE_Y_UP:
+      return GridCoordinates(0, 1, 0);
+    case POSITIVE_Z_UP:
+      return GridCoordinates(0, 0, -1);
+    case NEGATIVE_Z_UP:
+      return GridCoordinates(0, 0, 1);
+    case POSITIVE_X_UP:
+      return GridCoordinates(-1, 0, 0);
+    case NEGATIVE_X_UP:
+      return GridCoordinates(1, 0, 0);
+  }
+}

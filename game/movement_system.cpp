@@ -39,9 +39,9 @@ static void movePlayer(args(), float dt) {
     camera.position = to;
     state.moving = false;
 
-    auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
+    // auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
 
-    Console::log(currentGridCoordinates.x, currentGridCoordinates.y, currentGridCoordinates.z);
+    // Console::log(currentGridCoordinates.x, currentGridCoordinates.y, currentGridCoordinates.z);
   } else {
     #define easeCamera(easingFn)\
       camera.position.x = easingFn(from.x, to.x, alpha);\
@@ -165,12 +165,22 @@ static void updateCurrentMoveAction(args()) {
   // @todo create a separate entity behavior system module
   // @todo distinguish between entities that trigger ahead
   // of moving to their grid coordinates vs. after
+  auto worldOrientation = state.worldOrientationState.worldOrientation;
+  auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
+
   for (auto& entity : state.staircaseMovers) {
     if (
-      currentGridCoordinates == entity.previousCoordinates &&
-      targetGridCoordinates == entity.activeCoordinates
+      currentGridCoordinates == entity.stepFromCoordinates &&
+      targetGridCoordinates == entity.coordinates
     ) {
+      // Down the staircase
       targetCameraPosition += entity.offset;
+    } else if (
+      currentGridCoordinates == entity.coordinates + downGridCoordinates &&
+      targetGridCoordinates == entity.stepFromCoordinates + downGridCoordinates
+    ) {
+      // Back up the staircase
+      targetCameraPosition -= entity.offset;
     }
   }
 

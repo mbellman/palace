@@ -4,8 +4,8 @@
 #include "orientation_system.h"
 
 struct StaircaseMover {
-  GridCoordinates previousCoordinates;
-  GridCoordinates activeCoordinates;
+  GridCoordinates stepFromCoordinates;
+  GridCoordinates coordinates;
   // @todo change to MoveDirection
   Gamma::Vec3f offset;
 };

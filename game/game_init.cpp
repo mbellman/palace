@@ -208,7 +208,7 @@ static void addCacti(args()) {
     auto& cactus = createObjectFrom("cactus");
 
     cactus.color = Vec3f(0.6f, 1.f, 0.3f);
-    cactus.scale = Gm_Random(8.f, 12.f);
+    cactus.scale = Gm_Random(8.f, 15.f);
 
     cactus.position = Vec3f(
       randomPosition(-5.f, 4.f),
@@ -277,7 +277,7 @@ static void addStatues(args()) {
 
   auto& anubis = createObjectFrom("anubis");
 
-  anubis.position = gridCoordinatesToWorldPosition({ 0, -10, 0 }) + Vec3f(0, 0, HALF_TILE_SIZE);
+  anubis.position = gridCoordinatesToWorldPosition({ 0, -9, 0 }) + Vec3f(0, 0, HALF_TILE_SIZE);
   anubis.scale = TILE_SIZE;
   anubis.rotation = Vec3f(-Gm_PI / 2.f, 0, Gm_PI / 2.f);
   anubis.color = Vec3f(0.4f, 0.6f, 1.f);
