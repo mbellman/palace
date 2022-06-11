@@ -52,7 +52,8 @@ void main() {
   gl_Position = matProjection * matView * world_position;
 
   fragColor = unpack(modelColor);
-  fragPosition = world_position.xyz;
+  // @hack invert Z
+  fragPosition = glVec3(world_position.xyz);
   fragNormal = normal_matrix * vertexNormal;
   fragTangent = normal_matrix * vertexTangent;
   fragBitangent = getFragBitangent(fragNormal, fragTangent);

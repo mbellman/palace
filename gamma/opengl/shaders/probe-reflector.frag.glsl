@@ -38,17 +38,27 @@ vec3 getNormal() {
   }
 }
 
-// @todo implement parallax correction
 void main() {
   vec3 color = hasTexture ? texture(meshTexture, fragUv).rgb * fragColor : fragColor;
-  vec3 position = fragPosition;
   vec3 normal = getNormal();
 
-  vec3 incident_vector = position - cameraPosition;
-  vec3 reflection_vector = glVec3(reflect(incident_vector, normal));
+  vec3 incident_vector = fragPosition - cameraPosition;
+  vec3 reflection_vector = reflect(incident_vector, normal);
+
+  // https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+  // @todo support custom probe reflector bounding boxes
+  vec3 box_max = probePosition + vec3(12.0, 30.0, 40.0);
+  vec3 box_min = probePosition - vec3(12.0, 30.0, 40.0);
+
+  vec3 first_plane_intersection = (box_max - fragPosition) / reflection_vector;
+  vec3 second_plane_intersection = (box_min - fragPosition) / reflection_vector;
+  vec3 furthest_plane = max(first_plane_intersection, second_plane_intersection);
+  float plane_distance = min(min(furthest_plane.x, furthest_plane.y), furthest_plane.z);
+  vec3 intersection_point = fragPosition + reflection_vector * plane_distance;
+  vec3 sample_vector = intersection_point - probePosition;
 
   // @todo support roughness
-  vec3 probe_reflector_color = color * texture(probeMap, reflection_vector).rgb;
+  vec3 probe_reflector_color = color * texture(probeMap, sample_vector).rgb;
 
   out_color_and_depth = vec4(probe_reflector_color, gl_FragCoord.z);
   // @todo support custom emissivity

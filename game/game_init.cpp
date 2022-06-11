@@ -271,6 +271,7 @@ static void addStatues(args()) {
   commit(statue);
 
   addMesh("anubis", 1, Mesh::Model("./game/models/anubis/model.obj"));
+  // addMesh("anubis", 1, Mesh::Model("./game/models/rock/model.obj"));
   mesh("anubis")->type = MeshType::PROBE_REFLECTOR;
   mesh("anubis")->probe = "anubis-probe";
 
@@ -283,7 +284,7 @@ static void addStatues(args()) {
 
   commit(anubis);
 
-  addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -10.f));
+  addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -TILE_SIZE));
 }
 
 void initializeGame(args()) {
