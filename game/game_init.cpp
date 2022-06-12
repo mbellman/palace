@@ -3,6 +3,7 @@
 #include "game_init.h"
 #include "orientation_system.h"
 #include "grid_utilities.h"
+#include "world_system.h"
 #include "game_macros.h"
 #include "game_state.h"
 
@@ -35,8 +36,8 @@ static void addKeyHandlers(args()) {
 static void addGroundTiles(args()) {
   addMesh("plane", 196, Mesh::Plane(2));
 
-  for (int i = -5; i < 5; i++) {
-    for (int j = -5; j < 5; j++) {
+  for (s16 i = -5; i < 5; i++) {
+    for (s16 j = -5; j < 5; j++) {
       if (i == 0 && (j == 1 || j == 2)) {
         continue;
       }
@@ -56,8 +57,8 @@ static void addGroundTiles(args()) {
     }
   }
 
-  for (int i = -5; i < 5; i++) {
-    for (int j = -5; j < 5; j++) {
+  for (s16 i = -5; i < 5; i++) {
+    for (s16 j = -5; j < 5; j++) {
       if (i == 0 && (j == 3 || j == 4)) {
         continue;
       }

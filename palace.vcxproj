@@ -124,6 +124,7 @@
     <ClCompile Include="game\movement_system.cpp" />
     <ClCompile Include="game\move_queue.cpp" />
     <ClCompile Include="game\orientation_system.cpp" />
+    <ClCompile Include="game\world_system.cpp" />
     <ClCompile Include="gamma\math\matrix.cpp" />
     <ClCompile Include="gamma\math\orientation.cpp" />
     <ClCompile Include="gamma\math\Quaternion.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="game\movement_system.h" />
     <ClInclude Include="game\move_queue.h" />
     <ClInclude Include="game\orientation_system.h" />
+    <ClInclude Include="game\world_system.h" />
     <ClInclude Include="gamma\Gamma.h" />
     <ClInclude Include="gamma\math\constants.h" />
     <ClInclude Include="gamma\math\geometry.h" />

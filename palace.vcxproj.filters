@@ -132,6 +132,9 @@
     <ClCompile Include="game\orientation_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\world_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\glew\include\eglew.h">
@@ -558,6 +561,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\entities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\world_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
