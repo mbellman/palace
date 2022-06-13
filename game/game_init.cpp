@@ -35,12 +35,22 @@ static void addKeyHandlers(args()) {
 
 static void addGroundTiles(args()) {
   addMesh("plane", 196, Mesh::Plane(2));
+  addMesh("cube", 196, Mesh::Cube());
 
   for (s16 i = -5; i < 5; i++) {
     for (s16 j = -5; j < 5; j++) {
       if (i == 0 && (j == 1 || j == 2)) {
         continue;
       }
+
+      storeEntityAtCoordinates(state.world, { i, 0, j }, new Ground);
+
+      auto& cube = createObjectFrom("cube");
+
+      cube.position = gridCoordinatesToWorldPosition({i,0,j});
+      cube.color = pVec4(0,0,255);
+
+      commit(cube);
 
       auto& plane = createObjectFrom("plane");
 
@@ -62,6 +72,15 @@ static void addGroundTiles(args()) {
       if (i == 0 && (j == 3 || j == 4)) {
         continue;
       }
+
+      storeEntityAtCoordinates(state.world, { i, j - 5, 0 }, new Ground);
+
+      auto& cube = createObjectFrom("cube");
+
+      cube.position = gridCoordinatesToWorldPosition({i,j-5,0});
+      cube.color = pVec4(0,0,255);
+
+      commit(cube);
 
       auto& plane = createObjectFrom("plane");
 

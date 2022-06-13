@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
     Gm_LogFrameEnd(context);
   }
 
+  // @todo free game memory
+
   Gm_DestroyContext(context);
 
   return 0;

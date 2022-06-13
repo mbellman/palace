@@ -28,5 +28,5 @@ struct World {
   DynamicEntityManager entities;
 };
 
-void storeEntityAtCoordinates(const World& world, const GridCoordinates& coordinates, StaticEntity* entity);
+void storeEntityAtCoordinates(World& world, const GridCoordinates& coordinates, StaticEntity* entity);
 StaticEntity* getEntityByCoordinates(const World& world, const GridCoordinates& coordinates);
