@@ -12,6 +12,10 @@ using namespace Gamma;
 
 #define abs(n) (n < 0.f ? -n : n)
 
+static inline bool isMoving(args()) {
+  return state.currentMove.startTime != 0.f;
+}
+
 static void movePlayer(args(), float dt) {
   auto& camera = getCamera();
   auto& from = state.currentMove.from;
@@ -37,7 +41,7 @@ static void movePlayer(args(), float dt) {
 
   if (alpha >= 1.f) {
     camera.position = to;
-    state.moving = false;
+    state.currentMove.startTime = 0.f;
   } else {
     #define easeCamera(easingFn)\
       camera.position.x = easingFn(from.x, to.x, alpha);\
@@ -198,7 +202,7 @@ static void updateCurrentMoveAction(args()) {
     setWorldOrientation(params(), ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
   }
 
-  if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {
+  if (!isMoving(params()) || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
     // or after having sufficiently slowed down from a
     // prior move sequence. An in-out easing works best
@@ -214,7 +218,6 @@ static void updateCurrentMoveAction(args()) {
     state.currentMove.easing = EasingType::LINEAR;
   }
 
-  state.moving = true;
   state.currentMove.startTime = runningTime;
   state.currentMove.from = camera.position;
   state.currentMove.to = targetCameraPosition;
@@ -248,7 +251,7 @@ void handlePlayerMovement(args(), float dt) {
     updateCurrentMoveAction(params());
   }
 
-  if (state.moving) {
+  if (isMoving(params())) {
     movePlayer(params(), dt);
   }
 }
