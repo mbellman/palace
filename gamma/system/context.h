@@ -22,9 +22,11 @@ struct GmContext {
   Gamma::AbstractRenderer* renderer = nullptr;
   Gamma::uint32 lastTick = 0;
   Gamma::uint64 frameStartMicroseconds = 0;
+  // @todo debug-mode only
   Gamma::Averager<5, Gamma::uint32> fpsAverager;
   Gamma::Averager<5, Gamma::uint64> frameTimeAverager;
   Gamma::Commander commander;
+  std::vector<std::string> debugMessages;
 
   struct GmWindow {
     bool closed = false;

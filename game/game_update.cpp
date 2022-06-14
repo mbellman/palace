@@ -17,4 +17,14 @@ void updateGame(args(), float dt) {
 
     commit(lamp);
   }
+
+  auto& camera = getCamera();
+  auto& coordinates = worldPositionToGridCoordinates(camera.position);
+
+  std::string positionLabel = "Grid position:"
+    + std::to_string(coordinates.x) + ","
+    + std::to_string(coordinates.y) + ","
+    + std::to_string(coordinates.z);
+
+  addDebugMessage(positionLabel);
 }

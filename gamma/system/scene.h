@@ -29,6 +29,8 @@
 #define getCamera() context->scene.camera
 #define getRunningTime() context->scene.runningTime
 
+#define addDebugMessage(message) context->debugMessages.push_back(message)
+
 struct GmContext;
 
 struct GmSceneStats {

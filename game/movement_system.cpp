@@ -38,10 +38,6 @@ static void movePlayer(args(), float dt) {
   if (alpha >= 1.f) {
     camera.position = to;
     state.moving = false;
-
-    auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
-
-    Console::log(currentGridCoordinates.x, currentGridCoordinates.y, currentGridCoordinates.z);
   } else {
     #define easeCamera(easingFn)\
       camera.position.x = easingFn(from.x, to.x, alpha);\

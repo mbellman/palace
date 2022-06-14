@@ -30,6 +30,7 @@ static void Gm_DisplayDevtools(GmContext* context) {
   uint64 averageFrameTime = frameTimeAverager.average();
   uint32 frameTimeBudget = uint32(100.0f * (float)averageFrameTime / 16667.0f);
 
+  // Render system-defined debug messages
   auto fpsLabel = "FPS: "
     + String(fpsAverager.average())
     + ", low "
@@ -55,6 +56,15 @@ static void Gm_DisplayDevtools(GmContext* context) {
   renderer.renderText(font_sm, vertsLabel.c_str(), 25, 100);
   renderer.renderText(font_sm, trisLabel.c_str(), 25, 125);
   renderer.renderText(font_sm, memoryLabel.c_str(), 25, 150);
+
+  // Render user-defined debug messages
+  u8 index = 0;
+
+  for (auto& message : context->debugMessages) {
+    renderer.renderText(font_sm, message.c_str(), 25, 200 + index++ * 25, Vec3f(1.f), Vec4f(0.f, 0.f, 0.f, 0.8f));
+  }
+
+  context->debugMessages.clear();
 
   // Display command line
   if (commander.isOpen()) {

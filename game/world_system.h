@@ -19,12 +19,28 @@ struct GridCoordinatesHasher {
 
 template<typename T>
 struct GridMap : std::unordered_map<GridCoordinates, T*, GridCoordinatesHasher> {
+  void operator[](const GridCoordinates& coordinates) = delete;
+
   T* get(const GridCoordinates& coordinates) {
     if (find(coordinates) != end()) {
       return at(coordinates);
     }
 
     return nullptr; 
+  }
+
+  void remove(const GridCoordinates& coordinates) {
+    if (find(coordinates) != end()) {
+      T* t = at(coordinates);
+
+      delete t;
+
+      erase(coordinates);
+    }
+  }
+
+  void set(const GridCoordinates& coordinates, T* value) {
+    insert({ coordinates, value });
   }
 };
 

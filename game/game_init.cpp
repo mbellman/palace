@@ -42,7 +42,7 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      state.world.grid[{i,0,j}] = new Ground;
+      state.world.grid.set({i,0,j}, new Ground);
 
       auto& plane = createObjectFrom("plane");
 
@@ -65,7 +65,7 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      state.world.grid[{i,j-5,0}] = new Ground;
+      state.world.grid.set({i,j-5,0}, new Ground);
 
       auto& plane = createObjectFrom("plane");
 
@@ -111,12 +111,12 @@ static void addStaircase(args()) {
 
     trigger->targetWorldOrientation = target;
 
-    state.world.triggers[coordinates] = trigger;
+    state.world.triggers.set(coordinates, trigger);
   };
 
-  state.world.grid[{0,0,2}] = new StaircaseMover;
-  state.world.grid[{0,-1,1}] = new StaircaseMover;
-  state.world.grid[{0,-2,0}] = new StaircaseMover;
+  state.world.grid.set({0,0,2}, new StaircaseMover);
+  state.world.grid.set({0,-1,1}, new StaircaseMover);
+  state.world.grid.set({0,-2,0}, new StaircaseMover);
 
   createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
   createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
@@ -143,6 +143,8 @@ static void addRocks(args()) {
     rock.scale.y *= 1.5f;
 
     commit(rock);
+
+    state.world.grid.remove(worldPositionToGridCoordinates(rock.position));
   }
 }
 
@@ -219,13 +221,17 @@ static void addCacti(args()) {
     cactus.position = Vec3f(
       randomPosition(-5.f, 4.f),
       randomPosition(-10.f, -3.f),
-      1.f * TILE_SIZE
+      TILE_SIZE
     );
 
     cactus.rotation.x = -Gm_PI / 2.f;
     cactus.rotation.z = Gm_Random(0, Gm_PI);
 
     commit(cactus);
+
+    auto& coords = worldPositionToGridCoordinates(cactus.position);
+
+    state.world.grid.remove({ coords.x, coords.y, 0 });
   }
 }
 
@@ -276,6 +282,10 @@ static void addStatues(args()) {
 
   commit(statue);
 
+  auto& coords = worldPositionToGridCoordinates(statue.position);
+
+  state.world.grid.remove({ coords.x, 0, coords.z });
+
   addMesh("anubis", 1, Mesh::Model("./game/models/anubis/model.obj"));
   // addMesh("anubis", 1, Mesh::Model("./game/models/rock/model.obj"));
   mesh("anubis")->type = MeshType::PROBE_REFLECTOR;
@@ -291,6 +301,12 @@ static void addStatues(args()) {
   commit(anubis);
 
   addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -TILE_SIZE));
+
+  auto& coords2 = worldPositionToGridCoordinates(anubis.position);
+
+  state.world.grid.remove({ coords2.x, coords2.y, 0 });
+  state.world.grid.remove({ coords2.x, coords2.y + 1, 0 });
+  state.world.grid.remove({ coords2.x, coords2.y - 1, 0 });
 }
 
 // @todo add entity indicators toggle
