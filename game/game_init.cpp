@@ -35,7 +35,6 @@ static void addKeyHandlers(args()) {
 
 static void addGroundTiles(args()) {
   addMesh("plane", 196, Mesh::Plane(2));
-  addMesh("cube", 196, Mesh::Cube());
 
   for (s16 i = -5; i < 5; i++) {
     for (s16 j = -5; j < 5; j++) {
@@ -44,13 +43,6 @@ static void addGroundTiles(args()) {
       }
 
       storeEntityAtCoordinates(state.world, { i, 0, j }, new Ground);
-
-      auto& cube = createObjectFrom("cube");
-
-      cube.position = gridCoordinatesToWorldPosition({i,0,j});
-      cube.color = pVec4(0,0,255);
-
-      commit(cube);
 
       auto& plane = createObjectFrom("plane");
 
@@ -74,13 +66,6 @@ static void addGroundTiles(args()) {
       }
 
       storeEntityAtCoordinates(state.world, { i, j - 5, 0 }, new Ground);
-
-      auto& cube = createObjectFrom("cube");
-
-      cube.position = gridCoordinatesToWorldPosition({i,j-5,0});
-      cube.color = pVec4(0,0,255);
-
-      commit(cube);
 
       auto& plane = createObjectFrom("plane");
 
@@ -120,20 +105,37 @@ static void addStaircase(args()) {
   commit(s1);
   commit(s2);
 
-  // @todo define a proper way of creating entities
-  // @todo in debug mode, render colored cubes to represent entity types
-  state.staircaseMovers[0] = {{0,1,3}, {0,1,2}, Vec3f(0, -TILE_SIZE, 0)};
-  state.staircaseMovers[1] = {{0,0,2}, {0,0,1}, Vec3f(0, -TILE_SIZE, 0)};
-  state.staircaseMovers[2] = {{0,-1,1}, {0,-1,0}, Vec3f(0, -TILE_SIZE, 0)};
-  state.staircaseMovers[3] = {{0,-2,0}, {0,-2,-1}, Vec3f(0, -TILE_SIZE, 0)};
+  // @todo define elsewhere
+  auto createStaircaseMover = [context, &state](const GridCoordinates& coordinates, const GridCoordinates& from, const Vec3f& movementOffset) {
+    auto* entity = new StaircaseMover;
 
-  state.staircaseMovers[4] = {{0,-3,-1}, {0,-2,-1}, Vec3f(0, 0, TILE_SIZE)};
-  state.staircaseMovers[5] = {{0,-2,0}, {0,-1,0}, Vec3f(0, 0, TILE_SIZE)};
-  state.staircaseMovers[6] = {{0,-1,1}, {0,0,1}, Vec3f(0, 0, TILE_SIZE)};
-  state.staircaseMovers[7] = {{0,0,2}, {0,1,2}, Vec3f(0, 0, TILE_SIZE)};
+    entity->stepFromCoordinates = from;
+    entity->movementOffset = movementOffset;
 
-  state.worldOrientationChanges[0] = {{0,1,3}, POSITIVE_Y_UP};
-  state.worldOrientationChanges[1] = {{0,-3,-1}, NEGATIVE_Z_UP};
+    storeEntityAtCoordinates(state.world, coordinates, entity);
+  };
+
+  // @todo define elsewhere
+  auto createWorldOrientationChanger = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
+    auto* entity = new WorldOrientationChanger;
+
+    entity->targetWorldOrientation = target;
+
+    storeEntityAtCoordinates(state.world, coordinates, entity);
+  };
+
+  createStaircaseMover({0,1,2}, {0,1,3}, {0, -TILE_SIZE, 0});
+  createStaircaseMover({0,0,1}, {0,0,2}, {0, -TILE_SIZE, 0});
+  createStaircaseMover({0,-1,0}, {0,-1,1}, {0, -TILE_SIZE, 0});
+  createStaircaseMover({0,-2,-1}, {0,-2,0}, {0, -TILE_SIZE, 0});
+  
+  // createStaircaseMover({0,-2,-1}, {0,-3,-1}, {0, 0, TILE_SIZE});
+  // createStaircaseMover({0,-1,0}, {0,-2,0}, {0, 0, TILE_SIZE});
+  // createStaircaseMover({0,0,1}, {0,-1,1}, {0, 0, TILE_SIZE});
+  // createStaircaseMover({0,1,2}, {0,0,2}, {0, 0, TILE_SIZE});
+
+  createWorldOrientationChanger({0,1,3}, POSITIVE_Y_UP);
+  createWorldOrientationChanger({0,-3,-1}, NEGATIVE_Z_UP);
 }
 
 static void addRocks(args()) {
@@ -307,6 +309,22 @@ static void addStatues(args()) {
   addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -TILE_SIZE));
 }
 
+static void addEntityIndicators(args()) {
+  auto totalEntities = (s16)state.world.grid.size();
+
+  addMesh("cube", totalEntities, Mesh::Cube());
+
+  for (auto& [ coordinates, entity ] : state.world.grid) {
+    auto& cube = createObjectFrom("cube");
+
+    cube.color = pVec4(0,0,255);
+    cube.position = gridCoordinatesToWorldPosition(coordinates);
+    cube.scale = 0.5f;
+
+    commit(cube);
+  }
+}
+
 void initializeGame(args()) {
   Gm_EnableFlags(GammaFlags::VSYNC);
 
@@ -347,6 +365,7 @@ void initializeGame(args()) {
   addCacti(params());
   addLamps(params());
   addStatues(params());
+  addEntityIndicators(params());
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 
