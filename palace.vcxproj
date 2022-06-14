@@ -124,7 +124,6 @@
     <ClCompile Include="game\movement_system.cpp" />
     <ClCompile Include="game\move_queue.cpp" />
     <ClCompile Include="game\orientation_system.cpp" />
-    <ClCompile Include="game\world_system.cpp" />
     <ClCompile Include="gamma\math\matrix.cpp" />
     <ClCompile Include="gamma\math\orientation.cpp" />
     <ClCompile Include="gamma\math\Quaternion.cpp" />

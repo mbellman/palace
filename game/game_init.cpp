@@ -42,7 +42,7 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      storeEntityAtCoordinates(state.world, { i, 0, j }, new Ground);
+      state.world.grid[{i,0,j}] = new Ground;
 
       auto& plane = createObjectFrom("plane");
 
@@ -65,7 +65,7 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      storeEntityAtCoordinates(state.world, { i, j - 5, 0 }, new Ground);
+      state.world.grid[{i,j-5,0}] = new Ground;
 
       auto& plane = createObjectFrom("plane");
 
@@ -106,36 +106,20 @@ static void addStaircase(args()) {
   commit(s2);
 
   // @todo define elsewhere
-  auto createStaircaseMover = [context, &state](const GridCoordinates& coordinates, const GridCoordinates& from, const Vec3f& movementOffset) {
-    auto* entity = new StaircaseMover;
+  auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
+    auto* trigger = new WorldOrientationChange;
 
-    entity->stepFromCoordinates = from;
-    entity->movementOffset = movementOffset;
+    trigger->targetWorldOrientation = target;
 
-    storeEntityAtCoordinates(state.world, coordinates, entity);
+    state.world.triggers[coordinates] = trigger;
   };
 
-  // @todo define elsewhere
-  auto createWorldOrientationChanger = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
-    auto* entity = new WorldOrientationChanger;
+  state.world.grid[{0,0,2}] = new StaircaseMover;
+  state.world.grid[{0,-1,1}] = new StaircaseMover;
+  state.world.grid[{0,-2,0}] = new StaircaseMover;
 
-    entity->targetWorldOrientation = target;
-
-    storeEntityAtCoordinates(state.world, coordinates, entity);
-  };
-
-  createStaircaseMover({0,1,2}, {0,1,3}, {0, -TILE_SIZE, 0});
-  createStaircaseMover({0,0,1}, {0,0,2}, {0, -TILE_SIZE, 0});
-  createStaircaseMover({0,-1,0}, {0,-1,1}, {0, -TILE_SIZE, 0});
-  createStaircaseMover({0,-2,-1}, {0,-2,0}, {0, -TILE_SIZE, 0});
-  
-  // createStaircaseMover({0,-2,-1}, {0,-3,-1}, {0, 0, TILE_SIZE});
-  // createStaircaseMover({0,-1,0}, {0,-2,0}, {0, 0, TILE_SIZE});
-  // createStaircaseMover({0,0,1}, {0,-1,1}, {0, 0, TILE_SIZE});
-  // createStaircaseMover({0,1,2}, {0,0,2}, {0, 0, TILE_SIZE});
-
-  createWorldOrientationChanger({0,1,3}, POSITIVE_Y_UP);
-  createWorldOrientationChanger({0,-3,-1}, NEGATIVE_Z_UP);
+  createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
+  createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
 }
 
 static void addRocks(args()) {
@@ -309,17 +293,39 @@ static void addStatues(args()) {
   addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -TILE_SIZE));
 }
 
+// @todo add entity indicators toggle
 static void addEntityIndicators(args()) {
-  auto totalEntities = (s16)state.world.grid.size();
+  auto totalEntities = (s16)state.world.grid.size() + (s16)state.world.triggers.size();
 
   addMesh("cube", totalEntities, Mesh::Cube());
 
   for (auto& [ coordinates, entity ] : state.world.grid) {
     auto& cube = createObjectFrom("cube");
 
-    cube.color = pVec4(0,0,255);
     cube.position = gridCoordinatesToWorldPosition(coordinates);
     cube.scale = 0.5f;
+
+    switch (entity->type) {
+      case GROUND:
+        cube.color = pVec4(0,0,255);
+        break;
+    }
+
+    commit(cube);
+  }
+
+  // @todo use spheres
+  for (auto& [ coordinates, trigger ] : state.world.triggers) {
+    auto& cube = createObjectFrom("cube");
+
+    cube.position = gridCoordinatesToWorldPosition(coordinates) + Vec3f(1.f);
+    cube.scale = 0.5f;
+
+    switch (trigger->type) {
+      case WORLD_ORIENTATION_CHANGE:
+        cube.color = pVec4(255,0,255);
+        break;
+    }
 
     commit(cube);
   }

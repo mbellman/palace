@@ -9,8 +9,7 @@
  */
 enum StaticEntityType {
   GROUND,
-  STAIRCASE_MOVER,
-  WORLD_ORIENTATION_CHANGER
+  STAIRCASE_MOVER
 };
 
 struct StaticEntity {
@@ -23,18 +22,28 @@ struct Ground : StaticEntity {
   Ground(): StaticEntity(GROUND) {};
 };
 
-// @todo refactor as Staircase
 struct StaircaseMover : StaticEntity {
-  GridCoordinates stepFromCoordinates;
-  Gamma::Vec3f movementOffset;
-
   StaircaseMover(): StaticEntity(STAIRCASE_MOVER) {};
 };
 
-struct WorldOrientationChanger : StaticEntity {
+/**
+ * Trigger Entities
+ * ----------------
+ */
+enum TriggerEntityType {
+  WORLD_ORIENTATION_CHANGE
+};
+
+struct TriggerEntity {
+  TriggerEntityType type;
+
+  TriggerEntity(TriggerEntityType type): type(type) {};
+};
+
+struct WorldOrientationChange : TriggerEntity {
   WorldOrientation targetWorldOrientation;
 
-  WorldOrientationChanger(): StaticEntity(WORLD_ORIENTATION_CHANGER) {};
+  WorldOrientationChange(): TriggerEntity(WORLD_ORIENTATION_CHANGE) {};
 };
 
 /**

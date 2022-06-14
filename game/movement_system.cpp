@@ -165,45 +165,41 @@ static void updateCurrentMoveAction(args()) {
   auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
   auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
   auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
-  auto* targetEntity = getEntityByCoordinates(state.world, targetGridCoordinates);
-  auto* currentEntityAbove = getEntityByCoordinates(state.world, currentGridCoordinates + upGridCoordinates);
-  auto* targetEntityBelow = getEntityByCoordinates(state.world, targetGridCoordinates + downGridCoordinates);
+  auto* currentEntity = state.world.grid.get(currentGridCoordinates);
+  auto* targetEntity = state.world.grid.get(targetGridCoordinates);
+  auto* targetEntityAbove = state.world.grid.get(targetGridCoordinates + upGridCoordinates);
+  auto* targetEntityBelow = state.world.grid.get(targetGridCoordinates + downGridCoordinates);
 
-  if (targetEntityBelow != nullptr && targetEntityBelow->type == GROUND) {
+  // @todo create a static entity/movement handler
+  #define getEntityType(entity) entity != nullptr && entity->type
+
+  if (getEntityType(targetEntityBelow) == GROUND) {
     canMove = true;
-  }
-
-  // @todo create a separate entity behavior system module
-  // @todo distinguish between entities that trigger ahead
-  // of moving to their grid coordinates vs. after
-  // @todo clean up/refactor staircases to require fewer entities
-  if (targetEntity != nullptr && targetEntity->type == STAIRCASE_MOVER) {
-    auto& staircaseMover = *(StaircaseMover*)targetEntity;
-
-    if (currentGridCoordinates == staircaseMover.stepFromCoordinates) {
-      targetCameraPosition += staircaseMover.movementOffset;
-      canMove = true;
-    }
-  }
-
-  if (currentEntityAbove != nullptr && currentEntityAbove->type == STAIRCASE_MOVER) {
-    auto& staircaseMover = *(StaircaseMover*)currentEntityAbove;
-
-    if (targetGridCoordinates + upGridCoordinates == staircaseMover.stepFromCoordinates) {
-      targetCameraPosition -= staircaseMover.movementOffset;
-      canMove = true;
-    }
-  }
-
-  targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
-  targetEntity = getEntityByCoordinates(state.world, targetGridCoordinates);
-
-  if (targetEntity != nullptr && targetEntity->type == WORLD_ORIENTATION_CHANGER) {
-    setWorldOrientation(params(), ((WorldOrientationChanger*)targetEntity)->targetWorldOrientation);
+  } else if (
+    getEntityType(targetEntityBelow) == STAIRCASE_MOVER ||
+    (getEntityType(currentEntity) == STAIRCASE_MOVER && getEntityType(targetEntityBelow) == GROUND)
+  ) {
+    canMove = true;
+    targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;      
+  } else if (
+    getEntityType(targetEntityAbove) == STAIRCASE_MOVER ||
+    (getEntityType(currentEntity) == STAIRCASE_MOVER && getEntityType(targetEntity) == GROUND)
+  ) {
+    canMove = true;
+    targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
   }
 
   if (!canMove) {
     return;
+  }
+
+  targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
+
+  // @todo create a trigger entity handler
+  auto* targetTrigger = state.world.triggers.get(targetGridCoordinates);
+
+  if (getEntityType(targetTrigger) == WORLD_ORIENTATION_CHANGE) {
+    setWorldOrientation(params(), ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
   }
 
   if (!state.moving || timeSinceCurrentMoveBegan > 0.4f) {

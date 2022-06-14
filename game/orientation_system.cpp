@@ -67,8 +67,8 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
 
       Orientation t;
       t.roll = atan2f(dir.y, dir.x) - Gm_PI / 2.f;
-      // @hack add 0.1f to avoid a pitch drifting error
-      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f + 0.1f;
+      // @hack add a small adjustment term to avoid pitch drifting issues
+      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f + 0.2f;
       t.yaw = 0.f;
 
       state.worldOrientationState.orientationTo = t;

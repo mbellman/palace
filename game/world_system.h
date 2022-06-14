@@ -17,16 +17,23 @@ struct GridCoordinatesHasher {
   }
 };
 
-typedef std::unordered_map<GridCoordinates, StaticEntity*, GridCoordinatesHasher> WorldGrid;
+template<typename T>
+struct GridMap : std::unordered_map<GridCoordinates, T*, GridCoordinatesHasher> {
+  T* get(const GridCoordinates& coordinates) {
+    if (find(coordinates) != end()) {
+      return at(coordinates);
+    }
+
+    return nullptr; 
+  }
+};
 
 struct DynamicEntityManager {
   DynamicEntity* entities = nullptr;
 };
 
 struct World {
-  WorldGrid grid;
+  GridMap<StaticEntity> grid;
+  GridMap<TriggerEntity> triggers;
   DynamicEntityManager entities;
 };
-
-void storeEntityAtCoordinates(World& world, const GridCoordinates& coordinates, StaticEntity* entity);
-StaticEntity* getEntityByCoordinates(const World& world, const GridCoordinates& coordinates);
