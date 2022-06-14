@@ -11,55 +11,10 @@
 using namespace Gamma;
 
 #define abs(n) (n < 0.f ? -n : n)
+#define typeOfEntity(entity) entity != nullptr && entity->type
 
 static inline bool isMoving(args()) {
   return state.currentMove.startTime != 0.f;
-}
-
-static void movePlayer(args(), float dt) {
-  auto& camera = getCamera();
-  auto& from = state.currentMove.from;
-  auto& to = state.currentMove.to;
-
-  // Add dt to the easing alpha value to ensure that
-  // the camera is always in motion while executing
-  // movement. Since the 'from' position of the current
-  // move represents where the camera was when the
-  // move started, and since we run this routine on
-  // the same frame as updating the current move,
-  // we don't want to wait a frame to start moving
-  // the camera, as this produces a jarring stutter.
-  auto alpha = (getRunningTime() - state.currentMove.startTime) + dt;
-
-  if (state.currentMove.easing == EasingType::EASE_IN_OUT) {
-    alpha *= 3.f;
-  } else if (state.currentMove.easing == EasingType::LINEAR) {
-    alpha *= 4.f;
-  } else if (state.currentMove.easing == EasingType::EASE_OUT) {
-    alpha *= 2.f;
-  }
-
-  if (alpha >= 1.f) {
-    camera.position = to;
-    state.currentMove.startTime = 0.f;
-  } else {
-    #define easeCamera(easingFn)\
-      camera.position.x = easingFn(from.x, to.x, alpha);\
-      camera.position.y = easingFn(from.y, to.y, alpha);\
-      camera.position.z = easingFn(from.z, to.z, alpha);
-
-    switch (state.currentMove.easing) {
-      case EasingType::EASE_IN_OUT:
-        easeCamera(easeInOut);
-        break;
-      case EasingType::LINEAR:
-        easeCamera(Gm_Lerpf);
-        break;
-      case EasingType::EASE_OUT:
-        easeCamera(easeOut);
-        break;
-    }
-  }
 }
 
 static Vec3f worldDirectionToGridDirection(args(), const Vec3f& worldDirection) {
@@ -118,7 +73,46 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   return move;
 }
 
-static void updateCurrentMoveAction(args()) {
+static bool validateNextMove(args(), const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
+  auto worldOrientation = state.worldOrientationState.worldOrientation;
+  auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
+  auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
+  auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
+  auto* currentEntity = state.world.grid.get(currentGridCoordinates);
+  auto* targetEntity = state.world.grid.get(targetGridCoordinates);
+  auto* targetEntityAbove = state.world.grid.get(targetGridCoordinates + upGridCoordinates);
+  auto* targetEntityBelow = state.world.grid.get(targetGridCoordinates + downGridCoordinates);
+
+  if (typeOfEntity(targetEntityBelow) == GROUND) {
+    return true;
+  } else if (
+    typeOfEntity(targetEntityBelow) == STAIRCASE_MOVER ||
+    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityBelow) == GROUND)
+  ) {
+    targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
+
+    return true; 
+  } else if (
+    typeOfEntity(targetEntityAbove) == STAIRCASE_MOVER ||
+    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntity) == GROUND)
+  ) {
+    targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
+
+    return true;
+  }
+
+  return false;
+}
+
+static void handleTriggerEntitiesBeforeMove(args(), const GridCoordinates& targetGridCoordinates) {
+  auto* targetTrigger = state.world.triggers.get(targetGridCoordinates);
+
+  if (typeOfEntity(targetTrigger) == WORLD_ORIENTATION_CHANGE) {
+    setWorldOrientation(params(), ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
+  }
+}
+
+static void handleNextMove(args()) {
   auto& camera = getCamera();
   auto runningTime = getRunningTime();
   auto nextMove = takeNextMove(state.moves);
@@ -160,47 +154,13 @@ static void updateCurrentMoveAction(args()) {
   moveDelta *= state.worldOrientationState.movementPlane;
   targetCameraPosition += moveDelta;
 
-  bool canMove = false;
-  auto worldOrientation = state.worldOrientationState.worldOrientation;
-  auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
-  auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
-  auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
-  auto* currentEntity = state.world.grid.get(currentGridCoordinates);
-  auto* targetEntity = state.world.grid.get(targetGridCoordinates);
-  auto* targetEntityAbove = state.world.grid.get(targetGridCoordinates + upGridCoordinates);
-  auto* targetEntityBelow = state.world.grid.get(targetGridCoordinates + downGridCoordinates);
-
-  // @todo create a static entity/movement handler
-  #define getEntityType(entity) entity != nullptr && entity->type
-
-  if (getEntityType(targetEntityBelow) == GROUND) {
-    canMove = true;
-  } else if (
-    getEntityType(targetEntityBelow) == STAIRCASE_MOVER ||
-    (getEntityType(currentEntity) == STAIRCASE_MOVER && getEntityType(targetEntityBelow) == GROUND)
-  ) {
-    canMove = true;
-    targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;      
-  } else if (
-    getEntityType(targetEntityAbove) == STAIRCASE_MOVER ||
-    (getEntityType(currentEntity) == STAIRCASE_MOVER && getEntityType(targetEntity) == GROUND)
-  ) {
-    canMove = true;
-    targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
-  }
-
-  if (!canMove) {
+  if (!validateNextMove(params(), currentGridCoordinates, targetCameraPosition)) {
     return;
   }
 
-  targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
+  auto& targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
-  // @todo create a trigger entity handler
-  auto* targetTrigger = state.world.triggers.get(targetGridCoordinates);
-
-  if (getEntityType(targetTrigger) == WORLD_ORIENTATION_CHANGE) {
-    setWorldOrientation(params(), ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
-  }
+  handleTriggerEntitiesBeforeMove(params(), targetGridCoordinates);
 
   if (!isMoving(params()) || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
@@ -222,6 +182,52 @@ static void updateCurrentMoveAction(args()) {
   state.currentMove.from = camera.position;
   state.currentMove.to = targetCameraPosition;
   // @todo reduce tween time based on proximity to the target position
+}
+
+static void movePlayer(args(), float dt) {
+  auto& camera = getCamera();
+  auto& from = state.currentMove.from;
+  auto& to = state.currentMove.to;
+
+  // Add dt to the easing alpha value to ensure that
+  // the camera is always in motion while executing
+  // movement. Since the 'from' position of the current
+  // move represents where the camera was when the
+  // move started, and since we run this routine on
+  // the same frame as updating the current move,
+  // we don't want to wait a frame to start moving
+  // the camera, as this produces a jarring stutter.
+  auto alpha = (getRunningTime() - state.currentMove.startTime) + dt;
+
+  if (state.currentMove.easing == EasingType::EASE_IN_OUT) {
+    alpha *= 3.f;
+  } else if (state.currentMove.easing == EasingType::LINEAR) {
+    alpha *= 4.f;
+  } else if (state.currentMove.easing == EasingType::EASE_OUT) {
+    alpha *= 2.f;
+  }
+
+  if (alpha >= 1.f) {
+    camera.position = to;
+    state.currentMove.startTime = 0.f;
+  } else {
+    #define easeCamera(easingFn)\
+      camera.position.x = easingFn(from.x, to.x, alpha);\
+      camera.position.y = easingFn(from.y, to.y, alpha);\
+      camera.position.z = easingFn(from.z, to.z, alpha);
+
+    switch (state.currentMove.easing) {
+      case EasingType::EASE_IN_OUT:
+        easeCamera(easeInOut);
+        break;
+      case EasingType::LINEAR:
+        easeCamera(Gm_Lerpf);
+        break;
+      case EasingType::EASE_OUT:
+        easeCamera(easeOut);
+        break;
+    }
+  }
 }
 
 void handlePlayerMovement(args(), float dt) {
@@ -248,7 +254,7 @@ void handlePlayerMovement(args(), float dt) {
     state.moves.size > 0 &&
     timeSinceCurrentMoveBegan > 0.2f
   ) {
-    updateCurrentMoveAction(params());
+    handleNextMove(params());
   }
 
   if (isMoving(params())) {
