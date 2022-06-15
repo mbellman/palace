@@ -7,10 +7,13 @@
 #include "opengl/OpenGLRenderer.h"
 #include "performance/benchmark.h"
 #include "performance/tools.h"
+#include "system/assert.h"
 #include "system/console.h"
 #include "system/context.h"
 #include "system/flags.h"
 #include "system/scene.h"
+
+using namespace Gamma;
 
 #define String(value) std::to_string(value)
 
@@ -27,8 +30,8 @@ static void Gm_DisplayDevtools(GmContext* context) {
   auto& window = context->window;
   auto* font_sm = window.font_sm;
   auto* font_lg = window.font_lg;
-  uint64 averageFrameTime = frameTimeAverager.average();
-  uint32 frameTimeBudget = uint32(100.0f * (float)averageFrameTime / 16667.0f);
+  u64 averageFrameTime = frameTimeAverager.average();
+  u32 frameTimeBudget = u32(100.0f * (float)averageFrameTime / 16667.0f);
 
   // Render system-defined debug messages
   auto fpsLabel = "FPS: "
@@ -78,7 +81,7 @@ static void Gm_DisplayDevtools(GmContext* context) {
 
   // Display console messages
   auto* message = Console::getFirstMessage();
-  uint8 messageIndex = 0;
+  u8 messageIndex = 0;
 
   // @todo clear messages after a set duration
   while (message != nullptr) {
@@ -95,22 +98,32 @@ GmContext* Gm_CreateContext() {
   TTF_Init();
   IMG_Init(IMG_INIT_PNG);
 
-  // @todo Gm_OpenWindow(const char* title, const Area<uint32>& size)
-  context->window.sdl_window = SDL_CreateWindow(
-    "Gamma",
-    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-    640, 480,
-    SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
-  );
-
   context->window.font_sm = TTF_OpenFont("./fonts/OpenSans-Regular.ttf", 16);
   context->window.font_lg = TTF_OpenFont("./fonts/OpenSans-Regular.ttf", 22);
-  context->window.size = { 640, 480 };
 
   return context;
 }
 
+void Gm_OpenWindow(GmContext* context, const char* title, const Gamma::Area<u32>& size) {
+  context->window.sdl_window = SDL_CreateWindow(
+    title,
+    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    size.width, size.height,
+    SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
+  );
+
+  context->window.size = size;
+}
+
+void Gm_SetWindowSize(GmContext* context, const Area<u32>& size) {
+  context->window.size = size;
+
+  SDL_SetWindowSize(context->window.sdl_window, size.width, size.height);
+}
+
 void Gm_SetRenderMode(GmContext* context, GmRenderMode mode) {
+  assert(context->window.sdl_window != nullptr, "Attempted to set render mode before calling Gm_OpenWindow()!");
+
   if (context->renderer != nullptr) {
     context->renderer->destroy();
 
@@ -121,7 +134,7 @@ void Gm_SetRenderMode(GmContext* context, GmRenderMode mode) {
 
   switch (mode) {
     case GmRenderMode::OPENGL:
-      context->renderer = new Gamma::OpenGLRenderer(context);
+      context->renderer = new OpenGLRenderer(context);
       break;
     case GmRenderMode::VULKAN:
       // @todo
@@ -134,7 +147,7 @@ void Gm_SetRenderMode(GmContext* context, GmRenderMode mode) {
 }
 
 float Gm_GetDeltaTime(GmContext* context) {
-  Gamma::uint32 ticks = SDL_GetTicks();
+  u32 ticks = SDL_GetTicks();
   float dt = float(ticks - context->lastTick) / 1000.0f;
 
   context->lastTick = ticks;
@@ -157,8 +170,8 @@ void Gm_HandleEvents(GmContext* context) {
       case SDL_WINDOWEVENT:
         if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
           context->window.size = {
-            (Gamma::uint32)event.window.data1,
-            (Gamma::uint32)event.window.data2
+            (u32)event.window.data1,
+            (u32)event.window.data2
           };
         }
 
@@ -187,14 +200,14 @@ void Gm_RenderScene(GmContext* context) {
   context->renderer->present();
 
   // @todo move this elsewhere
-  Gamma::Gm_SavePreviousFlags();
+  Gm_SavePreviousFlags();
 }
 
 void Gm_LogFrameEnd(GmContext* context) {
   using namespace Gamma;
 
-  uint64 frameTimeInMicroseconds = Gm_GetMicroseconds() - context->frameStartMicroseconds;
-  uint32 fps = (uint32)(1000000.0f / (float)frameTimeInMicroseconds);
+  u64 frameTimeInMicroseconds = Gm_GetMicroseconds() - context->frameStartMicroseconds;
+  u32 fps = (u32)(1000000.0f / (float)frameTimeInMicroseconds);
 
   context->fpsAverager.add(fps);
   context->frameTimeAverager.add(frameTimeInMicroseconds);

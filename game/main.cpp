@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
   GameState state;
   auto* context = Gm_CreateContext();
 
+  Gm_OpenWindow(context, "Palace", { 900, 600 });
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
 
   initializeGame(params());
