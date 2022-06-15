@@ -18,6 +18,7 @@ struct StaticEntity {
   StaticEntityType type;
 
   StaticEntity(StaticEntityType type): type(type) {};
+  virtual ~StaticEntity() = default;
 };
 
 struct Ground : StaticEntity {

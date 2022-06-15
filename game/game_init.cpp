@@ -34,32 +34,66 @@ static void addKeyHandlers(args()) {
 }
 
 static void addGroundEntities(args()) {
-  for (s16 i = -5; i < 5; i++) {
-    for (s16 j = -5; j < 5; j++) {
-      if (i == 0 && (j == 1 || j == 2)) {
+  auto& grid = state.world.grid;
+
+  // Top area
+  for (s16 x = -5; x < 5; x++) {
+    for (s16 z = -5; z < 5; z++) {
+      if (x == 0 && (z == 1 || z == 2)) {
         continue;
       }
 
-      state.world.grid.set({i,1,j}, new WalkableSpace);
-      state.world.grid.set({i,-1,j}, new Ground);
+      grid.set({x,1,z}, new WalkableSpace);
+      grid.set({x,-1,z}, new Ground);
     }
   }
 
-  for (s16 i = -5; i < 5; i++) {
-    for (s16 j = -5; j < 5; j++) {
-      if (i == 0 && (j == 3 || j == 4)) {
+  // Left area
+  for (s16 z = -5; z < 5; z++) {
+    for (s16 y = -1; y < 10; y++) {
+      grid.set({-6,y,z}, new Ground);
+
+      if (y >= 0) {
+        grid.set({-4,y,z}, new WalkableSpace);
+      }
+    }
+  }
+
+  grid.remove({-4,2,0});
+
+  // Lower area
+  for (s16 x = -5; x < 5; x++) {
+    for (s16 y = -10; y < -1; y++) {
+      if (x == 0 && (y == -2 || y == -1)) {
         continue;
       }
 
-      state.world.grid.set({i,j-5,-1}, new WalkableSpace);
-      state.world.grid.set({i,j-5,1}, new Ground);
+      grid.set({x,y,-1}, new WalkableSpace);
+      grid.set({x,y,1}, new Ground);
     }
   }
 }
 
 static void addStaircaseEntities(args()) {
-  state.world.grid.set({0,-1,2}, new Staircase);
-  state.world.grid.set({0,-2,1}, new Staircase);
+  auto& grid = state.world.grid;
+
+  // Down to lower area
+  grid.set({0,-1,2}, new Staircase);
+  grid.set({0,-2,1}, new Staircase);
+
+  grid.set({0,0,2}, new StaircaseMover);
+  grid.set({0,-1,1}, new StaircaseMover);
+  grid.set({0,-2,0}, new StaircaseMover);
+
+  // Up to left area
+  grid.set({-3,0,0}, new Staircase);
+  grid.get<Staircase>({-3,0,0})->orientation.yaw = -Gm_PI / 2.f;
+  grid.set({-4,1,0}, new Staircase);
+  grid.get<Staircase>({-4,1,0})->orientation.yaw = -Gm_PI / 2.f;
+  grid.set({-5,2,0}, new Staircase);
+  grid.get<Staircase>({-5,2,0})->orientation.yaw = -Gm_PI / 2.f;
+
+  grid.set({-4,2,0}, new StaircaseMover);
 
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
@@ -70,12 +104,10 @@ static void addStaircaseEntities(args()) {
     state.world.triggers.set(coordinates, trigger);
   };
 
-  state.world.grid.set({0,0,2}, new StaircaseMover);
-  state.world.grid.set({0,-1,1}, new StaircaseMover);
-  state.world.grid.set({0,-2,0}, new StaircaseMover);
-
   createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
   createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
+
+  createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
 }
 
 static void addRocks(args()) {
@@ -189,10 +221,12 @@ static void addStatues(args()) {
 
 static void addEntityObjects(args()) {
   // @todo count entities by type
-  addMesh("ground-tile", 196, Mesh::Cube());
-  addMesh("staircase", 2, Mesh::Model("./game/models/staircase/model.obj"));
+  auto& grid = state.world.grid;
 
-  for (auto& [ coordinates, entity ] : state.world.grid) {
+  addMesh("ground-tile", grid.count<Ground>(), Mesh::Cube());
+  addMesh("staircase", grid.count<Staircase>(), Mesh::Model("./game/models/staircase/model.obj"));
+
+  for (auto& [ coordinates, entity ] : grid) {
     switch (entity->type) {
       case GROUND: {
         // @todo createGroundTileObject()
@@ -208,11 +242,13 @@ static void addEntityObjects(args()) {
       case STAIRCASE: {
         // @todo createStaircaseObject()
         auto& staircase = createObjectFrom("staircase");
+        auto* stairs = (Staircase*)entity;
 
         staircase.position = gridCoordinatesToWorldPosition(coordinates);
         staircase.color = Vec3f(0.5f);
         staircase.scale = HALF_TILE_SIZE;
-        staircase.rotation.y = -Gm_PI / 2.f;  // @todo use entity orientation
+        // @todo use proper model orientation to avoid the -PI/2 offset here
+        staircase.rotation.y = -Gm_PI / 2.f + stairs->orientation.yaw;
 
         commit(staircase);
         break;
@@ -309,7 +345,7 @@ void initializeGame(args()) {
   addRocks(params());
   addParticles(params());
   addCacti(params());
-  addStatues(params());
+  // addStatues(params());
 
   addEntityObjects(params());
   addInvisibleEntityIndicators(params());
