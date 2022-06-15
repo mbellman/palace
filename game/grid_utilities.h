@@ -23,7 +23,7 @@ struct GridCoordinates {
     return x != comparison.x || y != comparison.y || z != comparison.z;
   }
 
-  GridCoordinates GridCoordinates::operator+(const GridCoordinates& coordinates) {
+  GridCoordinates GridCoordinates::operator+(const GridCoordinates& coordinates) const {
     return {
       x + coordinates.x,
       y + coordinates.y,

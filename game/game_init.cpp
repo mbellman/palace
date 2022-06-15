@@ -81,10 +81,6 @@ static void addStaircaseEntities(args()) {
   grid.set({0,-1,2}, new Staircase);
   grid.set({0,-2,1}, new Staircase);
 
-  grid.set({0,0,2}, new StaircaseMover);
-  grid.set({0,-1,1}, new StaircaseMover);
-  grid.set({0,-2,0}, new StaircaseMover);
-
   // Up to left area
   grid.set({-3,0,0}, new Staircase);
   grid.get<Staircase>({-3,0,0})->orientation.yaw = -Gm_PI / 2.f;
@@ -92,8 +88,6 @@ static void addStaircaseEntities(args()) {
   grid.get<Staircase>({-4,1,0})->orientation.yaw = -Gm_PI / 2.f;
   grid.set({-5,2,0}, new Staircase);
   grid.get<Staircase>({-5,2,0})->orientation.yaw = -Gm_PI / 2.f;
-
-  grid.set({-4,2,0}, new StaircaseMover);
 
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
@@ -107,7 +101,7 @@ static void addStaircaseEntities(args()) {
   createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
   createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
 
-  createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
+  // createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
 }
 
 static void addRocks(args()) {
@@ -277,16 +271,6 @@ static void addInvisibleEntityIndicators(args()) {
         commit(indicator);
         break;
       }
-      case STAIRCASE_MOVER: {
-        auto& indicator = createObjectFrom("indicator");
-
-        indicator.position = gridCoordinatesToWorldPosition(coordinates);
-        indicator.scale = 0.5f;
-        indicator.color = pVec4(0,255,0);
-
-        commit(indicator);
-        break;
-      }
     }
 
   }
@@ -342,9 +326,9 @@ void initializeGame(args()) {
   addKeyHandlers(params());
   addGroundEntities(params());
   addStaircaseEntities(params());
-  addRocks(params());
+  // addRocks(params());
   addParticles(params());
-  addCacti(params());
+  // addCacti(params());
   // addStatues(params());
 
   addEntityObjects(params());

@@ -10,8 +10,7 @@
 enum StaticEntityType {
   GROUND,
   STAIRCASE,
-  WALKABLE_SPACE,
-  STAIRCASE_MOVER
+  WALKABLE_SPACE
 };
 
 struct StaticEntity {
@@ -33,10 +32,6 @@ struct Staircase : StaticEntity {
 
 struct WalkableSpace : StaticEntity {
   WalkableSpace(): StaticEntity(WALKABLE_SPACE) {};
-};
-
-struct StaircaseMover : StaticEntity {
-  StaircaseMover(): StaticEntity(STAIRCASE_MOVER) {};
 };
 
 /**

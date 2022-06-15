@@ -74,30 +74,48 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
 }
 
 static bool isNextMoveValid(args(), const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
+  auto& grid = state.world.grid;
+  auto& triggers = state.world.triggers;
   auto worldOrientation = state.worldOrientationState.worldOrientation;
   auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
   auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
   auto targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
-  auto* currentEntity = state.world.grid.get(currentGridCoordinates);
-  auto* targetEntity = state.world.grid.get(targetGridCoordinates);
-  auto* targetEntityAbove = state.world.grid.get(targetGridCoordinates + upGridCoordinates);
-  auto* targetEntityBelow = state.world.grid.get(targetGridCoordinates + downGridCoordinates);
+  auto targetBelowCoordinates = targetGridCoordinates + downGridCoordinates;
+  auto* currentTileBelow = grid.get(currentGridCoordinates + downGridCoordinates);
+  auto* targetTile = grid.get(targetGridCoordinates);
+  auto* targetTileAbove = grid.get(targetGridCoordinates + upGridCoordinates);
+  auto* targetTileBelow = grid.get(targetBelowCoordinates);
+  auto* targetTileTwoBelow = grid.get(targetBelowCoordinates + downGridCoordinates);
 
-  if (typeOfEntity(targetEntity) == WALKABLE_SPACE) {
-    return true;
-  } else if (
-    typeOfEntity(targetEntityBelow) == STAIRCASE_MOVER ||
-    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityBelow) == WALKABLE_SPACE)
+  if (
+    // Walking down a staircase
+    (
+      typeOfEntity(currentTileBelow) == STAIRCASE &&
+      typeOfEntity(targetTileTwoBelow) == STAIRCASE ||
+      // Allow world orientation changes placed at the end
+      // of a downward staircase to be navigated to, even
+      // if the tile isn't technically on a staircase in
+      // the current world orientation.
+      typeOfEntity(triggers.get(targetBelowCoordinates)) == WORLD_ORIENTATION_CHANGE
+    ) ||
+    // Entering onto a downward staircase
+    typeOfEntity(targetTileTwoBelow) == STAIRCASE
   ) {
     targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
 
     return true;
   } else if (
-    typeOfEntity(targetEntityAbove) == STAIRCASE_MOVER ||
-    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityAbove) == WALKABLE_SPACE)
+    // Walking up a staircase
+    (typeOfEntity(currentTileBelow) == STAIRCASE &&
+    typeOfEntity(targetTile) == STAIRCASE) ||
+    // Exiting off of an upward staircase
+    (typeOfEntity(currentTileBelow) == STAIRCASE &&
+    typeOfEntity(targetTileAbove) == WALKABLE_SPACE)
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
+    return true;
+  } else if (typeOfEntity(targetTile) == WALKABLE_SPACE) {
     return true;
   }
 
