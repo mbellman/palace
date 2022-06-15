@@ -557,10 +557,10 @@
     <ClInclude Include="game\orientation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\entities.h">
+    <ClInclude Include="game\world_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\world_system.h">
+    <ClInclude Include="game\game_entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

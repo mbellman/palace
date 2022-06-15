@@ -6,7 +6,7 @@
 #include "movement_system.h"
 #include "orientation_system.h"
 #include "world_system.h"
-#include "entities.h"
+#include "game_entities.h"
 
 struct GameState {
   float lastMoveInputTime = 0.f;

@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "grid_utilities.h"
-#include "entities.h"
+#include "game_entities.h"
 
 struct GridCoordinatesHasher {
   std::size_t operator()(const GridCoordinates& coordinates) const {
