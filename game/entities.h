@@ -9,6 +9,7 @@
  */
 enum StaticEntityType {
   GROUND,
+  WALKABLE_SPACE,
   STAIRCASE_MOVER
 };
 
@@ -20,6 +21,10 @@ struct StaticEntity {
 
 struct Ground : StaticEntity {
   Ground(): StaticEntity(GROUND) {};
+};
+
+struct WalkableSpace : StaticEntity {
+  WalkableSpace(): StaticEntity(WALKABLE_SPACE) {};
 };
 
 struct StaircaseMover : StaticEntity {

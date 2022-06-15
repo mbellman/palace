@@ -73,7 +73,7 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   return move;
 }
 
-static bool validateNextMove(args(), const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
+static bool isNextMoveValid(args(), const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
   auto worldOrientation = state.worldOrientationState.worldOrientation;
   auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
   auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
@@ -83,18 +83,18 @@ static bool validateNextMove(args(), const GridCoordinates& currentGridCoordinat
   auto* targetEntityAbove = state.world.grid.get(targetGridCoordinates + upGridCoordinates);
   auto* targetEntityBelow = state.world.grid.get(targetGridCoordinates + downGridCoordinates);
 
-  if (typeOfEntity(targetEntityBelow) == GROUND) {
+  if (typeOfEntity(targetEntity) == WALKABLE_SPACE) {
     return true;
   } else if (
     typeOfEntity(targetEntityBelow) == STAIRCASE_MOVER ||
-    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityBelow) == GROUND)
+    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityBelow) == WALKABLE_SPACE)
   ) {
     targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
 
-    return true; 
+    return true;
   } else if (
     typeOfEntity(targetEntityAbove) == STAIRCASE_MOVER ||
-    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntity) == GROUND)
+    (typeOfEntity(currentEntity) == STAIRCASE_MOVER && typeOfEntity(targetEntityAbove) == WALKABLE_SPACE)
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
@@ -154,7 +154,7 @@ static void handleNextMove(args()) {
   moveDelta *= state.worldOrientationState.movementPlane;
   targetCameraPosition += moveDelta;
 
-  if (!validateNextMove(params(), currentGridCoordinates, targetCameraPosition)) {
+  if (!isNextMoveValid(params(), currentGridCoordinates, targetCameraPosition)) {
     return;
   }
 

@@ -34,7 +34,7 @@ static void addKeyHandlers(args()) {
 }
 
 static void addGroundTiles(args()) {
-  addMesh("plane", 196, Mesh::Plane(2));
+  addMesh("ground-tile", 196, Mesh::Cube());
 
   for (s16 i = -5; i < 5; i++) {
     for (s16 j = -5; j < 5; j++) {
@@ -42,20 +42,16 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      state.world.grid.set({i,0,j}, new Ground);
+      state.world.grid.set({i,1,j}, new WalkableSpace);
 
-      auto& plane = createObjectFrom("plane");
+      // @todo create ground entities
+      auto& cube = createObjectFrom("ground-tile");
 
-      plane.position = gridCoordinatesToWorldPosition({ i, 0, j }) + Vec3f(0, -HALF_TILE_SIZE, 0);
-      plane.scale = TILE_SIZE;
+      cube.position = gridCoordinatesToWorldPosition({ i, -1, j });
+      cube.scale = HALF_TILE_SIZE * 0.98f;
+      cube.color = Vec3f(1.f, 0.7f, 0.3f);
 
-      plane.color = Vec3f(
-        Gm_Random(0.f, 0.3f),
-        Gm_Random(0.5f, 1.f),
-        Gm_Random(0.f, 0.7f)
-      );
-
-      commit(plane);
+      commit(cube);
     }
   }
 
@@ -65,21 +61,16 @@ static void addGroundTiles(args()) {
         continue;
       }
 
-      state.world.grid.set({i,j-5,0}, new Ground);
+      state.world.grid.set({i,j-5,-1}, new WalkableSpace);
 
-      auto& plane = createObjectFrom("plane");
+      // @todo create ground entities
+      auto& cube = createObjectFrom("ground-tile");
 
-      plane.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 }) + Vec3f(0, 0, -HALF_TILE_SIZE);
-      plane.scale = TILE_SIZE;
-      plane.rotation.x = -Gm_PI / 2.f;
+      cube.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 });
+      cube.scale = HALF_TILE_SIZE * 0.98f;
+      cube.color = Vec3f(1.f, 0.7f, 0.3f);
 
-      plane.color = Vec3f(
-        Gm_Random(0.5f, 1.f),
-        Gm_Random(0.f, 0.3f),
-        Gm_Random(0.1f, 0.4f)
-      );
-
-      commit(plane);
+      commit(cube);
     }
   }
 }
@@ -144,7 +135,9 @@ static void addRocks(args()) {
 
     commit(rock);
 
-    state.world.grid.remove(worldPositionToGridCoordinates(rock.position));
+    auto& coords = worldPositionToGridCoordinates(rock.position);
+
+    state.world.grid.remove({ coords.x, 1, coords.z });
   }
 }
 
@@ -158,51 +151,6 @@ static void addParticles(args()) {
   particles.deviation = 10.f;
   particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
-}
-
-static void addPlants(args()) {
-  addMesh("grass", 200, Mesh::Model("./game/models/grass/model.obj"));
-  addMesh("flower-stalk", 100, Mesh::Model("./game/models/flower/stalk.obj"));
-  addMesh("flower-petals", 100, Mesh::Model("./game/models/flower/petals.obj"));
-
-  mesh("flower-petals")->normalMap = "./game/models/flower/petals-normals.png";
-
-  for loop(uint8, 0, 200) {
-    auto& grass = createObjectFrom("grass");
-
-    grass.position = Vec3f(
-      Gm_Random(-70.f, 70.f),
-      0.f,
-      Gm_Random(-70.f, 70.f)
-    );
-
-    grass.scale = Gm_Random(1.f, 3.f);
-    grass.color = pVec4(0, 255, 0);
-    grass.rotation.y = Gm_Random(0.f, Gm_TAU);
-
-    commit(grass);
-  }
-
-  for loop(uint8, 0, 100) {
-    auto& stalk = createObjectFrom("flower-stalk");
-    auto& petals = createObjectFrom("flower-petals");
-
-    Vec3f position = Vec3f(
-      Gm_Random(-70.f, 70.f),
-      0.f,
-      Gm_Random(-70.f, 70.f)
-    );
-
-    stalk.position = petals.position = position;
-    stalk.scale = petals.scale = Gm_Random(1.f, 2.f);
-    stalk.rotation.y = petals.rotation.y = Gm_Random(0.f, Gm_TAU);
-
-    stalk.color = pVec4(0, 255, 0);
-    petals.color = Vec3f(Gm_Random(0.f, 1.f), Gm_Random(0.f, 1.f), Gm_Random(0.f, 1.f));
-
-    commit(stalk);
-    commit(petals);
-  }
 }
 
 static void addCacti(args()) {
@@ -231,7 +179,7 @@ static void addCacti(args()) {
 
     auto& coords = worldPositionToGridCoordinates(cactus.position);
 
-    state.world.grid.remove({ coords.x, coords.y, 0 });
+    state.world.grid.remove({ coords.x, coords.y, -1 });
   }
 }
 
@@ -284,10 +232,9 @@ static void addStatues(args()) {
 
   auto& coords = worldPositionToGridCoordinates(statue.position);
 
-  state.world.grid.remove({ coords.x, 0, coords.z });
+  state.world.grid.remove({ coords.x, 1, coords.z });
 
   addMesh("anubis", 1, Mesh::Model("./game/models/anubis/model.obj"));
-  // addMesh("anubis", 1, Mesh::Model("./game/models/rock/model.obj"));
   mesh("anubis")->type = MeshType::PROBE_REFLECTOR;
   mesh("anubis")->probe = "anubis-probe";
 
@@ -304,25 +251,25 @@ static void addStatues(args()) {
 
   auto& coords2 = worldPositionToGridCoordinates(anubis.position);
 
-  state.world.grid.remove({ coords2.x, coords2.y, 0 });
-  state.world.grid.remove({ coords2.x, coords2.y + 1, 0 });
-  state.world.grid.remove({ coords2.x, coords2.y - 1, 0 });
+  state.world.grid.remove({ coords2.x, coords2.y, -1 });
+  state.world.grid.remove({ coords2.x, coords2.y + 1, -1 });
+  state.world.grid.remove({ coords2.x, coords2.y - 1, -1 });
 }
 
 // @todo add entity indicators toggle
 static void addEntityIndicators(args()) {
   auto totalEntities = (s16)state.world.grid.size() + (s16)state.world.triggers.size();
 
-  addMesh("cube", totalEntities, Mesh::Cube());
+  addMesh("indicator", totalEntities, Mesh::Cube());
 
   for (auto& [ coordinates, entity ] : state.world.grid) {
-    auto& cube = createObjectFrom("cube");
+    auto& cube = createObjectFrom("indicator");
 
     cube.position = gridCoordinatesToWorldPosition(coordinates);
     cube.scale = 0.5f;
 
     switch (entity->type) {
-      case GROUND:
+      case WALKABLE_SPACE:
         cube.color = pVec4(0,0,255);
         break;
     }
@@ -332,7 +279,7 @@ static void addEntityIndicators(args()) {
 
   // @todo use spheres
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
-    auto& cube = createObjectFrom("cube");
+    auto& cube = createObjectFrom("indicator");
 
     cube.position = gridCoordinatesToWorldPosition(coordinates) + Vec3f(1.f);
     cube.scale = 0.5f;
@@ -383,7 +330,6 @@ void initializeGame(args()) {
   addStaircase(params());
   addRocks(params());
   addParticles(params());
-  addPlants(params());
   addCacti(params());
   addLamps(params());
   addStatues(params());
