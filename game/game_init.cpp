@@ -59,8 +59,6 @@ static void addGroundEntities(args()) {
     }
   }
 
-  grid.remove({-4,2,0});
-
   // Lower area
   for (s16 x = -5; x < 5; x++) {
     for (s16 y = -10; y < -1; y++) {
@@ -101,7 +99,8 @@ static void addStaircaseEntities(args()) {
   createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
   createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
 
-  // createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
+  createWorldOrientationChange({-3,1,0}, POSITIVE_Y_UP);
+  createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
 }
 
 static void addRocks(args()) {

@@ -76,16 +76,22 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
 
       break;
     }
-    case POSITIVE_X_UP:
-      // @todo properly define orientationTo
-      camera.orientation.roll = Gm_PI / 2.f;
-      state.worldOrientationState.orientationTo = camera.orientation;
+    case POSITIVE_X_UP: {
+      Orientation to = camera.orientation;
+
+      to.pitch += (Gm_PI / 2.f) * -sinf(to.yaw);
+      to.roll = Gm_PI / 2.f;
+
+      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
       break;
+    }
     case NEGATIVE_X_UP: {
-      // @todo properly define orientationTo
-      camera.orientation.roll = -Gm_PI / 2.f;
-      state.worldOrientationState.orientationTo = camera.orientation;
+      Orientation to = camera.orientation;
+
+      to.roll = -Gm_PI / 2.f;
+
+      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
       break;
     }

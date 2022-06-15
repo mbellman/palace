@@ -2,11 +2,11 @@
 
 namespace Gamma {
   constexpr float Gm_PI = 3.141592f;
-  constexpr float Gm_TAU = Gm_PI * 2.0f;
-  constexpr float Gm_HALF_PI = Gm_PI / 2.0f;
+  constexpr float Gm_TAU = Gm_PI * 2.f;
+  constexpr float Gm_HALF_PI = Gm_PI / 2.f;
 
   inline float Gm_Absf(float value) {
-    return value < 0.0f ? -value : value;
+    return value < 0.f ? -value : value;
   }
 
   inline float Gm_Clampf(float value, float min, float max) {
@@ -24,9 +24,9 @@ namespace Gamma {
     float range = b - a;
 
     if (range > maxRange) {
-      a += maxRange * 2.0f;
+      a += maxRange * 2.f;
     } else if (range < -maxRange) {
-      a -= maxRange * 2.0f;
+      a -= maxRange * 2.f;
     }
 
     return a + (b - a) * alpha;
