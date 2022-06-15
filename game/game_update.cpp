@@ -17,9 +17,9 @@ static void addDebugMessages(args()) {
     + std::to_string(coordinates.z);
 
   std::string orientationLabel = std::string("Orientation: ")
-    + "Pitch: " + std::to_string(camera.orientation.pitch) + ", "
-    + "Yaw: " + std::to_string(camera.orientation.yaw) + ", "
-    + "Roll: " + std::to_string(camera.orientation.roll);
+    + std::to_string(camera.orientation.pitch) + " (pitch), "
+    + std::to_string(camera.orientation.yaw) + " (yaw), "
+    + std::to_string(camera.orientation.roll) + " (roll)";
 
   addDebugMessage(positionLabel);
   addDebugMessage(orientationLabel);
