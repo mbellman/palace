@@ -26,9 +26,9 @@ static void addDebugMessages(args()) {
 }
 
 void updateGame(args(), float dt) {
-  handlePlayerMovement(params(), dt);
+  // handlePlayerMovement(params(), dt);
+  Gm_HandleFreeCameraMode(context, dt);
   handleWorldOrientation(params(), dt);
-  // Gm_HandleFreeCameraMode(context, dt);
 
   addDebugMessages(params());
 }

@@ -33,59 +33,106 @@ static void addKeyHandlers(args()) {
   });
 }
 
-static void addGroundEntities(args()) {
+template<typename E>
+static void addEntityOverRange(args(), const GridCoordinates& start, const GridCoordinates& end) {
   auto& grid = state.world.grid;
 
-  // Top area
-  for (s16 x = -5; x < 5; x++) {
-    for (s16 z = -5; z < 5; z++) {
-      if (x == 0 && (z == 1 || z == 2)) {
-        continue;
+  for (s16 x = start.x; x <= end.x; x++) {
+    for (s16 y = start.y; y <= end.y; y++) {
+      for (s16 z = start.z; z <= end.z; z++) {
+        grid.set({ x, y, z }, new E);
       }
-
-      grid.set({x,1,z}, new WalkableSpace);
-      grid.set({x,-1,z}, new Ground);
-    }
-  }
-
-  // Left area
-  for (s16 z = -5; z < 5; z++) {
-    for (s16 y = -1; y < 10; y++) {
-      grid.set({-6,y,z}, new Ground);
-
-      if (y >= 0) {
-        grid.set({-4,y,z}, new WalkableSpace);
-      }
-    }
-  }
-
-  // Lower area
-  for (s16 x = -5; x < 5; x++) {
-    for (s16 y = -10; y < -1; y++) {
-      if (x == 0 && (y == -2 || y == -1)) {
-        continue;
-      }
-
-      grid.set({x,y,-1}, new WalkableSpace);
-      grid.set({x,y,1}, new Ground);
     }
   }
 }
 
-static void addStaircaseEntities(args()) {
+static void addOrientationTestLayout(args()) {
   auto& grid = state.world.grid;
 
-  // Down to lower area
-  grid.set({0,-1,2}, new Staircase);
-  grid.set({0,-2,1}, new Staircase);
+  // Bottom area
+  addEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
 
-  // Up to left area
-  grid.set({-3,0,0}, new Staircase);
-  grid.get<Staircase>({-3,0,0})->orientation.yaw = -Gm_PI / 2.f;
-  grid.set({-4,1,0}, new Staircase);
-  grid.get<Staircase>({-4,1,0})->orientation.yaw = -Gm_PI / 2.f;
-  grid.set({-5,2,0}, new Staircase);
-  grid.get<Staircase>({-5,2,0})->orientation.yaw = -Gm_PI / 2.f;
+  // Left area
+  addEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
+
+  // Right area
+  addEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
+  
+  // Top area
+  addEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
+
+  // Back area
+  addEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
+
+  // Front area
+  addEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
+
+  // Bottom to left staircase
+  grid.set({ -2, 0, 0 }, new Staircase);
+  grid.get<Staircase>({ -2, 0, 0 })->orientation.yaw = -Gm_PI / 2.f;
+  grid.set({ -3, 1, 0 }, new Staircase);
+  grid.get<Staircase>({ -3, 1, 0 })->orientation.yaw = -Gm_PI / 2.f;
+  grid.set({ -4, 2, 0 }, new Staircase);
+  grid.get<Staircase>({ -4, 2, 0 })->orientation.yaw = -Gm_PI / 2.f;
+
+  // Bottom to front staircase
+  grid.set({ 0, 0, 2 }, new Staircase);
+  grid.set({ 0, 1, 3 }, new Staircase);
+  grid.set({ 0, 2, 4 }, new Staircase);
+
+  // Bottom to right staircase
+  grid.set({ 2, 0, 0 }, new Staircase);
+  grid.get<Staircase>({ 2, 0, 0 })->orientation.yaw = Gm_PI / 2.f;
+  grid.set({ 3, 1, 0 }, new Staircase);
+  grid.get<Staircase>({ 3, 1, 0 })->orientation.yaw = Gm_PI / 2.f;
+  grid.set({ 4, 2, 0 }, new Staircase);
+  grid.get<Staircase>({ 4, 2, 0 })->orientation.yaw = Gm_PI / 2.f;
+
+  // Bottom to back staircase
+  grid.set({ 0, 0, -2 }, new Staircase);
+  grid.get<Staircase>({ 0, 0, -2 })->orientation.yaw = Gm_PI;
+  grid.set({ 0, 1, -3 }, new Staircase);
+  grid.get<Staircase>({ 0, 1, -3 })->orientation.yaw = Gm_PI;
+  grid.set({ 0, 2, -4 }, new Staircase);
+  grid.get<Staircase>({ 0, 2, -4 })->orientation.yaw = Gm_PI;
+
+  // Left to front staircase
+  grid.set({ -4, 4, 2 }, new Staircase);
+  grid.get<Staircase>({ -4, 4, 2 })->orientation.roll = Gm_PI / 2.f;
+  grid.set({ -3, 4, 3 }, new Staircase);
+  grid.get<Staircase>({ -3, 4, 3 })->orientation.roll = Gm_PI / 2.f;
+  grid.set({ -2, 4, 4 }, new Staircase);
+  grid.get<Staircase>({ -2, 4, 4 })->orientation.roll = Gm_PI / 2.f;
+
+  // Left to back staircase
+  grid.set({ -4, 4, -2 }, new Staircase);
+  grid.get<Staircase>({ -4, 4, -2 })->orientation.roll = Gm_PI / 2.f;
+  grid.get<Staircase>({ -4, 4, -2 })->orientation.yaw = Gm_PI;
+  grid.set({ -3, 4, -3 }, new Staircase);
+  grid.get<Staircase>({ -3, 4, -3 })->orientation.roll = Gm_PI / 2.f;
+  grid.get<Staircase>({ -3, 4, -3 })->orientation.yaw = Gm_PI;
+  grid.set({ -2, 4, -4 }, new Staircase);
+  grid.get<Staircase>({ -2, 4, -4 })->orientation.roll = Gm_PI / 2.f;
+  grid.get<Staircase>({ -2, 4, -4 })->orientation.yaw = Gm_PI;
+
+  // Left to top staircase
+  grid.set({ -4, 6, 0 }, new Staircase);
+  grid.get<Staircase>({ -4, 6, 0 })->orientation.yaw = -Gm_PI / 2.f;
+  grid.get<Staircase>({ -4, 6, 0 })->orientation.roll = Gm_PI / 2.f;
+  grid.set({ -3, 7, 0 }, new Staircase);
+  grid.get<Staircase>({ -3, 7, 0 })->orientation.yaw = -Gm_PI / 2.f;
+  grid.get<Staircase>({ -3, 7, 0 })->orientation.roll = Gm_PI / 2.f;
+  grid.set({ -2, 8, 0 }, new Staircase);
+  grid.get<Staircase>({ -2, 8, 0 })->orientation.yaw = -Gm_PI / 2.f;
+  grid.get<Staircase>({ -2, 8, 0 })->orientation.roll = Gm_PI / 2.f;
+
+  // Front to right staircase
+  grid.set({ 2, 4, 4 }, new Staircase);
+  grid.get<Staircase>({ 2, 4, 4 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 3, 4, 3 }, new Staircase);
+  grid.get<Staircase>({ 3, 4, 3 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 4, 4, 2 }, new Staircase);
+  grid.get<Staircase>({ 4, 4, 2 })->orientation.roll = -Gm_PI / 2.f;
 
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
@@ -95,40 +142,6 @@ static void addStaircaseEntities(args()) {
 
     state.world.triggers.set(coordinates, trigger);
   };
-
-  createWorldOrientationChange({0,0,2}, POSITIVE_Y_UP);
-  createWorldOrientationChange({0,-2,0}, NEGATIVE_Z_UP);
-
-  createWorldOrientationChange({-3,1,0}, POSITIVE_Y_UP);
-  createWorldOrientationChange({-4,2,0}, POSITIVE_X_UP);
-}
-
-static void addRocks(args()) {
-  addMesh("rock", 5, Mesh::Model("./game/models/rock/model.obj"));
-
-  auto randomPosition = []() {
-    return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
-  };
-
-  for loop(uint8, 0, 5) {
-    auto& rock = createObjectFrom("rock");
-
-    rock.position = Vec3f(
-      randomPosition(),
-      1.f,
-      randomPosition()
-    );
-
-    rock.rotation.y = Gm_Random(0.f, Gm_TAU);
-    rock.scale = Gm_Random(6.f, 9.f);
-    rock.scale.y *= 1.5f;
-
-    commit(rock);
-
-    auto& coords = worldPositionToGridCoordinates(rock.position);
-
-    state.world.grid.remove({ coords.x, 1, coords.z });
-  }
 }
 
 static void addParticles(args()) {
@@ -141,75 +154,6 @@ static void addParticles(args()) {
   particles.deviation = 10.f;
   particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
-}
-
-static void addCacti(args()) {
-  addMesh("cactus", 5, Mesh::Model("./game/models/cactus/model.obj"));
-
-  auto randomPosition = [](float low, float high) {
-    return std::roundf(Gm_Random(low, high)) * TILE_SIZE + HALF_TILE_SIZE;
-  };
-
-  for loop(uint8, 0, 5) {
-    auto& cactus = createObjectFrom("cactus");
-
-    cactus.color = Vec3f(0.6f, 1.f, 0.3f);
-    cactus.scale = Gm_Random(8.f, 15.f);
-
-    cactus.position = Vec3f(
-      randomPosition(-5.f, 4.f),
-      randomPosition(-10.f, -3.f),
-      TILE_SIZE
-    );
-
-    cactus.rotation.x = -Gm_PI / 2.f;
-    cactus.rotation.z = Gm_Random(0, Gm_PI);
-
-    commit(cactus);
-
-    auto& coords = worldPositionToGridCoordinates(cactus.position);
-
-    state.world.grid.remove({ coords.x, coords.y, -1 });
-  }
-}
-
-static void addStatues(args()) {
-  addMesh("statue", 1, Mesh::Model("./game/models/statue/model.obj"));
-  mesh("statue")->type = MeshType::REFRACTIVE;
-
-  auto& statue = createObjectFrom("statue");
-
-  statue.position = gridCoordinatesToWorldPosition({ 0, 0, 0 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
-  statue.scale = HALF_TILE_SIZE;
-  statue.color = pVec4(200, 220, 255);
-  statue.rotation.y = Gm_PI;
-
-  commit(statue);
-
-  auto& coords = worldPositionToGridCoordinates(statue.position);
-
-  state.world.grid.remove({ coords.x, 1, coords.z });
-
-  addMesh("anubis", 1, Mesh::Model("./game/models/anubis/model.obj"));
-  mesh("anubis")->type = MeshType::PROBE_REFLECTOR;
-  mesh("anubis")->probe = "anubis-probe";
-
-  auto& anubis = createObjectFrom("anubis");
-
-  anubis.position = gridCoordinatesToWorldPosition({ 0, -9, 0 }) + Vec3f(0, 0, HALF_TILE_SIZE);
-  anubis.scale = TILE_SIZE;
-  anubis.rotation = Vec3f(-Gm_PI / 2.f, 0, Gm_PI / 2.f);
-  anubis.color = Vec3f(0.4f, 0.6f, 1.f);
-
-  commit(anubis);
-
-  addProbe("anubis-probe", anubis.position + Vec3f(0, 0, -TILE_SIZE));
-
-  auto& coords2 = worldPositionToGridCoordinates(anubis.position);
-
-  state.world.grid.remove({ coords2.x, coords2.y, -1 });
-  state.world.grid.remove({ coords2.x, coords2.y + 1, -1 });
-  state.world.grid.remove({ coords2.x, coords2.y - 1, -1 });
 }
 
 static void addEntityObjects(args()) {
@@ -240,8 +184,10 @@ static void addEntityObjects(args()) {
         staircase.position = gridCoordinatesToWorldPosition(coordinates);
         staircase.color = Vec3f(0.5f);
         staircase.scale = HALF_TILE_SIZE;
+        staircase.rotation.x = stairs->orientation.pitch;
         // @todo use proper model orientation to avoid the -PI/2 offset here
         staircase.rotation.y = -Gm_PI / 2.f + stairs->orientation.yaw;
+        staircase.rotation.z = -stairs->orientation.roll;
 
         commit(staircase);
         break;
@@ -323,20 +269,18 @@ void initializeGame(args()) {
   });
 
   addKeyHandlers(params());
-  addGroundEntities(params());
-  addStaircaseEntities(params());
-  // addRocks(params());
+  addOrientationTestLayout(params());
   addParticles(params());
-  // addCacti(params());
-  // addStatues(params());
 
   addEntityObjects(params());
   addInvisibleEntityIndicators(params());
 
-  auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
+  auto& light = createLight(LightType::POINT_SHADOWCASTER);
 
-  light.direction = Vec3f(0.3f, 0.5f, -1.0f).invert();
   light.color = Vec3f(1.f, 0.8f, 0.4f);
+  light.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
+  light.radius = 500.f;
+  light.isStatic = true;
 
-  camera.position = gridCoordinatesToWorldPosition({ 0, 1, -5 });
+  camera.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
 }
