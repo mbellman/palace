@@ -188,6 +188,9 @@ void Gm_Commit(GmContext* context, const Gamma::Object& object) {
 }
 
 Gamma::ObjectPool& Gm_GetObjects(GmContext* context, const std::string& meshName) {
+  // @todo #if GAMMA_DEVELOPER_MODE
+  Gamma::assert(context->scene.meshMap.find(meshName) != context->scene.meshMap.end(), "Mesh '" + meshName + "' not found");
+
   return context->scene.meshMap[meshName]->objects;
 }
 
