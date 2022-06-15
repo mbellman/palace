@@ -9,6 +9,7 @@
  */
 enum StaticEntityType {
   GROUND,
+  STAIRCASE,
   WALKABLE_SPACE,
   STAIRCASE_MOVER
 };
@@ -21,6 +22,12 @@ struct StaticEntity {
 
 struct Ground : StaticEntity {
   Ground(): StaticEntity(GROUND) {};
+};
+
+struct Staircase : StaticEntity {
+  Staircase(): StaticEntity(STAIRCASE) {};
+
+  Gamma::Orientation orientation;
 };
 
 struct WalkableSpace : StaticEntity {
@@ -46,9 +53,9 @@ struct TriggerEntity {
 };
 
 struct WorldOrientationChange : TriggerEntity {
-  WorldOrientation targetWorldOrientation;
-
   WorldOrientationChange(): TriggerEntity(WORLD_ORIENTATION_CHANGE) {};
+
+  WorldOrientation targetWorldOrientation;
 };
 
 /**

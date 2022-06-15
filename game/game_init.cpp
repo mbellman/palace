@@ -33,9 +33,7 @@ static void addKeyHandlers(args()) {
   });
 }
 
-static void addGroundTiles(args()) {
-  addMesh("ground-tile", 196, Mesh::Cube());
-
+static void addGroundEntities(args()) {
   for (s16 i = -5; i < 5; i++) {
     for (s16 j = -5; j < 5; j++) {
       if (i == 0 && (j == 1 || j == 2)) {
@@ -43,15 +41,7 @@ static void addGroundTiles(args()) {
       }
 
       state.world.grid.set({i,1,j}, new WalkableSpace);
-
-      // @todo create ground entities
-      auto& cube = createObjectFrom("ground-tile");
-
-      cube.position = gridCoordinatesToWorldPosition({ i, -1, j });
-      cube.scale = HALF_TILE_SIZE * 0.98f;
-      cube.color = Vec3f(1.f, 0.7f, 0.3f);
-
-      commit(cube);
+      state.world.grid.set({i,-1,j}, new Ground);
     }
   }
 
@@ -62,39 +52,14 @@ static void addGroundTiles(args()) {
       }
 
       state.world.grid.set({i,j-5,-1}, new WalkableSpace);
-
-      // @todo create ground entities
-      auto& cube = createObjectFrom("ground-tile");
-
-      cube.position = gridCoordinatesToWorldPosition({ i, j - 5, 1 });
-      cube.scale = HALF_TILE_SIZE * 0.98f;
-      cube.color = Vec3f(1.f, 0.7f, 0.3f);
-
-      commit(cube);
+      state.world.grid.set({i,j-5,1}, new Ground);
     }
   }
 }
 
-static void addStaircase(args()) {
-  addMesh("stairs", 2, Mesh::Model("./game/models/staircase/model.obj"));
-
-  auto& s1 = createObjectFrom("stairs");
-  auto& s2 = createObjectFrom("stairs");
-
-  s1.position = gridCoordinatesToWorldPosition({ 0, 0, 2 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
-  s1.position.y -= 7.5f;
-  s1.scale = 7.5f;
-  s1.color = Vec3f(0.5f);
-  s1.rotation.y = -Gm_PI / 2.f;
-
-  s2.position = gridCoordinatesToWorldPosition({ 0, -1, 1 }) + Vec3f(0, -HALF_TILE_SIZE, 0);
-  s2.position.y -= 7.5f;
-  s2.scale = 7.5f;
-  s2.color = Vec3f(0.5f);
-  s2.rotation.y = -Gm_PI / 2.f;
-
-  commit(s1);
-  commit(s2);
+static void addStaircaseEntities(args()) {
+  state.world.grid.set({0,-1,2}, new Staircase);
+  state.world.grid.set({0,-2,1}, new Staircase);
 
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
@@ -183,40 +148,6 @@ static void addCacti(args()) {
   }
 }
 
-static void addLamps(args()) {
-  addMesh("lamp", 5, Mesh::Model("./game/models/lamp/model.obj"));
-
-  mesh("lamp")->texture = "./game/models/lamp/texture.png";
-  mesh("lamp")->normalMap = "./game/models/lamp/normals.png";
-
-  auto randomPosition = []() {
-    return std::roundf(Gm_Random(-5.f, 4.f)) * TILE_SIZE + HALF_TILE_SIZE;
-  };
-
-  for loop(uint8, 0, 5) {
-    auto& lamp = createObjectFrom("lamp");
-
-    lamp.position = Vec3f(
-      randomPosition(),
-      25.f,
-      randomPosition()
-    );
-
-    lamp.rotation.y = Gm_Random(0.f, Gm_TAU);
-    lamp.scale = 5.f;
-
-    commit(lamp);
-
-    auto& light = createLight(LightType::POINT_SHADOWCASTER);
-
-    light.color = Vec3f(1.f, 0.3f, 0.1f);
-    light.position = lamp.position - Vec3f(0, TILE_SIZE, 0);
-    light.power = 2.f;
-    light.radius = 20.f;
-    light.isStatic = true;
-  }
-}
-
 static void addStatues(args()) {
   addMesh("statue", 1, Mesh::Model("./game/models/statue/model.obj"));
   mesh("statue")->type = MeshType::REFRACTIVE;
@@ -256,41 +187,88 @@ static void addStatues(args()) {
   state.world.grid.remove({ coords2.x, coords2.y - 1, -1 });
 }
 
-// @todo add entity indicators toggle
-static void addEntityIndicators(args()) {
+static void addEntityObjects(args()) {
+  // @todo count entities by type
+  addMesh("ground-tile", 196, Mesh::Cube());
+  addMesh("staircase", 2, Mesh::Model("./game/models/staircase/model.obj"));
+
+  for (auto& [ coordinates, entity ] : state.world.grid) {
+    switch (entity->type) {
+      case GROUND: {
+        // @todo createGroundTileObject()
+        auto& ground = createObjectFrom("ground-tile");
+
+        ground.position = gridCoordinatesToWorldPosition(coordinates);
+        ground.scale = HALF_TILE_SIZE * 0.98f;
+        ground.color = Vec3f(1.f, 0.7f, 0.3f);
+
+        commit(ground);
+        break;
+      }
+      case STAIRCASE: {
+        // @todo createStaircaseObject()
+        auto& staircase = createObjectFrom("staircase");
+
+        staircase.position = gridCoordinatesToWorldPosition(coordinates);
+        staircase.color = Vec3f(0.5f);
+        staircase.scale = HALF_TILE_SIZE;
+        staircase.rotation.y = -Gm_PI / 2.f;  // @todo use entity orientation
+
+        commit(staircase);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
+// @todo allow indicators to be toggled
+static void addInvisibleEntityIndicators(args()) {
   auto totalEntities = (s16)state.world.grid.size() + (s16)state.world.triggers.size();
 
   addMesh("indicator", totalEntities, Mesh::Cube());
 
   for (auto& [ coordinates, entity ] : state.world.grid) {
-    auto& cube = createObjectFrom("indicator");
-
-    cube.position = gridCoordinatesToWorldPosition(coordinates);
-    cube.scale = 0.5f;
-
     switch (entity->type) {
-      case WALKABLE_SPACE:
-        cube.color = pVec4(0,0,255);
+      case WALKABLE_SPACE: {
+        auto& indicator = createObjectFrom("indicator");
+
+        indicator.position = gridCoordinatesToWorldPosition(coordinates);
+        indicator.scale = 0.5f;
+        indicator.color = pVec4(0,0,255);
+
+        commit(indicator);
         break;
+      }
+      case STAIRCASE_MOVER: {
+        auto& indicator = createObjectFrom("indicator");
+
+        indicator.position = gridCoordinatesToWorldPosition(coordinates);
+        indicator.scale = 0.5f;
+        indicator.color = pVec4(0,255,0);
+
+        commit(indicator);
+        break;
+      }
     }
 
-    commit(cube);
   }
 
   // @todo use spheres
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
-    auto& cube = createObjectFrom("indicator");
-
-    cube.position = gridCoordinatesToWorldPosition(coordinates) + Vec3f(1.f);
-    cube.scale = 0.5f;
-
     switch (trigger->type) {
-      case WORLD_ORIENTATION_CHANGE:
-        cube.color = pVec4(255,0,255);
-        break;
-    }
+      case WORLD_ORIENTATION_CHANGE: {
+        auto& indicator = createObjectFrom("indicator");
 
-    commit(cube);
+        indicator.position = gridCoordinatesToWorldPosition(coordinates) + Vec3f(1.f);
+        indicator.scale = 0.5f;
+        indicator.color = pVec4(255,0,0);
+
+        commit(indicator);
+        break;
+      }
+    }
   }
 }
 
@@ -326,14 +304,15 @@ void initializeGame(args()) {
   });
 
   addKeyHandlers(params());
-  addGroundTiles(params());
-  addStaircase(params());
+  addGroundEntities(params());
+  addStaircaseEntities(params());
   addRocks(params());
   addParticles(params());
   addCacti(params());
-  addLamps(params());
   addStatues(params());
-  addEntityIndicators(params());
+
+  addEntityObjects(params());
+  addInvisibleEntityIndicators(params());
 
   auto& light = createLight(LightType::DIRECTIONAL_SHADOWCASTER);
 

@@ -48,6 +48,10 @@ struct DynamicEntityManager {
   DynamicEntity* entities = nullptr;
 };
 
+struct Area {
+  // @todo
+};
+
 struct World {
   GridMap<StaticEntity> grid;
   GridMap<TriggerEntity> triggers;

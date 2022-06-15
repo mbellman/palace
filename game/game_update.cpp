@@ -12,12 +12,6 @@ void updateGame(args(), float dt) {
   handleWorldOrientation(params(), dt);
   // Gm_HandleFreeCameraMode(context, dt);
 
-  for (auto& lamp : objects("lamp")) {
-    lamp.position.y = 25.f + std::sinf(getRunningTime() * 0.5f + lamp.position.x + lamp.position.z);
-
-    commit(lamp);
-  }
-
   auto& camera = getCamera();
   auto& coordinates = worldPositionToGridCoordinates(camera.position);
 
