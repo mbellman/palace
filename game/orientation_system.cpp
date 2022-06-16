@@ -10,22 +10,66 @@ using namespace Gamma;
 typedef std::tuple<WorldOrientation, WorldOrientation> OrientationTransition;
 typedef std::function<void(Orientation&, Camera&)> OrientationHandler;
 
-#define transition(from, to) { from, to }, [](Orientation& orientation, Camera& camera)
-
-const static std::map<OrientationTransition, OrientationHandler> orientationHandlerMap = {
-  {
-    transition(POSITIVE_Y_UP, NEGATIVE_Z_UP) {
-      orientation.roll = camera.orientation.yaw;
-    }
-  },
-  {
-    transition(NEGATIVE_Z_UP, POSITIVE_Y_UP) {
-      orientation.yaw = camera.orientation.roll;
-    }
-  }
-};
+#define transition() [](Orientation& orientation, Camera& camera)
 
 static void defaultOrientationHandler(Orientation& orientation, Camera& camera) {}
+
+static void rollFromYaw(Orientation& orientation, Camera& camera) {
+  orientation.roll = camera.orientation.yaw;
+}
+
+static void rollFromInverseYaw(Orientation& orientation, Camera& camera) {
+  orientation.roll = -camera.orientation.yaw;
+}
+
+static void yawFromYaw(Orientation& orientation, Camera& camera) {
+  orientation.yaw = camera.orientation.yaw;
+}
+
+static void yawFromRoll(Orientation& orientation, Camera& camera) {
+  orientation.yaw = camera.orientation.roll;
+}
+
+static void yawFromInverseRoll(Orientation& orientation, Camera& camera) {
+  orientation.yaw = -camera.orientation.roll;
+}
+
+// @todo allow reverse mappings to be implicit
+const static std::map<OrientationTransition, OrientationHandler> orientationHandlerMap = {
+  // +Y Up ->
+  { {POSITIVE_Y_UP, POSITIVE_Z_UP}, rollFromInverseYaw },
+  { {POSITIVE_Y_UP, NEGATIVE_Z_UP}, rollFromYaw },
+  { {POSITIVE_Y_UP, POSITIVE_X_UP}, yawFromYaw },
+  { {POSITIVE_Y_UP, NEGATIVE_X_UP}, yawFromYaw },
+
+  // -Y Up ->
+  { {NEGATIVE_Y_UP, NEGATIVE_Z_UP}, rollFromInverseYaw },
+
+  // +X Up ->
+  { {POSITIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
+  { {POSITIVE_X_UP, NEGATIVE_Z_UP}, transition() {
+    orientation.roll = camera.orientation.yaw + Gm_PI / 2.f;
+  }},
+
+  // -X Up ->
+  { {NEGATIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
+  { {NEGATIVE_X_UP, NEGATIVE_Z_UP}, transition() {
+    orientation.roll = camera.orientation.yaw - Gm_PI / 2.f;
+  }},
+
+  // +Z Up ->
+  { {POSITIVE_Z_UP, POSITIVE_Y_UP}, yawFromInverseRoll },
+
+  // -Z Up ->
+  { {NEGATIVE_Z_UP, POSITIVE_Y_UP}, yawFromRoll },
+  { {NEGATIVE_Z_UP, NEGATIVE_Y_UP}, yawFromInverseRoll },
+  { {NEGATIVE_Z_UP, POSITIVE_X_UP}, transition() {
+    orientation.yaw = camera.orientation.roll - Gm_PI / 2.f;
+  }},
+  { {NEGATIVE_Z_UP, NEGATIVE_X_UP}, transition() {
+    orientation.yaw = camera.orientation.roll + Gm_PI / 2.f;
+  }}
+};
 
 void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   auto& camera = getCamera();
@@ -114,7 +158,7 @@ void setWorldOrientation(args(), WorldOrientation targetWorldOrientation) {
       break;
     }
     case NEGATIVE_X_UP: {
-      to.pitch = Gm_PI;
+      to.pitch = 0.f;
       to.roll = -Gm_PI / 2.f;
 
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
