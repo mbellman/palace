@@ -46,32 +46,54 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
     return;
   }
 
+  // @todo fix issues with incorrect yaw/roll after orientation transitions
   switch (worldOrientation) {
-    case POSITIVE_Y_UP:
-    case NEGATIVE_Y_UP: {
-      // @todo cleanup
-      Orientation o = camera.orientation;
-      o.face(o.getDirection(), o.getUpDirection());
-      o.roll = 0.f;
+    case POSITIVE_Y_UP: {
+      Orientation to;
 
-      state.worldOrientationState.orientationTo = o;
+      to.pitch = 0.f;
+      to.yaw = camera.orientation.roll;
+      to.roll = 0.f;
+
+      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
 
       break;
     }
-    case POSITIVE_Z_UP:
+    case NEGATIVE_Y_UP: {
+      Orientation to;
+
+      to.pitch = Gm_PI;
+      to.yaw = camera.orientation.roll;
+      to.roll = 0.f;
+
+      state.worldOrientationState.orientationTo = to;
+      state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
+
+      break;
+    }
+    case POSITIVE_Z_UP: {
+      auto direction = camera.orientation.getDirection();
+
+      Orientation to;
+      to.pitch = Gm_PI / 2.f;
+      to.roll = camera.orientation.yaw;
+      to.yaw = 0.f;
+
+      state.worldOrientationState.orientationTo = to;
+      state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
+
+      break;
+    }
     case NEGATIVE_Z_UP: {
-      // @todo cleanup
-      Orientation o = camera.orientation;
-      Vec3f dir = o.getDirection();
+      auto direction = camera.orientation.getDirection();
 
-      Orientation t;
-      t.roll = atan2f(dir.y, dir.x) - Gm_PI / 2.f;
-      // @hack add a small adjustment term to avoid pitch drifting issues
-      t.pitch = dir.z * Gm_PI / 2.f - Gm_PI / 2.f + 0.2f;
-      t.yaw = 0.f;
+      Orientation to;
+      to.pitch = Gm_PI + Gm_PI / 2.f;
+      to.roll = camera.orientation.yaw;
+      to.yaw = 0.f;
 
-      state.worldOrientationState.orientationTo = t;
+      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
 
       break;
@@ -79,7 +101,9 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
     case POSITIVE_X_UP: {
       Orientation to = camera.orientation;
 
-      to.pitch += (Gm_PI / 2.f) * -sinf(to.yaw);
+      // @todo this is currently broken
+      to.pitch += -(Gm_PI / 2.f) * sinf(to.yaw) - Gm_PI * sinf(to.roll);
+      to.yaw -= Gm_PI * sinf(to.roll);
       to.roll = Gm_PI / 2.f;
 
       state.worldOrientationState.orientationTo = to;
@@ -89,6 +113,8 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
     case NEGATIVE_X_UP: {
       Orientation to = camera.orientation;
 
+      // @todo this is currently broken
+      to.pitch += (Gm_PI / 2.f) * sinf(to.yaw);
       to.roll = -Gm_PI / 2.f;
 
       state.worldOrientationState.orientationTo = to;
@@ -100,6 +126,12 @@ void setWorldOrientation(args(), WorldOrientation worldOrientation) {
   state.worldOrientationState.startTime = getRunningTime();
   state.worldOrientationState.worldOrientation = worldOrientation;
   state.worldOrientationState.orientationFrom = camera.orientation;
+
+  // Pre-emptively set the new camera orientation,
+  // preventing movement bugs during the orientation
+  // transition. The camera's rotation quaternion will
+  // represent the apparent orientation in the meantime.
+  camera.orientation = state.worldOrientationState.orientationTo;
 }
 
 void handleWorldOrientation(args(), float dt) {

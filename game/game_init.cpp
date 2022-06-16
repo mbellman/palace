@@ -48,24 +48,48 @@ static void addEntityOverRange(args(), const GridCoordinates& start, const GridC
 
 static void addOrientationTestLayout(args()) {
   auto& grid = state.world.grid;
+  auto& triggers = state.world.triggers;
 
   // Bottom area
   addEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
 
   // Left area
   addEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
 
   // Right area
   addEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
   
   // Top area
   addEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
 
   // Back area
   addEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
 
   // Front area
   addEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
+
+  // @todo define elsewhere
+  auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
+    auto* trigger = new WorldOrientationChange;
+
+    trigger->targetWorldOrientation = target;
+
+    state.world.triggers.set(coordinates, trigger);
+  };
+
+  // Bottom to front staircase
+  grid.set({ 0, 0, 2 }, new Staircase);
+  grid.set({ 0, 1, 3 }, new Staircase);
+  grid.set({ 0, 2, 4 }, new Staircase);
+
+  createWorldOrientationChange({ 0, 1, 2 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 0, 2, 3 }, NEGATIVE_Z_UP);
 
   // Bottom to left staircase
   grid.set({ -2, 0, 0 }, new Staircase);
@@ -75,10 +99,8 @@ static void addOrientationTestLayout(args()) {
   grid.set({ -4, 2, 0 }, new Staircase);
   grid.get<Staircase>({ -4, 2, 0 })->orientation.yaw = -Gm_PI / 2.f;
 
-  // Bottom to front staircase
-  grid.set({ 0, 0, 2 }, new Staircase);
-  grid.set({ 0, 1, 3 }, new Staircase);
-  grid.set({ 0, 2, 4 }, new Staircase);
+  createWorldOrientationChange({ -2, 1, 0 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ -3, 2, 0 }, POSITIVE_X_UP);
 
   // Bottom to right staircase
   grid.set({ 2, 0, 0 }, new Staircase);
@@ -88,6 +110,9 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 4, 2, 0 }, new Staircase);
   grid.get<Staircase>({ 4, 2, 0 })->orientation.yaw = Gm_PI / 2.f;
 
+  createWorldOrientationChange({ 2, 1, 0 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 3, 2, 0 }, NEGATIVE_X_UP);
+
   // Bottom to back staircase
   grid.set({ 0, 0, -2 }, new Staircase);
   grid.get<Staircase>({ 0, 0, -2 })->orientation.yaw = Gm_PI;
@@ -96,6 +121,9 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 0, 2, -4 }, new Staircase);
   grid.get<Staircase>({ 0, 2, -4 })->orientation.yaw = Gm_PI;
 
+  createWorldOrientationChange({ 0, 1, -2 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 0, 2, -3 }, POSITIVE_Z_UP);
+
   // Left to front staircase
   grid.set({ -4, 4, 2 }, new Staircase);
   grid.get<Staircase>({ -4, 4, 2 })->orientation.roll = Gm_PI / 2.f;
@@ -103,6 +131,9 @@ static void addOrientationTestLayout(args()) {
   grid.get<Staircase>({ -3, 4, 3 })->orientation.roll = Gm_PI / 2.f;
   grid.set({ -2, 4, 4 }, new Staircase);
   grid.get<Staircase>({ -2, 4, 4 })->orientation.roll = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ -2, 4, 3 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ -3, 4, 2 }, POSITIVE_X_UP);
 
   // Left to back staircase
   grid.set({ -4, 4, -2 }, new Staircase);
@@ -134,6 +165,9 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 4, 4, 2 }, new Staircase);
   grid.get<Staircase>({ 4, 4, 2 })->orientation.roll = -Gm_PI / 2.f;
 
+  createWorldOrientationChange({ 3, 4, 2 }, NEGATIVE_X_UP);
+  createWorldOrientationChange({ 2, 4, 3 }, NEGATIVE_Z_UP);
+
   // Front to top staircase
   grid.set({ 0, 6, 4 }, new Staircase);
   grid.get<Staircase>({ 0, 6, 4 })->orientation.pitch = -Gm_PI / 2.f;
@@ -141,6 +175,9 @@ static void addOrientationTestLayout(args()) {
   grid.get<Staircase>({ 0, 7, 3 })->orientation.pitch = -Gm_PI / 2.f;
   grid.set({ 0, 8, 2 }, new Staircase);
   grid.get<Staircase>({ 0, 8, 2 })->orientation.pitch = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 0, 6, 3 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ 0, 7, 2 }, NEGATIVE_Y_UP);
 
   // Right to top staircase
   grid.set({ 4, 6, 0 }, new Staircase);
@@ -174,15 +211,6 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 4, 4, -2 }, new Staircase);
   grid.get<Staircase>({ 4, 4, -2 })->orientation.yaw = Gm_PI;
   grid.get<Staircase>({ 4, 4, -2 })->orientation.roll = -Gm_PI / 2.f;
-
-  // @todo define elsewhere
-  auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
-    auto* trigger = new WorldOrientationChange;
-
-    trigger->targetWorldOrientation = target;
-
-    state.world.triggers.set(coordinates, trigger);
-  };
 }
 
 static void addParticles(args()) {
@@ -324,5 +352,5 @@ void initializeGame(args()) {
   light.radius = 500.f;
   light.isStatic = true;
 
-  camera.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
+  camera.position = gridCoordinatesToWorldPosition({ 0, 1, 0 });
 }
