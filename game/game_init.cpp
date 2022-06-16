@@ -134,6 +134,47 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 4, 4, 2 }, new Staircase);
   grid.get<Staircase>({ 4, 4, 2 })->orientation.roll = -Gm_PI / 2.f;
 
+  // Front to top staircase
+  grid.set({ 0, 6, 4 }, new Staircase);
+  grid.get<Staircase>({ 0, 6, 4 })->orientation.pitch = -Gm_PI / 2.f;
+  grid.set({ 0, 7, 3 }, new Staircase);
+  grid.get<Staircase>({ 0, 7, 3 })->orientation.pitch = -Gm_PI / 2.f;
+  grid.set({ 0, 8, 2 }, new Staircase);
+  grid.get<Staircase>({ 0, 8, 2 })->orientation.pitch = -Gm_PI / 2.f;
+
+  // Right to top staircase
+  grid.set({ 4, 6, 0 }, new Staircase);
+  grid.get<Staircase>({ 4, 6, 0 })->orientation.yaw = Gm_PI / 2.f;
+  grid.get<Staircase>({ 4, 6, 0 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 3, 7, 0 }, new Staircase);
+  grid.get<Staircase>({ 3, 7, 0 })->orientation.yaw = Gm_PI / 2.f;
+  grid.get<Staircase>({ 3, 7, 0 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 2, 8, 0 }, new Staircase);
+  grid.get<Staircase>({ 2, 8, 0 })->orientation.yaw = Gm_PI / 2.f;
+  grid.get<Staircase>({ 2, 8, 0 })->orientation.roll = -Gm_PI / 2.f;
+
+  // Back to top staircase
+  grid.set({ 0, 6, -4 }, new Staircase);
+  grid.get<Staircase>({ 0, 6, -4 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 0, 6, -4 })->orientation.pitch = Gm_PI / 2.f;
+  grid.set({ 0, 7, -3 }, new Staircase);
+  grid.get<Staircase>({ 0, 7, -3 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 0, 7, -3 })->orientation.pitch = Gm_PI / 2.f;
+  grid.set({ 0, 8, -2 }, new Staircase);
+  grid.get<Staircase>({ 0, 8, -2 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 0, 8, -2 })->orientation.pitch = Gm_PI / 2.f;
+
+  // Back to right staircase
+  grid.set({ 2, 4, -4 }, new Staircase);
+  grid.get<Staircase>({ 2, 4, -4 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 2, 4, -4 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 3, 4, -3 }, new Staircase);
+  grid.get<Staircase>({ 3, 4, -3 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 3, 4, -3 })->orientation.roll = -Gm_PI / 2.f;
+  grid.set({ 4, 4, -2 }, new Staircase);
+  grid.get<Staircase>({ 4, 4, -2 })->orientation.yaw = Gm_PI;
+  grid.get<Staircase>({ 4, 4, -2 })->orientation.roll = -Gm_PI / 2.f;
+
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
     auto* trigger = new WorldOrientationChange;
@@ -154,6 +195,7 @@ static void addParticles(args()) {
   particles.deviation = 10.f;
   particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
+  particles.spawn = gridCoordinatesToWorldPosition({ 0, 4, 0 });
 }
 
 static void addEntityObjects(args()) {

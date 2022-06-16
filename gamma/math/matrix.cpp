@@ -111,7 +111,7 @@ namespace Gamma {
     Quaternion yaw = Quaternion::fromAxisAngle(rotation.y, 0.0f, 1.0f, 0.0f);
     Quaternion roll = Quaternion::fromAxisAngle(rotation.z, 0.0f, 0.0f, 1.0f);
 
-    return (roll * yaw * pitch).toMatrix4f();
+    return (roll * pitch * yaw).toMatrix4f();
   }
 
   Matrix4f Matrix4f::rotation(const Orientation& orientation) {
