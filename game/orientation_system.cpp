@@ -1,12 +1,31 @@
+#include <map>
+
 #include "orientation_system.h"
 #include "easing_utilities.h"
 #include "game_state.h"
 #include "game_macros.h"
 
-// Wrap a value to within the [0, TAU] range
-#define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
-
 using namespace Gamma;
+
+typedef std::tuple<WorldOrientation, WorldOrientation> OrientationTransition;
+typedef std::function<void(Orientation&, Camera&)> OrientationHandler;
+
+#define transition(from, to) { from, to }, [](Orientation& orientation, Camera& camera)
+
+const static std::map<OrientationTransition, OrientationHandler> orientationHandlerMap = {
+  {
+    transition(POSITIVE_Y_UP, NEGATIVE_Z_UP) {
+      orientation.roll = camera.orientation.yaw;
+    }
+  },
+  {
+    transition(NEGATIVE_Z_UP, POSITIVE_Y_UP) {
+      orientation.yaw = camera.orientation.roll;
+    }
+  }
+};
+
+static void defaultOrientationHandler(Orientation& orientation, Camera& camera) {}
 
 void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   auto& camera = getCamera();
@@ -34,98 +53,81 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
       break;
   }
 
+  // Wrap a value to within the [0, TAU] range
+  #define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
+
   wrap(camera.orientation.pitch);
   wrap(camera.orientation.yaw);
   wrap(camera.orientation.roll);
 }
 
-void setWorldOrientation(args(), WorldOrientation worldOrientation) {
+void setWorldOrientation(args(), WorldOrientation targetWorldOrientation) {
   auto& camera = getCamera();
+  auto currentWorldOrientation = state.worldOrientationState.worldOrientation;
 
-  if (state.worldOrientationState.worldOrientation == worldOrientation) {
+  if (targetWorldOrientation == currentWorldOrientation) {
     return;
   }
 
-  // @todo fix issues with incorrect yaw/roll after orientation transitions
-  switch (worldOrientation) {
-    case POSITIVE_Y_UP: {
-      Orientation to;
+  Orientation to;
+  auto orientationTransition = std::pair(currentWorldOrientation, targetWorldOrientation);
 
+  auto orientationHandler =
+    orientationHandlerMap.find(orientationTransition) != orientationHandlerMap.end()
+      ? orientationHandlerMap.at(orientationTransition)
+      : defaultOrientationHandler;
+
+  switch (targetWorldOrientation) {
+    case POSITIVE_Y_UP: {
       to.pitch = 0.f;
-      to.yaw = camera.orientation.roll;
       to.roll = 0.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
-
       break;
     }
     case NEGATIVE_Y_UP: {
-      Orientation to;
-
       to.pitch = Gm_PI;
-      to.yaw = camera.orientation.roll;
       to.roll = 0.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 0, 1.f);
-
       break;
     }
     case POSITIVE_Z_UP: {
-      auto direction = camera.orientation.getDirection();
-
-      Orientation to;
       to.pitch = Gm_PI / 2.f;
-      to.roll = camera.orientation.yaw;
       to.yaw = 0.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
-
       break;
     }
     case NEGATIVE_Z_UP: {
-      auto direction = camera.orientation.getDirection();
-
-      Orientation to;
       to.pitch = Gm_PI + Gm_PI / 2.f;
-      to.roll = camera.orientation.yaw;
       to.yaw = 0.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(1.f, 1.f, 0);
-
       break;
     }
     case POSITIVE_X_UP: {
-      Orientation to = camera.orientation;
-
-      // @todo this is currently broken
-      to.pitch += -(Gm_PI / 2.f) * sinf(to.yaw) - Gm_PI * sinf(to.roll);
-      to.yaw -= Gm_PI * sinf(to.roll);
+      to.pitch = 0.f;
       to.roll = Gm_PI / 2.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
       break;
     }
     case NEGATIVE_X_UP: {
-      Orientation to = camera.orientation;
-
-      // @todo this is currently broken
-      to.pitch += (Gm_PI / 2.f) * sinf(to.yaw);
+      to.pitch = Gm_PI;
       to.roll = -Gm_PI / 2.f;
 
-      state.worldOrientationState.orientationTo = to;
       state.worldOrientationState.movementPlane = Vec3f(0, 1.f, 1.f);
       break;
     }
   }
 
+  orientationHandler(to, camera);
+
   state.worldOrientationState.startTime = getRunningTime();
-  state.worldOrientationState.worldOrientation = worldOrientation;
+  state.worldOrientationState.worldOrientation = targetWorldOrientation;
   state.worldOrientationState.orientationFrom = camera.orientation;
+  state.worldOrientationState.orientationTo = to;
 
   // Pre-emptively set the new camera orientation,
   // preventing movement bugs during the orientation
