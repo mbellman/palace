@@ -44,9 +44,18 @@ const static std::map<OrientationTransition, OrientationHandler> orientationHand
 
   // -Y Up ->
   { {NEGATIVE_Y_UP, NEGATIVE_Z_UP}, rollFromInverseYaw },
+  { {NEGATIVE_Y_UP, POSITIVE_X_UP}, transition() {
+    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+  }},
+  { {NEGATIVE_Y_UP, NEGATIVE_X_UP}, transition() {
+    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+  }},
 
   // +X Up ->
   { {POSITIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
+  { {POSITIVE_X_UP, NEGATIVE_Y_UP}, transition() {
+    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+  }},
   { {POSITIVE_X_UP, NEGATIVE_Z_UP}, transition() {
     orientation.roll = camera.orientation.yaw + Gm_PI / 2.f;
   }},
@@ -55,6 +64,9 @@ const static std::map<OrientationTransition, OrientationHandler> orientationHand
   { {NEGATIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
   { {NEGATIVE_X_UP, NEGATIVE_Z_UP}, transition() {
     orientation.roll = camera.orientation.yaw - Gm_PI / 2.f;
+  }},
+  { {NEGATIVE_X_UP, NEGATIVE_Y_UP}, transition() {
+    orientation.yaw = -camera.orientation.yaw + Gm_PI;
   }},
 
   // +Z Up ->

@@ -157,6 +157,9 @@ static void addOrientationTestLayout(args()) {
   grid.get<Staircase>({ -2, 8, 0 })->orientation.yaw = -Gm_PI / 2.f;
   grid.get<Staircase>({ -2, 8, 0 })->orientation.roll = Gm_PI / 2.f;
 
+  createWorldOrientationChange({ -3, 6, 0 }, POSITIVE_X_UP);
+  createWorldOrientationChange({ -2, 7, 0 }, NEGATIVE_Y_UP);
+
   // Front to right staircase
   grid.set({ 2, 4, 4 }, new Staircase);
   grid.get<Staircase>({ 2, 4, 4 })->orientation.roll = -Gm_PI / 2.f;
@@ -189,6 +192,9 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 2, 8, 0 }, new Staircase);
   grid.get<Staircase>({ 2, 8, 0 })->orientation.yaw = Gm_PI / 2.f;
   grid.get<Staircase>({ 2, 8, 0 })->orientation.roll = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 3, 6, 0 }, NEGATIVE_X_UP);
+  createWorldOrientationChange({ 2, 7, 0 }, NEGATIVE_Y_UP);
 
   // Back to top staircase
   grid.set({ 0, 6, -4 }, new Staircase);
