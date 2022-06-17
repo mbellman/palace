@@ -122,6 +122,80 @@ static void addOrientationTestLayout(args()) {
   createWorldOrientationChange({ 0, 9, -6 }, NEGATIVE_Z_UP);
   createWorldOrientationChange({ 0, 10, -5 }, POSITIVE_Y_UP);
 
+  // Back to left staircase outdoors
+  grid.set({ -5, 4, -5 }, new Staircase);
+  grid.get<Staircase>({ -5, 4, -5 })->orientation.roll = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ -5, 4, -6 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ -6, 4, -5 }, NEGATIVE_X_UP);
+
+  // Back to right staircase outdoors
+  grid.set({ 5, 4, -5 }, new Staircase);
+  grid.get<Staircase>({ 5, 4, -5 })->orientation.roll = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 5, 4, -6 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ 6, 4, -5 }, POSITIVE_X_UP);
+
+  // Top to left staircase outdoors
+  grid.set({ -5, 9, 0 }, new Staircase);
+  grid.get<Staircase>({ -5, 9, 0 })->orientation.yaw = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ -5, 10, 0 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ -6, 9, 0 }, NEGATIVE_X_UP);
+
+  // Top to right staircase outdoors
+  grid.set({ 5, 9, 0 }, new Staircase);
+  grid.get<Staircase>({ 5, 9, 0 })->orientation.yaw = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 5, 10, 0 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 6, 9, 0 }, POSITIVE_X_UP);
+
+  // Top to front staircase outdoors
+  grid.set({ 0, 9, 5 }, new Staircase);
+  grid.get<Staircase>({ 0, 9, 5 })->orientation.pitch = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 0, 10, 5 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 0, 9, 6 }, POSITIVE_Z_UP);
+
+  // Front to bottom staircase outdoors
+  grid.set({ 0, -1, 5 }, new Staircase);
+  grid.get<Staircase>({ 0, -1, 5 })->orientation.pitch = Gm_PI;
+
+  createWorldOrientationChange({ 0, -1, 6 }, POSITIVE_Z_UP);
+  createWorldOrientationChange({ 0, -2, 5 }, NEGATIVE_Y_UP);
+
+  // Bottom to right staircase outdoors
+  grid.set({ 5, -1, 0 }, new Staircase);
+  grid.get<Staircase>({ 5, -1, 0 })->orientation.roll = Gm_PI / 2.f;
+  grid.get<Staircase>({ 5, -1, 0 })->orientation.yaw = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 5, -2, 0 }, NEGATIVE_Y_UP);
+  createWorldOrientationChange({ 6, -1, 0 }, POSITIVE_X_UP);
+
+  // Bottom to left staircase outdoors
+  grid.set({ -5, -1, 0 }, new Staircase);
+  grid.get<Staircase>({ -5, -1, 0 })->orientation.roll = -Gm_PI / 2.f;
+  grid.get<Staircase>({ -5, -1, 0 })->orientation.yaw = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ -5, -2, 0 }, NEGATIVE_Y_UP);
+  createWorldOrientationChange({ -6, -1, 0 }, NEGATIVE_X_UP);
+
+  // Right to front staircase outdoors
+  grid.set({ 5, 4, 5 }, new Staircase);
+  grid.get<Staircase>({ 5, 4, 5 })->orientation.pitch = Gm_PI / 2.f;
+  grid.get<Staircase>({ 5, 4, 5 })->orientation.yaw = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 6, 4, 5 }, POSITIVE_X_UP);
+  createWorldOrientationChange({ 5, 4, 6 }, POSITIVE_Z_UP);
+
+  // Left to front staircase outdoors
+  grid.set({ -5, 4, 5 }, new Staircase);
+  grid.get<Staircase>({ -5, 4, 5 })->orientation.pitch = Gm_PI / 2.f;
+  grid.get<Staircase>({ -5, 4, 5 })->orientation.yaw = Gm_PI / 2.f;
+
+  createWorldOrientationChange({ -6, 4, 5 }, NEGATIVE_X_UP);
+  createWorldOrientationChange({ -5, 4, 6 }, POSITIVE_Z_UP);
+
   // Bottom to front staircase
   grid.set({ 0, 0, 2 }, new Staircase);
   grid.set({ 0, 1, 3 }, new Staircase);
