@@ -50,30 +50,6 @@ static void addOrientationTestLayout(args()) {
   auto& grid = state.world.grid;
   auto& triggers = state.world.triggers;
 
-  // Bottom area
-  addEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
-
-  // Left area
-  addEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
-
-  // Right area
-  addEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
-  
-  // Top area
-  addEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
-
-  // Back area
-  addEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
-
-  // Front area
-  addEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
-
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
     auto* trigger = new WorldOrientationChange;
@@ -82,6 +58,69 @@ static void addOrientationTestLayout(args()) {
 
     state.world.triggers.set(coordinates, trigger);
   };
+
+  // Bottom area
+  addEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { -5, -3, -5 }, { 5, -3, 5 });
+
+  // Left area
+  addEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { -7, -1, -5 }, { -7, 9, 5 });
+
+  // Right area
+  addEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { 7, -1, -5 }, { 7, 9, 5 });
+  
+  // Top area
+  addEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { -5, 11, -5 }, { 5, 11, 5 });
+
+  // Back area
+  addEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { -5, -1, -7 }, { 5, 9, -7 });
+
+  // Front area
+  addEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
+  addEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
+  // Outdoors
+  addEntityOverRange<WalkableSpace>(params(), { -5, -1, 7 }, { 5, 9, 7 });
+
+  // Pathway outdoors
+  grid.remove({ 3, 1, -5 });
+  grid.remove({ 3, 0, -5 });
+  grid.set({ 3, 1, -5 }, new WalkableSpace);
+  grid.set({ 3, -1, -6 }, new Ground);
+  grid.set({ 3, -1, -7 }, new Ground);
+  grid.set({ 2, -1, -7 }, new Ground);
+  grid.set({ 3, 1, -6 }, new WalkableSpace);
+  grid.set({ 3, 1, -7 }, new WalkableSpace);
+  grid.set({ 2, 1, -7 }, new WalkableSpace);
+
+  createWorldOrientationChange({ 3, 1, -7 }, POSITIVE_Y_UP);
+  createWorldOrientationChange({ 2, 1, -7 }, NEGATIVE_Z_UP);
+
+  // Back to bottom staircase outdoors
+  grid.set({ 0, -1, -5 }, new Staircase);
+  grid.get<Staircase>({ 0, -1, -5 })->orientation.pitch = Gm_PI + Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 0, -1, -6 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ 0, -2, -5 }, NEGATIVE_Y_UP);
+
+  // Back to top staircase outdoors
+  grid.set({ 0, 9, -5 }, new Staircase);
+
+  createWorldOrientationChange({ 0, 9, -6 }, NEGATIVE_Z_UP);
+  createWorldOrientationChange({ 0, 10, -5 }, POSITIVE_Y_UP);
 
   // Bottom to front staircase
   grid.set({ 0, 0, 2 }, new Staircase);
@@ -358,14 +397,19 @@ void initializeGame(args()) {
   addParticles(params());
 
   addEntityObjects(params());
-  addInvisibleEntityIndicators(params());
+  // addInvisibleEntityIndicators(params());
 
-  auto& light = createLight(LightType::POINT_SHADOWCASTER);
+  auto& light = createLight(POINT_SHADOWCASTER);
 
   light.color = Vec3f(1.f, 0.8f, 0.4f);
   light.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
   light.radius = 500.f;
   light.isStatic = true;
+
+  auto& sunlight = createLight(DIRECTIONAL_SHADOWCASTER);
+
+  sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
+  sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
 
   camera.position = gridCoordinatesToWorldPosition({ 0, 1, 0 });
 }
