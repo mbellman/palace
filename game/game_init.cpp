@@ -146,6 +146,9 @@ static void addOrientationTestLayout(args()) {
   grid.get<Staircase>({ -2, 4, -4 })->orientation.roll = Gm_PI / 2.f;
   grid.get<Staircase>({ -2, 4, -4 })->orientation.yaw = Gm_PI;
 
+  createWorldOrientationChange({ -3, 4, -2 }, POSITIVE_X_UP);
+  createWorldOrientationChange({ -2, 4, -3 }, POSITIVE_Z_UP);
+
   // Left to top staircase
   grid.set({ -4, 6, 0 }, new Staircase);
   grid.get<Staircase>({ -4, 6, 0 })->orientation.yaw = -Gm_PI / 2.f;
@@ -207,6 +210,9 @@ static void addOrientationTestLayout(args()) {
   grid.get<Staircase>({ 0, 8, -2 })->orientation.yaw = Gm_PI;
   grid.get<Staircase>({ 0, 8, -2 })->orientation.pitch = Gm_PI / 2.f;
 
+  createWorldOrientationChange({ 0, 7, -2 }, NEGATIVE_Y_UP);
+  createWorldOrientationChange({ 0, 6, -3 }, POSITIVE_Z_UP);
+
   // Back to right staircase
   grid.set({ 2, 4, -4 }, new Staircase);
   grid.get<Staircase>({ 2, 4, -4 })->orientation.yaw = Gm_PI;
@@ -217,6 +223,9 @@ static void addOrientationTestLayout(args()) {
   grid.set({ 4, 4, -2 }, new Staircase);
   grid.get<Staircase>({ 4, 4, -2 })->orientation.yaw = Gm_PI;
   grid.get<Staircase>({ 4, 4, -2 })->orientation.roll = -Gm_PI / 2.f;
+
+  createWorldOrientationChange({ 3, 4, -2 }, NEGATIVE_X_UP);
+  createWorldOrientationChange({ 2, 4, -3 }, POSITIVE_Z_UP);
 }
 
 static void addParticles(args()) {

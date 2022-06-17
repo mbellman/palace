@@ -8,30 +8,30 @@
 using namespace Gamma;
 
 typedef std::tuple<WorldOrientation, WorldOrientation> OrientationTransition;
-typedef std::function<void(Orientation&, Camera&)> OrientationHandler;
+typedef std::function<void(Orientation&, Orientation&)> OrientationHandler;
 
-#define transition() [](Orientation& orientation, Camera& camera)
+#define transition() [](Orientation& to, Orientation& view)
 
-static void defaultOrientationHandler(Orientation& orientation, Camera& camera) {}
+static void defaultOrientationHandler(Orientation& to, Orientation& view) {}
 
-static void rollFromYaw(Orientation& orientation, Camera& camera) {
-  orientation.roll = camera.orientation.yaw;
+static void rollFromYaw(Orientation& to, Orientation& view) {
+  to.roll = view.yaw;
 }
 
-static void rollFromInverseYaw(Orientation& orientation, Camera& camera) {
-  orientation.roll = -camera.orientation.yaw;
+static void rollFromInverseYaw(Orientation& to, Orientation& view) {
+  to.roll = -view.yaw;
 }
 
-static void yawFromYaw(Orientation& orientation, Camera& camera) {
-  orientation.yaw = camera.orientation.yaw;
+static void yawFromYaw(Orientation& to, Orientation& view) {
+  to.yaw = view.yaw;
 }
 
-static void yawFromRoll(Orientation& orientation, Camera& camera) {
-  orientation.yaw = camera.orientation.roll;
+static void yawFromRoll(Orientation& to, Orientation& view) {
+  to.yaw = view.roll;
 }
 
-static void yawFromInverseRoll(Orientation& orientation, Camera& camera) {
-  orientation.yaw = -camera.orientation.roll;
+static void yawFromInverseRoll(Orientation& to, Orientation& view) {
+  to.yaw = -view.roll;
 }
 
 // @todo allow reverse mappings to be implicit
@@ -43,43 +43,57 @@ const static std::map<OrientationTransition, OrientationHandler> orientationHand
   { {POSITIVE_Y_UP, NEGATIVE_X_UP}, yawFromYaw },
 
   // -Y Up ->
+  { {NEGATIVE_Y_UP, POSITIVE_Z_UP}, rollFromYaw },
   { {NEGATIVE_Y_UP, NEGATIVE_Z_UP}, rollFromInverseYaw },
   { {NEGATIVE_Y_UP, POSITIVE_X_UP}, transition() {
-    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+    to.yaw = -view.yaw + Gm_PI;
   }},
   { {NEGATIVE_Y_UP, NEGATIVE_X_UP}, transition() {
-    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+    to.yaw = -view.yaw + Gm_PI;
   }},
 
   // +X Up ->
   { {POSITIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
   { {POSITIVE_X_UP, NEGATIVE_Y_UP}, transition() {
-    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+    to.yaw = -view.yaw + Gm_PI;
+  }},
+  { {POSITIVE_X_UP, POSITIVE_Z_UP}, transition() {
+    to.roll = -view.yaw + Gm_PI / 2.f;
   }},
   { {POSITIVE_X_UP, NEGATIVE_Z_UP}, transition() {
-    orientation.roll = camera.orientation.yaw + Gm_PI / 2.f;
+    to.roll = view.yaw + Gm_PI / 2.f;
   }},
 
   // -X Up ->
   { {NEGATIVE_X_UP, POSITIVE_Y_UP}, yawFromYaw },
-  { {NEGATIVE_X_UP, NEGATIVE_Z_UP}, transition() {
-    orientation.roll = camera.orientation.yaw - Gm_PI / 2.f;
-  }},
   { {NEGATIVE_X_UP, NEGATIVE_Y_UP}, transition() {
-    orientation.yaw = -camera.orientation.yaw + Gm_PI;
+    to.yaw = -view.yaw + Gm_PI;
+  }},
+  { {NEGATIVE_X_UP, POSITIVE_Z_UP}, transition() {
+    to.roll = -view.yaw - Gm_PI / 2.f;
+  }},
+  { {NEGATIVE_X_UP, NEGATIVE_Z_UP}, transition() {
+    to.roll = view.yaw - Gm_PI / 2.f;
   }},
 
   // +Z Up ->
   { {POSITIVE_Z_UP, POSITIVE_Y_UP}, yawFromInverseRoll },
+  { {POSITIVE_Z_UP, NEGATIVE_Y_UP}, yawFromRoll },
+  { {POSITIVE_Z_UP, POSITIVE_X_UP}, transition() {
+    to.yaw = -view.roll + Gm_PI / 2.f;
+  }},
+  { {POSITIVE_Z_UP, NEGATIVE_X_UP}, transition() {
+    to.yaw = -view.roll - Gm_PI / 2.f;
+  }},
 
   // -Z Up ->
   { {NEGATIVE_Z_UP, POSITIVE_Y_UP}, yawFromRoll },
   { {NEGATIVE_Z_UP, NEGATIVE_Y_UP}, yawFromInverseRoll },
   { {NEGATIVE_Z_UP, POSITIVE_X_UP}, transition() {
-    orientation.yaw = camera.orientation.roll - Gm_PI / 2.f;
+    to.yaw = view.roll - Gm_PI / 2.f;
   }},
   { {NEGATIVE_Z_UP, NEGATIVE_X_UP}, transition() {
-    orientation.yaw = camera.orientation.roll + Gm_PI / 2.f;
+    to.yaw = view.roll + Gm_PI / 2.f;
   }}
 };
 
@@ -178,7 +192,7 @@ void setWorldOrientation(args(), WorldOrientation targetWorldOrientation) {
     }
   }
 
-  orientationHandler(to, camera);
+  orientationHandler(to, camera.orientation);
 
   state.worldOrientationState.startTime = getRunningTime();
   state.worldOrientationState.worldOrientation = targetWorldOrientation;
