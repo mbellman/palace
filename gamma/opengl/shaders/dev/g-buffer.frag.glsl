@@ -30,8 +30,9 @@ void main() {
     // Depth (adjusted for clarity)
     vec2 uv = (fragUv - vec2(0.25, 0.0)) * vec2(4.0, 1.0);
     vec4 color_and_depth = texture(texColorAndDepth, uv);
+    float adjusted_depth = pow(getLinearizedDepth(color_and_depth.w) / Z_FAR, 1.0 / 4.0);
 
-    out_color = vec3(sqrt(getLinearizedDepth(color_and_depth.w) / Z_FAR));
+    out_color = vec3(adjusted_depth);
   } else if (fragUv.x < 0.75) {
     // Normal
     vec2 uv = (fragUv - vec2(0.5, 0.0)) * vec2(4.0, 1.0);
