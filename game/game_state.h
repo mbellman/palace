@@ -14,4 +14,9 @@ struct GameState {
   WorldOrientationState worldOrientationState;
   MoveQueue moves;
   CurrentMove currentMove;
+
+  #if GAMMA_DEVELOPER_MODE == 1
+    GridCoordinates lastGridCoordinates;
+    bool freeCameraMode = false;
+  #endif
 };

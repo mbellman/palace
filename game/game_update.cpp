@@ -41,8 +41,16 @@ static void addDebugMessages(args()) {
 }
 
 void updateGame(args(), float dt) {
-  handlePlayerMovement(params(), dt);
-  // Gm_HandleFreeCameraMode(context, dt);
+  #if GAMMA_DEVELOPER_MODE == 1
+    if (state.freeCameraMode) {
+      Gm_HandleFreeCameraMode(context, dt);
+    } else {
+      handlePlayerMovement(params(), dt);
+    }
+  #else
+    handlePlayerMovement(params(), dt);
+  #endif
+
   handleWorldOrientation(params(), dt);
 
   addDebugMessages(params());

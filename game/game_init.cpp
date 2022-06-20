@@ -18,7 +18,7 @@ static void addKeyHandlers(args()) {
     }
   });
 
-  input.on<Key>("keyup", [&](Key key) {
+  input.on<Key>("keyup", [context, &state](Key key) {
     if (key == Key::ESCAPE) {
       SDL_SetRelativeMouseMode(SDL_FALSE);
     }
@@ -30,6 +30,16 @@ static void addKeyHandlers(args()) {
         Gm_EnableFlags(GammaFlags::VSYNC);
       }
     }
+
+    #if GAMMA_DEVELOPER_MODE == 1
+      if (key == Key::C) {
+        state.freeCameraMode = !state.freeCameraMode;
+
+        if (!state.freeCameraMode) {
+          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
+        }
+      }
+    #endif
   });
 }
 

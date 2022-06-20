@@ -278,4 +278,8 @@ void handlePlayerMovement(args(), float dt) {
   if (isMoving(params())) {
     movePlayer(params(), dt);
   }
+
+  #if GAMMA_DEVELOPER_MODE == 1
+    state.lastGridCoordinates = worldPositionToGridCoordinates(camera.position);
+  #endif
 }
