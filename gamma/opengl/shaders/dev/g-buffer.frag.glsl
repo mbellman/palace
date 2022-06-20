@@ -40,7 +40,7 @@ void main() {
 
     out_color = normal_and_emissivity.rgb;
   } else {
-    // Specularity
+    // Emissivity
     vec2 uv = (fragUv - vec2(0.75, 0.0)) * vec2(4.0, 1.0);
     vec4 normal_and_emissivity = texture(texNormalAndEmissivity, uv);
 

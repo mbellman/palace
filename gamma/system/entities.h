@@ -204,6 +204,8 @@ namespace Gamma {
     /**
      * Dynamic mesh vertices, based on the static vertices.
      * Remains empty unless transformGeometry() is used.
+     *
+     * @todo remove?
      */
     std::vector<Vertex> transformedVertices;
     /**
@@ -232,6 +234,8 @@ namespace Gamma {
     std::string normalMap = "";
     /**
      * An optional specularity map texture for the mesh.
+     *
+     * @todo This doesn't actually control specularity yet
      */
     std::string specularityMap = "";
     /**
@@ -255,6 +259,11 @@ namespace Gamma {
      */
     bool canCastShadows = true;
     /**
+     * Controls whether the mesh and its instances are
+     * ignored in all rendering passes.
+     */
+    bool disabled = false;
+    /**
      * Configuration parameters for particle system meshes.
      */
     ParticleSystem particleSystem;
@@ -267,6 +276,7 @@ namespace Gamma {
     // @todo Sphere(uint32 divisions)
     // @todo Cylinder(uint32 divisions)
 
+    // @todo remove?
     void transformGeometry(std::function<void(const Vertex&, Vertex&)> handler);
   };
 

@@ -30,16 +30,6 @@ static void addKeyHandlers(args()) {
         Gm_EnableFlags(GammaFlags::VSYNC);
       }
     }
-
-    #if GAMMA_DEVELOPER_MODE == 1
-      if (key == Key::C) {
-        state.freeCameraMode = !state.freeCameraMode;
-
-        if (!state.freeCameraMode) {
-          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
-        }
-      }
-    #endif
   });
 }
 
@@ -406,7 +396,6 @@ static void addEntityObjects(args()) {
   }
 }
 
-// @todo allow indicators to be toggled
 static void addInvisibleEntityIndicators(args()) {
   auto totalEntities = (s16)state.world.grid.size() + (s16)state.world.triggers.size();
 
@@ -457,23 +446,26 @@ void initializeGame(args()) {
     }
   });
 
-  // @temporary
   input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
     auto key = event.key;
 
-    if (key == Key::NUM_1) {
-      setWorldOrientation(params(), POSITIVE_Y_UP);
-    } else if (key == Key::NUM_2) {
-      setWorldOrientation(params(), NEGATIVE_Y_UP);
-    } else if (key == Key::NUM_3) {
-      setWorldOrientation(params(), POSITIVE_Z_UP);
-    } else if (key == Key::NUM_4) {
-      setWorldOrientation(params(), NEGATIVE_Z_UP);
-    } else if (key == Key::NUM_5) {
-      setWorldOrientation(params(), POSITIVE_X_UP);
-    } else if (key == Key::NUM_6) {
-      setWorldOrientation(params(), NEGATIVE_X_UP);
-    }
+    #if GAMMA_DEVELOPER_MODE == 1
+      // Toggle free camera mode
+      if (key == Key::C) {
+        state.freeCameraMode = !state.freeCameraMode;
+
+        if (!state.freeCameraMode) {
+          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
+        }
+      }
+
+      // Toggle entity indicators
+      if (key == Key::E) {
+        auto& indicators = *mesh("indicator");
+
+        indicators.disabled = !indicators.disabled;
+      }
+    #endif
   });
 
   addKeyHandlers(params());
@@ -481,7 +473,7 @@ void initializeGame(args()) {
   addParticles(params());
 
   addEntityObjects(params());
-  // addInvisibleEntityIndicators(params());
+  addInvisibleEntityIndicators(params());
 
   auto& light = createLight(POINT_SHADOWCASTER);
 

@@ -129,7 +129,7 @@ namespace Gamma {
   void OpenGLMesh::render(GLenum primitiveMode, bool useLowestLevelOfDetail) {
     auto& mesh = *sourceMesh;
 
-    if (mesh.objects.totalVisible() == 0) {
+    if (mesh.objects.totalVisible() == 0 || mesh.disabled) {
       return;
     }
 
