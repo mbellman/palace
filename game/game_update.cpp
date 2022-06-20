@@ -10,6 +10,7 @@ using namespace Gamma;
 
 std::string worldOrientationToString(WorldOrientation worldOrientation) {
   switch (worldOrientation) {
+    default:
     case POSITIVE_Y_UP: return "+Y up";
     case NEGATIVE_Y_UP: return "-Y up";
     case POSITIVE_X_UP: return "+X up";
@@ -53,5 +54,7 @@ void updateGame(args(), float dt) {
 
   handleWorldOrientation(params(), dt);
 
-  addDebugMessages(params());
+  #if GAMMA_DEVELOPER_MODE == 1
+    addDebugMessages(params());
+  #endif
 }
