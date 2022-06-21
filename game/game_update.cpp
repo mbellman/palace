@@ -6,6 +6,7 @@
 #include "editor_system.h"
 #include "game_state.h"
 #include "game_macros.h"
+#include "build_flags.h"
 
 using namespace Gamma;
 
@@ -43,8 +44,8 @@ static void addDebugMessages(args()) {
 }
 
 void updateGame(args(), float dt) {
-  #if GAMMA_DEVELOPER_MODE == 1
-    if (state.freeCameraMode) {
+  #if DEVELOPMENT == 1
+    if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
       Gm_HandleFreeCameraMode(context, dt);
     } else {
       handlePlayerMovement(params(), dt);
@@ -55,10 +56,8 @@ void updateGame(args(), float dt) {
 
   handleWorldOrientation(params(), dt);
 
-  // @todo only in edit mode
-  showStaticEntityPlacementPreview(params());
-
-  #if GAMMA_DEVELOPER_MODE == 1
+  #if DEVELOPMENT == 1
+    showStaticEntityPlacementPreview(params());
     addDebugMessages(params());
   #endif
 }

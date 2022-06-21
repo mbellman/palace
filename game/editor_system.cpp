@@ -8,6 +8,7 @@
 using namespace Gamma;
 
 void showStaticEntityPlacementPreview(args()) {
+#if DEVELOPMENT == 1
   auto& camera = getCamera();
   auto& grid = state.world.grid;
   auto& preview = object("preview");
@@ -41,4 +42,5 @@ void showStaticEntityPlacementPreview(args()) {
   }
 
   commit(preview);
+#endif
 }

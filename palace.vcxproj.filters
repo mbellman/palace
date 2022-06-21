@@ -569,5 +569,8 @@
     <ClInclude Include="game\editor_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\build_flags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

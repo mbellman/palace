@@ -6,6 +6,7 @@
 #include "world_system.h"
 #include "editor_system.h"
 #include "game_entities.h"
+#include "build_flags.h"
 
 struct GameState {
   float lastMoveInputTime = 0.f;
@@ -14,11 +15,8 @@ struct GameState {
   MoveQueue moves;
   CurrentMove currentMove;
 
-  // @todo dev mode only
-  WorldEditor editor;
-
-  #if GAMMA_DEVELOPER_MODE == 1
+  #if DEVELOPMENT == 1
+    WorldEditor editor;
     GridCoordinates lastGridCoordinates;
-    bool freeCameraMode = false;
   #endif
 };

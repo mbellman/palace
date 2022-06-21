@@ -7,6 +7,7 @@
 #include "grid_utilities.h"
 #include "game_state.h"
 #include "game_macros.h"
+#include "build_flags.h"
 
 using namespace Gamma;
 
@@ -279,7 +280,7 @@ void handlePlayerMovement(args(), float dt) {
     movePlayer(params(), dt);
   }
 
-  #if GAMMA_DEVELOPER_MODE == 1
+  #if DEVELOPMENT == 1
     state.lastGridCoordinates = worldPositionToGridCoordinates(camera.position);
   #endif
 }

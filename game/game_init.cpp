@@ -6,6 +6,7 @@
 #include "world_system.h"
 #include "game_macros.h"
 #include "game_state.h"
+#include "build_flags.h"
 
 using namespace Gamma;
 
@@ -453,12 +454,16 @@ void initializeGame(args()) {
   input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
     auto key = event.key;
 
-    #if GAMMA_DEVELOPER_MODE == 1
+    #if DEVELOPMENT == 1
       // Toggle free camera mode
       if (key == Key::C) {
-        state.freeCameraMode = !state.freeCameraMode;
+        if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+          Gm_DisableFlags(FREE_CAMERA_MODE);
+        } else {
+          Gm_EnableFlags(FREE_CAMERA_MODE);
+        }
 
-        if (!state.freeCameraMode) {
+        if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
           getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
         }
       }
@@ -479,7 +484,10 @@ void initializeGame(args()) {
   addParticles(params());
 
   addEntityObjects(params());
-  addInvisibleEntityIndicators(params());
+
+  #if DEVELOPMENT == 1
+    addInvisibleEntityIndicators(params());
+  #endif
 
   auto& light = createLight(POINT_SHADOWCASTER);
 
