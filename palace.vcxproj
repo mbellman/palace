@@ -118,6 +118,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\editor_system.cpp" />
     <ClCompile Include="game\game_init.cpp" />
     <ClCompile Include="game\game_update.cpp" />
     <ClCompile Include="game\main.cpp" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\easing_utilities.h" />
+    <ClInclude Include="game\editor_system.h" />
     <ClInclude Include="game\game_entities.h" />
     <ClInclude Include="game\game_init.h" />
     <ClInclude Include="game\game_macros.h" />

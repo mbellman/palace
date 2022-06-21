@@ -96,8 +96,8 @@ static void addOrientationTestLayout(args()) {
   addEntityOverRange<WalkableSpace>(params(), { -5, -1, 7 }, { 5, 9, 7 });
 
   // Pathway outdoors
-  grid.remove({ 3, 1, -5 });
-  grid.remove({ 3, 0, -5 });
+  grid.clear({ 3, 1, -5 });
+  grid.clear({ 3, 0, -5 });
   grid.set({ 3, 1, -5 }, new WalkableSpace);
   grid.set({ 3, -1, -6 }, new Ground);
   grid.set({ 3, -1, -7 }, new Ground);
@@ -358,7 +358,7 @@ static void addEntityObjects(args()) {
   // @todo count entities by type
   auto& grid = state.world.grid;
 
-  addMesh("ground-tile", grid.count<Ground>(), Mesh::Cube());
+  addMesh("ground-tile", grid.count<Ground>() + 1, Mesh::Cube());
   addMesh("staircase", grid.count<Staircase>(), Mesh::Model("./game/models/staircase/model.obj"));
 
   for (auto& [ coordinates, entity ] : grid) {
@@ -394,6 +394,11 @@ static void addEntityObjects(args()) {
         break;
     }
   }
+
+  // @temporary
+  auto& preview = createObjectFrom("ground-tile");
+
+  save("preview", preview);
 }
 
 static void addInvisibleEntityIndicators(args()) {

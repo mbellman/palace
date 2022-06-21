@@ -3,6 +3,7 @@
 #include "game_update.h"
 #include "movement_system.h"
 #include "orientation_system.h"
+#include "editor_system.h"
 #include "game_state.h"
 #include "game_macros.h"
 
@@ -53,6 +54,9 @@ void updateGame(args(), float dt) {
   #endif
 
   handleWorldOrientation(params(), dt);
+
+  // @todo only in edit mode
+  showStaticEntityPlacementPreview(params());
 
   #if GAMMA_DEVELOPER_MODE == 1
     addDebugMessages(params());

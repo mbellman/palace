@@ -21,6 +21,16 @@ template<typename T>
 struct GridMap : std::unordered_map<GridCoordinates, T*, GridCoordinatesHasher> {
   void operator[](const GridCoordinates& coordinates) = delete;
 
+  void clear(const GridCoordinates& coordinates) {
+    if (find(coordinates) != end()) {
+      T* t = at(coordinates);
+
+      delete t;
+
+      erase(coordinates);
+    }
+  }
+
   template<typename E>
   u32 count() const {
     u32 total = 0;
@@ -47,18 +57,8 @@ struct GridMap : std::unordered_map<GridCoordinates, T*, GridCoordinatesHasher> 
     return find(coordinates) != end();
   }
 
-  void remove(const GridCoordinates& coordinates) {
-    if (find(coordinates) != end()) {
-      T* t = at(coordinates);
-
-      delete t;
-
-      erase(coordinates);
-    }
-  }
-
   void set(const GridCoordinates& coordinates, T* value) {
-    remove(coordinates);
+    clear(coordinates);
     insert({ coordinates, value });
   }
 };

@@ -19,6 +19,9 @@
 #define createLight(type) Gm_CreateLight(context, type)
 #define createObjectFrom(meshName) Gm_CreateObjectFrom(context, meshName)
 #define commit(object) Gm_Commit(context, object)
+#define save(objectName, object) Gm_SaveObject(context, objectName, object)
+#define object(objectName) Gm_GetObject(context, objectName)
+#define remove(object) Gm_RemoveObject(context, object)
 #define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
 #define pointCamera(...) Gm_PointCamera(context, __VA_ARGS__)
@@ -60,6 +63,9 @@ void Gm_UseSceneFile(GmContext* context, const std::string& filename);
 Gamma::Object& Gm_CreateObjectFrom(GmContext* context, const std::string& meshName);
 void Gm_Commit(GmContext* context, const Gamma::Object& object);
 Gamma::ObjectPool& Gm_GetObjects(GmContext* context, const std::string& meshName);
+void Gm_SaveObject(GmContext* context, const std::string& objectName, const Gamma::Object& object);
+Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName);
+void Gm_RemoveObject(GmContext* context, const Gamma::Object& object);
 void Gm_PointCamera(GmContext* context, const Gamma::Object& object, bool upsideDown = false);
 void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsideDown = false);
 void Gm_HandleFreeCameraMode(GmContext* context, float dt);

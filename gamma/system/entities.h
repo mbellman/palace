@@ -57,6 +57,7 @@ namespace Gamma {
    */
   struct ObjectRecord {
     uint16 meshIndex = 0;
+    // @todo remove this and allow meshes to be 'deactivated' when freed
     uint16 meshId = 0;
     // @todo uint32 id with 24 bits for id and 8 for generation,
     // allowing up to ~16.77 million objects per pool

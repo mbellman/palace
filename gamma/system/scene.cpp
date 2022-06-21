@@ -7,6 +7,8 @@
 #include "system/flags.h"
 #include "system/yaml_parser.h"
 
+using namespace Gamma;
+
 const GmSceneStats Gm_GetSceneStats(GmContext* context) {
   GmSceneStats stats;
 
@@ -26,8 +28,6 @@ const GmSceneStats Gm_GetSceneStats(GmContext* context) {
 }
 
 void Gm_AddMesh(GmContext* context, const std::string& meshName, Gamma::uint16 maxInstances, Gamma::Mesh* mesh) {
-  using namespace Gamma;
-
   auto& scene = context->scene;
   auto& meshes = scene.meshes;
   auto& meshMap = scene.meshMap;
@@ -55,8 +55,6 @@ void Gm_AddProbe(GmContext* context, const std::string& probeName, const Gamma::
 }
 
 Gamma::Light& Gm_CreateLight(GmContext* context, Gamma::LightType type) {
-  using namespace Gamma;
-
   auto& lights = context->scene.lights;
 
   // @todo recycle removed/deactivated Lights
@@ -79,8 +77,6 @@ Gamma::Light& Gm_CreateLight(GmContext* context, Gamma::LightType type) {
 }
 
 void Gm_UseSceneFile(GmContext* context, const std::string& filename) {
-  using namespace Gamma;
-
   auto& scene = Gm_ParseYamlFile(filename.c_str());
 
   // Load meshes
@@ -144,8 +140,6 @@ void Gm_UseSceneFile(GmContext* context, const std::string& filename) {
 }
 
 Gamma::Object& Gm_CreateObjectFrom(GmContext* context, const std::string& meshName) {
-  using namespace Gamma;
-
   auto& meshMap = context->scene.meshMap;
 
   assert(meshMap.find(meshName) != meshMap.end(), "Mesh '" + meshName + "' not found");
@@ -171,8 +165,6 @@ Gamma::Object& Gm_CreateObjectFrom(GmContext* context, const std::string& meshNa
 }
 
 void Gm_Commit(GmContext* context, const Gamma::Object& object) {
-  using namespace Gamma;
-
   auto& meshes = context->scene.meshes;
   auto& record = object._record;
   auto* mesh = meshes[record.meshIndex];
@@ -194,13 +186,31 @@ Gamma::ObjectPool& Gm_GetObjects(GmContext* context, const std::string& meshName
   return context->scene.meshMap[meshName]->objects;
 }
 
+void Gm_SaveObject(GmContext* context, const std::string& objectName, const Gamma::Object& object) {
+  context->scene.objectStore[objectName] = object._record;
+}
+
+Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName) {
+  auto& scene = context->scene;
+  // @todo assert that the object exists
+  auto& record = scene.objectStore.at(objectName);
+  auto& mesh = scene.meshes[record.meshIndex];
+
+  return *mesh->objects.getByRecord(record);
+}
+
+void Gm_RemoveObject(GmContext* context, const Gamma::Object& object) {
+  auto& record = object._record;
+  auto& mesh = context->scene.meshes[record.meshIndex];
+
+  mesh->objects.removeById(record.id);
+}
+
 void Gm_PointCamera(GmContext* context, const Gamma::Object& object, bool upsideDown) {
   Gm_PointCamera(context, object.position, upsideDown);
 }
 
 void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsideDown) {
-  using namespace Gamma;
-
   auto& camera = context->scene.camera;
   Vec3f forward = (position - camera.position).unit();
   Vec3f sideways = Vec3f::cross(forward, Vec3f(0, 1.0f, 0));
@@ -213,8 +223,6 @@ void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsid
 }
 
 void Gm_HandleFreeCameraMode(GmContext* context, float dt) {
-  using namespace Gamma;
-  
   auto& scene = context->scene;
   auto& camera = scene.camera;
   auto& input = scene.input;
@@ -256,8 +264,6 @@ void Gm_UseFrustumCulling(GmContext* context, const std::initializer_list<std::s
 }
 
 void Gm_UseLodByDistance(GmContext* context, float distance, const std::initializer_list<std::string>& meshNames) {
-  using namespace Gamma;
-
   auto& meshMap = context->scene.meshMap;
   auto& camera = context->scene.camera;
 
