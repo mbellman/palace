@@ -4,6 +4,7 @@
 #include "movement_system.h"
 #include "orientation_system.h"
 #include "world_system.h"
+#include "editor_system.h"
 #include "game_entities.h"
 
 struct GameState {
@@ -12,6 +13,9 @@ struct GameState {
   WorldOrientationState worldOrientationState;
   MoveQueue moves;
   CurrentMove currentMove;
+
+  // @todo dev mode only
+  WorldEditor editor;
 
   #if GAMMA_DEVELOPER_MODE == 1
     GridCoordinates lastGridCoordinates;
