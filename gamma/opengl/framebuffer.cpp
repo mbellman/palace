@@ -58,11 +58,11 @@ namespace Gamma {
     addColorAttachment(format, colorAttachments.size());
   }
 
-  void OpenGLFrameBuffer::addColorAttachment(ColorFormat format, uint32 unit) {
+  void OpenGLFrameBuffer::addColorAttachment(ColorFormat format, u32 unit) {
     addColorAttachment(format, unit, GL_CLAMP_TO_BORDER);
   }
 
-  void OpenGLFrameBuffer::addColorAttachment(ColorFormat format, uint32 unit, GLint clamp) {
+  void OpenGLFrameBuffer::addColorAttachment(ColorFormat format, u32 unit, GLint clamp) {
     GLuint textureId;
     GLuint index = GL_COLOR_ATTACHMENT0 + colorAttachments.size();
     GLint glInternalFormat = glInternalFormatMap.at(format);
@@ -100,7 +100,7 @@ namespace Gamma {
   void OpenGLFrameBuffer::bindColorAttachments() {
     GLuint* attachments = new GLuint[colorAttachments.size()];
 
-    for (uint32 i = 0; i < colorAttachments.size(); i++) {
+    for (u32 i = 0; i < colorAttachments.size(); i++) {
       attachments[i] = colorAttachments[i].index;
     }
 
@@ -109,8 +109,8 @@ namespace Gamma {
     delete[] attachments;
   }
 
-  void OpenGLFrameBuffer::read(uint32 offset) {
-    for (uint32 i = 0; i < colorAttachments.size(); i++) {
+  void OpenGLFrameBuffer::read(u32 offset) {
+    for (u32 i = 0; i < colorAttachments.size(); i++) {
       glActiveTexture(GL_TEXTURE0 + colorAttachments[i].textureUnit + offset);
       glBindTexture(GL_TEXTURE_2D, colorAttachments[i].textureId);
     }
@@ -118,7 +118,7 @@ namespace Gamma {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   }
 
-  void OpenGLFrameBuffer::setSize(const Area<uint32>& size) {
+  void OpenGLFrameBuffer::setSize(const Area<u32>& size) {
     this->size = size;
   }
 
@@ -132,7 +132,7 @@ namespace Gamma {
     glViewport(0, 0, size.width, size.height);
   }
 
-  void OpenGLFrameBuffer::writeToAttachment(uint32 attachment) {
+  void OpenGLFrameBuffer::writeToAttachment(u32 attachment) {
     glDrawBuffer(GL_COLOR_ATTACHMENT0 + attachment);
   }
 
@@ -157,7 +157,7 @@ namespace Gamma {
     glDeleteTextures(1, &depthTextureId);
   }
 
-  void OpenGLCubeMap::addColorAttachment(ColorFormat format, uint32 unit) {
+  void OpenGLCubeMap::addColorAttachment(ColorFormat format, u32 unit) {
     GLuint textureId;
     GLuint index = GL_COLOR_ATTACHMENT0 + colorAttachments.size();
     GLint glInternalFormat = glInternalFormatMap.at(format);
@@ -166,7 +166,7 @@ namespace Gamma {
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
 
-    for (uint32 i = 0; i < 6; i++) {
+    for (u32 i = 0; i < 6; i++) {
       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, size.width, size.height, 0, glFormat, GL_FLOAT, NULL);
     }
 
@@ -190,13 +190,13 @@ namespace Gamma {
     colorAttachments.push_back({ index, textureId, unit });
   }
 
-  void OpenGLCubeMap::addDepthAttachment(uint32 unit) {
+  void OpenGLCubeMap::addDepthAttachment(u32 unit) {
     this->depthTextureUnit = unit;
 
     glGenTextures(1, &depthTextureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthTextureId);
 
-    for (uint32 i = 0; i < 6; i++) {
+    for (u32 i = 0; i < 6; i++) {
       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, size.width, size.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     }
 
@@ -216,7 +216,7 @@ namespace Gamma {
   void OpenGLCubeMap::bindColorAttachments() {
     GLuint* attachments = new GLuint[colorAttachments.size()];
 
-    for (uint32 i = 0; i < colorAttachments.size(); i++) {
+    for (u32 i = 0; i < colorAttachments.size(); i++) {
       attachments[i] = colorAttachments[i].index;
     }
 
@@ -239,7 +239,7 @@ namespace Gamma {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   }
 
-  void OpenGLCubeMap::setSize(const Area<uint32>& size) {
+  void OpenGLCubeMap::setSize(const Area<u32>& size) {
     this->size = size;
   }
 
@@ -248,7 +248,7 @@ namespace Gamma {
     glViewport(0, 0, size.width, size.height);
   }
 
-  void OpenGLCubeMap::writeToFace(uint8 face) {
+  void OpenGLCubeMap::writeToFace(u8 face) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
     for (auto& colorAttachment : colorAttachments) {

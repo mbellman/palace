@@ -57,7 +57,7 @@ namespace Gamma {
       vertex.normal = Vec3f(0.f);
     }
 
-    for (uint32 i = 0; i < faceElements.size(); i += 3) {
+    for (u32 i = 0; i < faceElements.size(); i += 3) {
       Vertex& v1 = vertices[faceElements[i]];
       Vertex& v2 = vertices[faceElements[i + 1]];
       Vertex& v3 = vertices[faceElements[i + 2]];
@@ -78,7 +78,7 @@ namespace Gamma {
     auto& vertices = mesh->vertices;
     auto& faceElements = mesh->faceElements;
 
-    for (uint32 i = 0; i < faceElements.size(); i += 3) {
+    for (u32 i = 0; i < faceElements.size(); i += 3) {
       Vertex& v1 = vertices[faceElements[i]];
       Vertex& v2 = vertices[faceElements[i + 1]];
       Vertex& v3 = vertices[faceElements[i + 2]];
@@ -120,20 +120,20 @@ namespace Gamma {
    * alone is technically feasible though. reconsider when revisiting
    * this for glMultiDrawElementsIndirect().
    */
-  static void Gm_BufferObjData(const ObjLoader& obj, std::vector<Vertex>& vertices, std::vector<uint32>& faceElements) {
-    uint32 baseVertex = vertices.size();
+  static void Gm_BufferObjData(const ObjLoader& obj, std::vector<Vertex>& vertices, std::vector<u32>& faceElements) {
+    u32 baseVertex = vertices.size();
 
     if (obj.textureCoordinates.size() == 0 && obj.normals.size() == 0) {
       // Only vertex positions defined, so simply load in vertices,
       // and then load in face element indexes
-      for (uint32 i = 0; i < obj.vertices.size(); i++) {
+      for (u32 i = 0; i < obj.vertices.size(); i++) {
         Vertex vertex;
         vertex.position = obj.vertices[i];
 
         vertices.push_back(vertex);
       }
 
-      for (uint32 i = 0; i < obj.faces.size(); i++) {
+      for (u32 i = 0; i < obj.faces.size(); i++) {
         faceElements.push_back(baseVertex + obj.faces[i].v1.vertexIndex);
         faceElements.push_back(baseVertex + obj.faces[i].v2.vertexIndex);
         faceElements.push_back(baseVertex + obj.faces[i].v3.vertexIndex);
@@ -142,9 +142,9 @@ namespace Gamma {
       // Texture coordinates and/or normals defined, so we need
       // to create a unique vertex for each position/uv/normal
       // tuple, and add face elements based on created vertices
-      typedef std::tuple<uint32, uint32, uint32> VertexTuple;
+      typedef std::tuple<u32, u32, u32> VertexTuple;
 
-      std::map<VertexTuple, uint32> vertexTupleToIndexMap;
+      std::map<VertexTuple, u32> vertexTupleToIndexMap;
 
       for (const auto& face : obj.faces) {
         VertexTuple vertexTuples[3] = {
@@ -154,7 +154,7 @@ namespace Gamma {
         };
 
         // Add face elements, creating vertices if necessary
-        for (uint32 p = 0; p < 3; p++) {
+        for (u32 p = 0; p < 3; p++) {
           auto& vertexTuple = vertexTuples[p];
           auto indexRecord = vertexTupleToIndexMap.find(vertexTuple);
 
@@ -165,7 +165,7 @@ namespace Gamma {
           } else {
             // Vertex doesn't exist, so we need to create it
             Vertex vertex;
-            uint32 index = vertices.size();
+            u32 index = vertices.size();
 
             // @todo Have the option to run through existing vertices,
             // compare position, and re-use any which are within a minuscule
@@ -208,10 +208,10 @@ namespace Gamma {
     faceElements.resize(36);
 
     // For each cube side
-    for (uint8 i = 0; i < 6; i++) {
+    for (u8 i = 0; i < 6; i++) {
       auto& face = cubeFaces[i];
-      uint32 f_offset = i * 6;
-      uint32 v_offset = i * 4;
+      u32 f_offset = i * 6;
+      u32 v_offset = i * 4;
 
       // Define vertex indexes for the two triangle faces on each cube side
       faceElements[f_offset] = v_offset;
@@ -223,7 +223,7 @@ namespace Gamma {
       faceElements[f_offset + 5] = v_offset + 3;
 
       // For each corner on this side
-      for (uint8 j = 0; j < 4; j++) {
+      for (u8 j = 0; j < 4; j++) {
         auto& vertex = vertices[v_offset++];
 
         // Define the corner vertex position/uvs
@@ -277,7 +277,7 @@ namespace Gamma {
 
     mesh->lods.resize(paths.size());
 
-    for (uint32 i = 0; i < paths.size(); i++) {
+    for (u32 i = 0; i < paths.size(); i++) {
       const char* path = paths[i].c_str();
 
       ObjLoader obj(path);
@@ -319,17 +319,17 @@ namespace Gamma {
    *
    * @todo description
    */
-  Mesh* Mesh::Plane(uint32 size, bool useLoopingTexture) {
+  Mesh* Mesh::Plane(u32 size, bool useLoopingTexture) {
     auto* mesh = new Mesh();
     auto& vertices = mesh->vertices;
     auto& faceElements = mesh->faceElements;
 
     // Front + back face vertices
-    for (uint8 i = 0; i < 2; i++) {
+    for (u8 i = 0; i < 2; i++) {
       // @bug size should represent the total number of
       // tiles across the plane, not the total vertices
-      for (uint32 x = 0; x < size; x++) {
-        for (uint32 z = 0; z < size; z++) {
+      for (u32 x = 0; x < size; x++) {
+        for (u32 z = 0; z < size; z++) {
           Vertex vertex;
 
           float xr = (float)x / (float)(size - 1);
@@ -349,9 +349,9 @@ namespace Gamma {
     }
 
     // Front face
-    for (uint32 z = 0; z < size - 1; z++) {
-      for (uint32 x = 0; x < size - 1; x++) {
-        uint32 offset = z * size + x;
+    for (u32 z = 0; z < size - 1; z++) {
+      for (u32 x = 0; x < size - 1; x++) {
+        u32 offset = z * size + x;
 
         faceElements.push_back(offset);
         faceElements.push_back(offset + 1 + size);
@@ -366,9 +366,9 @@ namespace Gamma {
     // Back face
     auto startingOffset = size * size;
 
-    for (uint32 z = 0; z < size - 1; z++) {
-      for (uint32 x = 0; x < size - 1; x++) {
-        uint32 offset = startingOffset + z * size + x;
+    for (u32 z = 0; z < size - 1; z++) {
+      for (u32 x = 0; x < size - 1; x++) {
+        u32 offset = startingOffset + z * size + x;
 
         faceElements.push_back(offset);
         faceElements.push_back(offset + 1);
@@ -400,7 +400,7 @@ namespace Gamma {
       }
     }
 
-    for (uint32 i = 0; i < vertices.size(); i++) {
+    for (u32 i = 0; i < vertices.size(); i++) {
       handler(vertices[i], transformedVertices[i]);
     }
   }

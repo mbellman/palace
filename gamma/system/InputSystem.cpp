@@ -51,7 +51,7 @@ namespace Gamma {
     { SDLK_TAB, Key::TAB }
   };
 
-  uint64 InputSystem::getLastKeyDown() const {
+  u64 InputSystem::getLastKeyDown() const {
     return lastKeyDown;
   }
 
@@ -78,8 +78,8 @@ namespace Gamma {
   void InputSystem::handleKeyDown(const SDL_Keycode& code) {
     if (keyMap.find(code) != keyMap.end()) {
       Key key = keyMap.at(code);
-      keyState |= (uint64)key;
-      lastKeyDown = (uint64)key;
+      keyState |= (u64)key;
+      lastKeyDown = (u64)key;
 
       signal("keydown", key);
     }
@@ -88,7 +88,7 @@ namespace Gamma {
   void InputSystem::handleKeyUp(const SDL_Keycode& code) {
     if (keyMap.find(code) != keyMap.end()) {
       Key key = keyMap.at(code);
-      keyState &= ~(uint64)key;
+      keyState &= ~(u64)key;
 
       signal("keyup", key);
     }
@@ -117,6 +117,6 @@ namespace Gamma {
   }
 
   bool InputSystem::isKeyHeld(Key key) {
-    return keyState & (uint64)key;
+    return keyState & (u64)key;
   }
 }

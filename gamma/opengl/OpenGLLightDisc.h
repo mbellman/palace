@@ -18,8 +18,8 @@ namespace Gamma {
   public:
     virtual void init() override;
     virtual void destroy() override;
-    void draw(const Light& light, const Area<uint32>& resolution, const Camera& camera);
-    void draw(const std::vector<Light>& lights, const Area<uint32>& resolution, const Camera& camera);
+    void draw(const Light& light, const Area<u32>& resolution, const Camera& camera);
+    void draw(const std::vector<Light>& lights, const Area<u32>& resolution, const Camera& camera);
 
   private:
     GLuint vao;

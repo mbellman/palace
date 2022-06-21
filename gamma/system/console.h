@@ -9,7 +9,7 @@
 
 namespace Gamma {
   struct ConsoleMessage {
-    uint32 time;
+    u32 time;
     std::string text;
     ConsoleMessage* next = nullptr;
   };
@@ -33,7 +33,7 @@ namespace Gamma {
     static std::stringstream output;
     static ConsoleMessage* firstMessage;
     static ConsoleMessage* lastMessage;
-    static uint32 messageCounter;
+    static u32 messageCounter;
 
     template<typename Arg, typename ...Args>
     static void out(Arg& arg, Args&& ...args) {

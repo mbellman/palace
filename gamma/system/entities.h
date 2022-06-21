@@ -38,10 +38,10 @@ namespace Gamma {
     float power = 1.0f;
     Vec3f direction = Vec3f(0.0f, -1.0f, 0.0f);
     float fov = 90.0f;
-    uint32 type = LightType::POINT;
+    u32 type = LightType::POINT;
     bool isStatic = false;
     int id = UNUSED_LIGHT_INDEX;
-    // @todo std::vector<uint32> shadowMapMeshes (?)
+    // @todo std::vector<u32> shadowMapMeshes (?)
   };
 
   /**
@@ -56,13 +56,13 @@ namespace Gamma {
    * @size 8 bytes
    */
   struct ObjectRecord {
-    uint16 meshIndex = 0;
+    u16 meshIndex = 0;
     // @todo remove this and allow meshes to be 'deactivated' when freed
-    uint16 meshId = 0;
-    // @todo uint32 id with 24 bits for id and 8 for generation,
+    u16 meshId = 0;
+    // @todo u32 id with 24 bits for id and 8 for generation,
     // allowing up to ~16.77 million objects per pool
-    uint16 id = 0;
-    uint16 generation = 0;
+    u16 id = 0;
+    u16 generation = 0;
   };
 
   /**
@@ -133,27 +133,27 @@ namespace Gamma {
     /**
      * Defines the starting face element in the LOD model.
      */
-    uint32 elementOffset = 0;
+    u32 elementOffset = 0;
     /**
      * Defines the number of face elements in the LOD model.
      */
-    uint32 elementCount = 0;
+    u32 elementCount = 0;
     /**
      * Defines the starting instance in the LOD group.
      */
-    uint32 instanceOffset = 0;
+    u32 instanceOffset = 0;
     /**
      * Defines the number of instances in the LOD group.
      */
-    uint32 instanceCount = 0;
+    u32 instanceCount = 0;
     /**
      * Defines the starting vertex in the LOD model.
      */
-    uint32 vertexOffset = 0;
+    u32 vertexOffset = 0;
     /**
      * Defines the number of vertices in the LOD model.
      */
-    uint32 vertexCount = 0;
+    u32 vertexCount = 0;
   };
 
   /**
@@ -189,7 +189,7 @@ namespace Gamma {
      * The index of the mesh in a scene's Mesh array,
      * used for efficient mesh lookups.
      */
-    uint16 index = 0;
+    u16 index = 0;
     /**
      * A unique ID for the mesh. If a mesh retrieved
      * at a specific index in a scene's Mesh array
@@ -197,7 +197,7 @@ namespace Gamma {
      * mesh structure has been recycled), the reference
      * should be considered stale.
      */
-    uint16 id = 0;
+    u16 id = 0;
     /**
      * Static mesh vertices in model space.
      */
@@ -213,7 +213,7 @@ namespace Gamma {
      * Vertex indices for each triangle face of the mesh,
      * defined in groups of three.
      */
-    std::vector<uint32> faceElements;
+    std::vector<u32> faceElements;
     /**
      * The LOD groups for the Mesh, if applicable.
      *
@@ -248,12 +248,12 @@ namespace Gamma {
      *
      * @see MeshType
      */
-    uint8 type = MeshType::NON_EMISSIVE;
+    u8 type = MeshType::NON_EMISSIVE;
     /**
      * Controls the maximum directional cascaded shadow
      * map that the mesh objects should be rendered to.
      */
-    uint8 maxCascade = 3;
+    u8 maxCascade = 3;
     /**
      * Controls whether the mesh's instances are rendered
      * to shadow maps, enabling them to cast shadows.
@@ -273,9 +273,9 @@ namespace Gamma {
     static Mesh* Model(const char* path);
     static Mesh* Model(const std::vector<std::string>& paths);
     static Mesh* Particles();
-    static Mesh* Plane(uint32 size, bool useLoopingTexture = false);
-    // @todo Sphere(uint32 divisions)
-    // @todo Cylinder(uint32 divisions)
+    static Mesh* Plane(u32 size, bool useLoopingTexture = false);
+    // @todo Sphere(u32 divisions)
+    // @todo Cylinder(u32 divisions)
 
     // @todo remove?
     void transformGeometry(std::function<void(const Vertex&, Vertex&)> handler);

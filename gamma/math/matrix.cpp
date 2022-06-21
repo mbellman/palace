@@ -11,7 +11,7 @@ namespace Gamma {
    * Matrix4f
    * -------
    */
-  Matrix4f Matrix4f::glPerspective(const Area<uint32>& area, float fov, float near, float far) {
+  Matrix4f Matrix4f::glPerspective(const Area<u32>& area, float fov, float near, float far) {
     float f = 1.0f / tanf(fov / 2.0f * DEGREES_TO_RADIANS);
     float aspectRatio = (float)area.width / (float)area.height;
 
@@ -145,13 +145,13 @@ namespace Gamma {
     float v[6];
 
     // Accumulate rotation * scale
-    for (uint32 r = 0; r < 3; r++) {
+    for (u32 r = 0; r < 3; r++) {
       // Store rotation terms
       v[0] = m_rotation.m[r * 4];
       v[2] = m_rotation.m[r * 4 + 1];
       v[4] = m_rotation.m[r * 4 + 2];
 
-      for (uint32 c = 0; c < 3; c++) {
+      for (u32 c = 0; c < 3; c++) {
         // Store scale terms
         v[1] = m_scale.m[c];
         v[3] = m_scale.m[4 + c];
@@ -194,7 +194,7 @@ namespace Gamma {
   }
 
   void Matrix4f::debug() const {
-    for (uint32 i = 0; i < 4; i++) {
+    for (u32 i = 0; i < 4; i++) {
       printf("[ %f, %f, %f, %f ]\n", m[i * 4], m[i * 4 + 1], m[i * 4 + 2], m[i * 4 + 3]);
     }
 

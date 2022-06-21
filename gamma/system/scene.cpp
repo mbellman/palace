@@ -27,14 +27,14 @@ const GmSceneStats Gm_GetSceneStats(GmContext* context) {
   return stats;
 }
 
-void Gm_AddMesh(GmContext* context, const std::string& meshName, Gamma::uint16 maxInstances, Gamma::Mesh* mesh) {
+void Gm_AddMesh(GmContext* context, const std::string& meshName, u16 maxInstances, Gamma::Mesh* mesh) {
   auto& scene = context->scene;
   auto& meshes = scene.meshes;
   auto& meshMap = scene.meshMap;
 
   assert(meshMap.find(meshName) == meshMap.end(), "Mesh '" + meshName + "' already exists!");
 
-  mesh->index = (uint16)meshes.size();
+  mesh->index = (u16)meshes.size();
   mesh->id = scene.runningMeshId++;
   mesh->objects.reserve(maxInstances);
 
@@ -42,7 +42,7 @@ void Gm_AddMesh(GmContext* context, const std::string& meshName, Gamma::uint16 m
   meshes.push_back(mesh);
 
   if (mesh->type == MeshType::PARTICLE_SYSTEM) {
-    for (uint16 i = 0; i < maxInstances; i++) {
+    for (u16 i = 0; i < maxInstances; i++) {
       Gm_CreateObjectFrom(context, meshName);
     }
   }
@@ -82,12 +82,12 @@ void Gm_UseSceneFile(GmContext* context, const std::string& filename) {
   // Load meshes
   for (auto& [ key, property ] : *scene["meshes"].object) {
     auto& meshConfig = *property.object;
-    uint32 maxInstances = Gm_ReadYamlProperty<uint32>(meshConfig, "max");
+    u32 maxInstances = Gm_ReadYamlProperty<u32>(meshConfig, "max");
     Mesh* mesh = nullptr;
 
     if (Gm_HasYamlProperty(meshConfig, "plane")) {
-      uint32 size = Gm_ReadYamlProperty<uint32>(meshConfig, "plane.size");
-      bool useLoopingTexture = Gm_ReadYamlProperty<uint32>(meshConfig, "plane.useLoopingTexture");
+      u32 size = Gm_ReadYamlProperty<u32>(meshConfig, "plane.size");
+      bool useLoopingTexture = Gm_ReadYamlProperty<u32>(meshConfig, "plane.useLoopingTexture");
 
       mesh = Mesh::Plane(size, useLoopingTexture);
     } else if (Gm_HasYamlProperty(meshConfig, "cube")) {
@@ -270,9 +270,9 @@ void Gm_UseLodByDistance(GmContext* context, float distance, const std::initiali
   for (auto& meshName : meshNames) {
     auto& mesh = *meshMap[meshName];
 
-    uint32 instanceOffset = 0;
+    u32 instanceOffset = 0;
 
-    for (uint32 lodIndex = 0; lodIndex < mesh.lods.size(); lodIndex++) {
+    for (u32 lodIndex = 0; lodIndex < mesh.lods.size(); lodIndex++) {
       mesh.lods[lodIndex].instanceOffset = instanceOffset;
 
       if (lodIndex < mesh.lods.size() - 1) {
@@ -280,13 +280,13 @@ void Gm_UseLodByDistance(GmContext* context, float distance, const std::initiali
         // in front of those outside it, and use the pivot
         // defining that boundary to determine our instance
         // count for this LoD set
-        instanceOffset = (uint32)mesh.objects.partitionByDistance((uint16)instanceOffset, distance * float(lodIndex + 1), camera.position);
+        instanceOffset = (u32)mesh.objects.partitionByDistance((u16)instanceOffset, distance * float(lodIndex + 1), camera.position);
 
         mesh.lods[lodIndex].instanceCount = instanceOffset - mesh.lods[lodIndex].instanceOffset;
       } else {
         // The final LoD can just use the remaining set
         // of objects beyond the last LoD distance threshold
-        mesh.lods[lodIndex].instanceCount = (uint32)mesh.objects.totalVisible() - instanceOffset;
+        mesh.lods[lodIndex].instanceCount = (u32)mesh.objects.totalVisible() - instanceOffset;
       }
     }
   }

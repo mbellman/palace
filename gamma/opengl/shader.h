@@ -40,7 +40,7 @@ namespace Gamma {
 
   private:
     GLuint program = -1;
-    uint32 lastShaderFileCheckTime = 0;
+    u32 lastShaderFileCheckTime = 0;
     std::vector<GLShaderRecord> glShaderRecords;
     std::map<std::string, std::string> defineVariables;
 

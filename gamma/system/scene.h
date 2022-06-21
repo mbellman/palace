@@ -37,8 +37,8 @@
 struct GmContext;
 
 struct GmSceneStats {
-  Gamma::uint32 verts = 0;
-  Gamma::uint32 tris = 0;
+  u32 verts = 0;
+  u32 tris = 0;
 };
 
 struct GmScene {
@@ -50,13 +50,13 @@ struct GmScene {
   std::map<std::string, Gamma::Vec3f> probeMap;
   std::map<std::string, Gamma::ObjectRecord> objectStore;
   Gamma::Vec3f freeCameraVelocity = Gamma::Vec3f(0.0f);
-  Gamma::uint16 runningMeshId = 0;
-  Gamma::uint32 frame = 0;
+  u16 runningMeshId = 0;
+  u32 frame = 0;
   float runningTime = 0.0f;
 };
 
 const GmSceneStats Gm_GetSceneStats(GmContext* context);
-void Gm_AddMesh(GmContext* context, const std::string& meshName, Gamma::uint16 maxInstances, Gamma::Mesh* mesh);
+void Gm_AddMesh(GmContext* context, const std::string& meshName, u16 maxInstances, Gamma::Mesh* mesh);
 void Gm_AddProbe(GmContext* context, const std::string& probeName, const Gamma::Vec3f& position);
 Gamma::Light& Gm_CreateLight(GmContext* context, Gamma::LightType type);
 void Gm_UseSceneFile(GmContext* context, const std::string& filename);

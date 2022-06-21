@@ -34,17 +34,17 @@ namespace Gamma {
 
     std::string source = Gm_LoadFileContents(path);
     std::vector<std::string> includes;
-    uint32 currentInclude;
+    u32 currentInclude;
 
     // Handle #include directives
     while ((currentInclude = source.find(INCLUDE_START)) != std::string::npos) {
-      uint32 pathStart = currentInclude + INCLUDE_START.size();
-      uint32 pathEnd = source.find(INCLUDE_END, pathStart);
+      u32 pathStart = currentInclude + INCLUDE_START.size();
+      u32 pathEnd = source.find(INCLUDE_END, pathStart);
       // @todo store include paths in shader record;
       // check all included files when hot reloading
       std::string includePath = INCLUDE_ROOT_PATH + source.substr(pathStart, pathEnd - pathStart);
-      uint32 replaceStart = currentInclude;
-      uint32 replaceLength = (pathEnd + INCLUDE_END.size()) - currentInclude;
+      u32 replaceStart = currentInclude;
+      u32 replaceLength = (pathEnd + INCLUDE_END.size()) - currentInclude;
 
       if (Gm_VectorContains(includes, includePath)) {
         // File already included; simply remove the directive
@@ -61,11 +61,11 @@ namespace Gamma {
     // Handle #define variable overrides
     for (auto& [ name, value ] : defineOverrides) {
       std::string defineDirective = "#define " + name + " ";
-      uint32 directiveStart = source.find(defineDirective);
+      u32 directiveStart = source.find(defineDirective);
 
       if (directiveStart != std::string::npos) {
-        uint32 valueStart = directiveStart + defineDirective.size();
-        uint32 valueEnd = source.find("\n", valueStart);
+        u32 valueStart = directiveStart + defineDirective.size();
+        u32 valueEnd = source.find("\n", valueStart);
 
         source.replace(valueStart, valueEnd - valueStart, value);
       }
@@ -142,7 +142,7 @@ namespace Gamma {
   }
 
   void OpenGLShader::checkAndHotReloadShaders() {
-    constexpr static uint32 CHECK_INTERVAL = 1000;
+    constexpr static u32 CHECK_INTERVAL = 1000;
 
     if ((SDL_GetTicks() - lastShaderFileCheckTime) > CHECK_INTERVAL) {
       for (auto& record : glShaderRecords) {

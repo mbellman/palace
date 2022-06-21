@@ -9,7 +9,7 @@ namespace Gamma {
     glGenBuffers(1, &glDrawIndirectBuffer);
   }
 
-  void Gm_BufferDrawElementsIndirectCommands(const GlDrawElementsIndirectCommand* commands, uint32 total) {
+  void Gm_BufferDrawElementsIndirectCommands(const GlDrawElementsIndirectCommand* commands, u32 total) {
     // @todo eventually treat this as a command queue,
     // rather than recreating the buffer store each time
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, glDrawIndirectBuffer);

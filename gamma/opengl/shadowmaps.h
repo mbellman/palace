@@ -10,7 +10,7 @@
 namespace Gamma {
   struct OpenGLBaseShadowMap {
     // @todo store a pointer to the light instead of the index
-    uint32 lightId = UNUSED_LIGHT_INDEX;
+    u32 lightId = UNUSED_LIGHT_INDEX;
     bool isRendered = false;
   };
 
@@ -32,5 +32,5 @@ namespace Gamma {
     OpenGLSpotShadowMap(const Light* light);
   };
 
-  Matrix4f Gm_CreateCascadedLightViewMatrixGL(uint8 cascade, const Vec3f& lightDirection, const Camera& camera);
+  Matrix4f Gm_CreateCascadedLightViewMatrixGL(u8 cascade, const Vec3f& lightDirection, const Camera& camera);
 }

@@ -4,7 +4,7 @@
 #include "glew.h"
 
 namespace Gamma {
-  void Gm_InitRendererResources(RendererBuffers& buffers, RendererShaders& shaders, const Area<uint32>& internalResolution) {
+  void Gm_InitRendererResources(RendererBuffers& buffers, RendererShaders& shaders, const Area<u32>& internalResolution) {
     // Initialize buffers
     buffers.gBuffer.init();
     buffers.gBuffer.setSize(internalResolution);

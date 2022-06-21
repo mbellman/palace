@@ -75,7 +75,7 @@ namespace Gamma {
    *
    * Adapted from https://alextardif.com/shadowmapping.html
    */
-  Matrix4f Gm_CreateCascadedLightViewMatrixGL(uint8 cascade, const Vec3f& lightDirection, const Camera& camera) {
+  Matrix4f Gm_CreateCascadedLightViewMatrixGL(u8 cascade, const Vec3f& lightDirection, const Camera& camera) {
     // Determine the near and far ranges of the cascade volume
     float near = cascadeDepthRanges[cascade][0];
     float far = cascadeDepthRanges[cascade][1];
@@ -104,7 +104,7 @@ namespace Gamma {
     Matrix4f cameraViewProjection = cameraProjection * cameraView;
     Matrix4f inverseCameraViewProjection = cameraViewProjection.inverse();
 
-    for (uint32 i = 0; i < 8; i++) {
+    for (u32 i = 0; i < 8; i++) {
       corners[i] = (inverseCameraViewProjection * corners[i]).homogenize();
       corners[i].z *= -1.0f;
     }
@@ -112,7 +112,7 @@ namespace Gamma {
     // Calculate world space frustum center/centroid
     Vec3f frustumCenter;
 
-    for (uint32 i = 0; i < 8; i++) {
+    for (u32 i = 0; i < 8; i++) {
       frustumCenter += corners[i];
     }
 
@@ -121,7 +121,7 @@ namespace Gamma {
     // Calculate the radius of a sphere encapsulating the frustum
     float radius = 0.0f;
 
-    for (uint32 i = 0; i < 8; i++) {
+    for (u32 i = 0; i < 8; i++) {
       radius = std::max(radius, (frustumCenter - corners[i]).magnitude());
     }
 

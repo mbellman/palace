@@ -6,7 +6,7 @@ namespace Gamma {
   std::stringstream Console::output;
   ConsoleMessage* Console::firstMessage = nullptr;
   ConsoleMessage* Console::lastMessage = nullptr;
-  uint32 Console::messageCounter = 0;
+  u32 Console::messageCounter = 0;
 
   void Console::clearMessages() {
     // @todo

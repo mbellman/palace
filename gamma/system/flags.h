@@ -28,7 +28,7 @@ namespace Gamma {
   void Gm_EnableFlags(GammaFlags flags);
   bool Gm_FlagWasDisabled(GammaFlags flag);
   bool Gm_FlagWasEnabled(GammaFlags flag);
-  uint32 Gm_GetFlags();
+  u32 Gm_GetFlags();
   bool Gm_IsFlagEnabled(GammaFlags flag);
   void Gm_SavePreviousFlags();
 }

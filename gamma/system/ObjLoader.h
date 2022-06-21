@@ -18,9 +18,9 @@ namespace Gamma {
    * index among the lists defined in an .obj file.
    */
   struct VertexData {
-    uint32 vertexIndex;
-    uint32 textureCoordinateIndex;
-    uint32 normalIndex;
+    u32 vertexIndex;
+    u32 textureCoordinateIndex;
+    u32 normalIndex;
   };
 
   /**

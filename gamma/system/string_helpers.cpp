@@ -10,8 +10,8 @@ namespace Gamma {
    */
   std::vector<std::string> Gm_SplitString(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> values;
-    uint32 offset = 0;
-    uint32 found = 0;
+    u32 offset = 0;
+    u32 found = 0;
 
     // Add each delimited string segment to the list
     while ((found = str.find(delimiter, offset)) != std::string::npos) {
@@ -34,8 +34,8 @@ namespace Gamma {
    */
   std::string Gm_TrimString(const std::string& str) {
     std::string trimmed;
-    uint32 start = 0;
-    uint32 end = str.size();
+    u32 start = 0;
+    u32 end = str.size();
 
     for (;;) {
       if (str[start] == ' ') start++;

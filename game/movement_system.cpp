@@ -58,7 +58,7 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   auto leftGridDirection = worldDirectionToGridDirection(params(), camera.orientation.getLeftDirection());
   auto move = MoveDirection::NONE;
 
-  #define keyPressed(key) input.getLastKeyDown() == (uint64)key && input.isKeyHeld(key)
+  #define keyPressed(key) input.getLastKeyDown() == (u64)key && input.isKeyHeld(key)
 
   if (keyPressed(Key::W)) {
     move = gridDirectionToMoveDirection(forwardGridDirection);

@@ -16,9 +16,9 @@ enum MoveDirection {
 
 struct MoveQueue {
   MoveDirection queue[MAX_MOVE_QUEUE_SIZE];
-  Gamma::uint8 size = 0;
+  u8 size = 0;
 };
 
 void commitMove(MoveQueue& moves, MoveDirection move);
-MoveDirection checkNextMove(MoveQueue& moves, Gamma::uint8 movesAhead = 0);
+MoveDirection checkNextMove(MoveQueue& moves, u8 movesAhead = 0);
 MoveDirection takeNextMove(MoveQueue& moves);

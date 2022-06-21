@@ -56,8 +56,8 @@ namespace Gamma {
   };
 
   struct RendererContext {
-    uint32 internalWidth;
-    uint32 internalHeight;
+    u32 internalWidth;
+    u32 internalHeight;
     bool hasEmissiveObjects;
     bool hasReflectiveObjects;
     bool hasRefractiveObjects;
@@ -93,7 +93,7 @@ namespace Gamma {
     virtual void destroyShadowMap(const Light* light) override;
     virtual const RenderStats& getRenderStats() override;
     virtual void present() override;
-    virtual void renderText(TTF_Font* font, const char* message, uint32 x, uint32 y, const Vec3f& color, const Vec4f& background) override;
+    virtual void renderText(TTF_Font* font, const char* message, u32 x, u32 y, const Vec3f& color, const Vec4f& background) override;
     virtual void resetShadowMaps() override;
 
   private:
@@ -104,7 +104,7 @@ namespace Gamma {
     OpenGLLightDisc lightDisc;
     OpenGLShader screen;
     GLuint screenTexture = 0;
-    uint32 frame = 0;
+    u32 frame = 0;
     std::vector<OpenGLMesh*> glMeshes;
     std::vector<OpenGLDirectionalShadowMap*> glDirectionalShadowMaps;
     std::vector<OpenGLPointShadowMap*> glPointShadowMaps;
@@ -141,7 +141,7 @@ namespace Gamma {
     void handleSettingsChanges();
     void initializeRendererContext();
     void initializeLightArrays();
-    void renderSurfaceToScreen(SDL_Surface* surface, uint32 x, uint32 y, const Vec3f& color, const Vec4f& background);
+    void renderSurfaceToScreen(SDL_Surface* surface, u32 x, u32 y, const Vec3f& color, const Vec4f& background);
     void renderToAccumulationBuffer();
     void swapAccumulationBuffers();
   };

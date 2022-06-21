@@ -9,7 +9,7 @@
 #include "system/console.h"
 
 namespace Gamma {
-  constexpr static uint32 DISC_SLICES = 16;
+  constexpr static u32 DISC_SLICES = 16;
 
   enum GLBuffer {
     VERTEX,
@@ -39,7 +39,7 @@ namespace Gamma {
     );
   }
 
-  static inline Matrix4f getLightProjectionMatrix(const Area<uint32>& resolution) {
+  static inline Matrix4f getLightProjectionMatrix(const Area<u32>& resolution) {
     return Matrix4f::glPerspective(resolution, 90.0f * 0.5f, 1.0f, 10000.0f);
   }
 
@@ -51,9 +51,9 @@ namespace Gamma {
     // Create the vertices for each slice of the disc
     Vec2f vertexPositions[DISC_SLICES * 3];
 
-    for (uint32 i = 0; i < DISC_SLICES; i++) {
+    for (u32 i = 0; i < DISC_SLICES; i++) {
       constexpr static float sliceAngle = 360.0f / (float)DISC_SLICES;
-      uint32 index = i * 3;
+      u32 index = i * 3;
 
       // Add center vertex
       vertexPositions[index] = Vec2f(0.0f);
@@ -140,7 +140,7 @@ namespace Gamma {
     }
   }
 
-  void OpenGLLightDisc::draw(const Light& light, const Area<uint32>& resolution, const Camera& camera) {
+  void OpenGLLightDisc::draw(const Light& light, const Area<u32>& resolution, const Camera& camera) {
     Disc discs[1];
     auto& disc = discs[0];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
@@ -156,14 +156,14 @@ namespace Gamma {
     glDrawArrays(GL_TRIANGLES, 0, DISC_SLICES * 3);
   }
 
-  void OpenGLLightDisc::draw(const std::vector<Light>& lights, const Area<uint32>& resolution, const Camera& camera) {
+  void OpenGLLightDisc::draw(const std::vector<Light>& lights, const Area<u32>& resolution, const Camera& camera) {
     // @todo avoid reallocating/freeing the disc array on each draw
     Disc* discs = new Disc[lights.size()];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
     Matrix4f matProjection = getLightProjectionMatrix(resolution);
     Matrix4f matView = getLightViewMatrix(camera);
 
-    for (uint32 i = 0; i < lights.size(); i++) {
+    for (u32 i = 0; i < lights.size(); i++) {
       auto& light = lights[i];
       auto& disc = discs[i];
 

@@ -21,7 +21,7 @@
 #include "system/scene.h"
 
 namespace Gamma {
-  const static uint32 MAX_LIGHTS = 1000;
+  const static u32 MAX_LIGHTS = 1000;
   const static Vec4f FULL_SCREEN_TRANSFORM = { 0.0f, 0.0f, 1.0f, 1.0f };
 
   const static Vec3f CUBE_MAP_DIRECTIONS[6] = {
@@ -515,13 +515,13 @@ namespace Gamma {
 
     shader.use();
 
-    for (uint32 mapIndex = 0; mapIndex < glDirectionalShadowMaps.size(); mapIndex++) {
+    for (u32 mapIndex = 0; mapIndex < glDirectionalShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glDirectionalShadowMaps[mapIndex];
       auto& light = ctx.directionalShadowcasters[mapIndex];
 
       glShadowMap.buffer.write();
 
-      for (uint32 cascade = 0; cascade < 3; cascade++) {
+      for (u32 cascade = 0; cascade < 3; cascade++) {
         glShadowMap.buffer.writeToAttachment(cascade);
         Matrix4f matLightView = Gm_CreateCascadedLightViewMatrixGL(cascade, light.direction, camera);
 
@@ -550,7 +550,7 @@ namespace Gamma {
 
     shader.use();
 
-    for (uint32 mapIndex = 0; mapIndex < glPointShadowMaps.size(); mapIndex++) {
+    for (u32 mapIndex = 0; mapIndex < glPointShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glPointShadowMaps[mapIndex];
       auto& light = ctx.pointShadowCasters[mapIndex];
 
@@ -562,7 +562,7 @@ namespace Gamma {
 
       glClear(GL_DEPTH_BUFFER_BIT);
 
-      for (uint32 i = 0; i < 6; i++) {
+      for (u32 i = 0; i < 6; i++) {
         auto& direction = CUBE_MAP_DIRECTIONS[i];
         auto& upDirection = CUBE_MAP_UP_DIRECTIONS[i];
 
@@ -600,7 +600,7 @@ namespace Gamma {
 
     shader.use();
 
-    for (uint32 mapIndex = 0; mapIndex < glSpotShadowMaps.size(); mapIndex++) {
+    for (u32 mapIndex = 0; mapIndex < glSpotShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glSpotShadowMaps[mapIndex];
       auto& light = ctx.spotShadowcasters[mapIndex];
 
@@ -699,7 +699,7 @@ namespace Gamma {
     shader.setMatrix4f("matInverseProjection", ctx.matInverseProjection);
     shader.setMatrix4f("matInverseView", ctx.matInverseView);
 
-    for (uint32 i = 0; i < ctx.pointShadowCasters.size(); i++) {
+    for (u32 i = 0; i < ctx.pointShadowCasters.size(); i++) {
       auto& glShadowMap = *glPointShadowMaps[i];
       auto& light = ctx.pointShadowCasters[i];
 
@@ -724,7 +724,7 @@ namespace Gamma {
     shader.setMatrix4f("matInverseView", ctx.matInverseView);
 
     // @todo limit to MAX_DIRECTIONAL_LIGHTS
-    for (uint32 i = 0; i < ctx.directionalLights.size(); i++) {
+    for (u32 i = 0; i < ctx.directionalLights.size(); i++) {
       auto& light = ctx.directionalLights[i];
       std::string indexedLight = "lights[" + std::to_string(i) + "]";
 
@@ -745,7 +745,7 @@ namespace Gamma {
 
     shader.use();
 
-    for (uint32 i = 0; i < ctx.directionalShadowcasters.size(); i++) {
+    for (u32 i = 0; i < ctx.directionalShadowcasters.size(); i++) {
       auto& light = ctx.directionalShadowcasters[i];
       auto& glShadowMap = *glDirectionalShadowMaps[i];
 
@@ -805,7 +805,7 @@ namespace Gamma {
     shader.setMatrix4f("matInverseView", ctx.matInverseView);
     shader.setFloat("time", gmContext->scene.runningTime);
 
-    for (uint32 i = 0; i < ctx.spotShadowcasters.size(); i++) {
+    for (u32 i = 0; i < ctx.spotShadowcasters.size(); i++) {
       auto& glShadowMap = *glSpotShadowMaps[i];
       auto& light = ctx.spotShadowcasters[i];
 
@@ -855,7 +855,7 @@ namespace Gamma {
       buffers.gBuffer.read();
       ctx.accumulationTarget->read();
 
-      // @todo OpenGLFrameBuffer::createMipmaps(uint32 levels)
+      // @todo OpenGLFrameBuffer::createMipmaps(u32 levels)
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3);
       glGenerateMipmap(GL_TEXTURE_2D);
@@ -889,7 +889,7 @@ namespace Gamma {
 
       ctx.accumulationTarget->read();
 
-      // @todo OpenGLFrameBuffer::setMaxMipmapLevel(uint32 level)
+      // @todo OpenGLFrameBuffer::setMaxMipmapLevel(u32 level)
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     }
 
@@ -970,10 +970,10 @@ namespace Gamma {
         shaders.particles.setFloat("particles.deviation", particles.deviation);
 
         // Set particle path parameters
-        constexpr static uint32 MAX_PATH_POINTS = 10;
-        uint32 totalPathPoints = std::min((uint32)particles.path.size(), (uint32)MAX_PATH_POINTS);
+        constexpr static u32 MAX_PATH_POINTS = 10;
+        u32 totalPathPoints = std::min((u32)particles.path.size(), (u32)MAX_PATH_POINTS);
 
-        for (uint8 i = 0; i < totalPathPoints; i++) {
+        for (u8 i = 0; i < totalPathPoints; i++) {
           shaders.particles.setVec3f("path.points[" + std::to_string(i) + "]", particles.path[i]);
         }
 
@@ -1166,7 +1166,7 @@ namespace Gamma {
 
     OpenGLScreenQuad::render();
 
-    for (uint32 i = 0; i < glDirectionalShadowMaps.size(); i++) {
+    for (u32 i = 0; i < glDirectionalShadowMaps.size(); i++) {
       float yOffset = 0.52f - float(i) * 0.32f;
 
       glDirectionalShadowMaps[i]->buffer.read();
@@ -1189,8 +1189,8 @@ namespace Gamma {
 
     #if GAMMA_DEVELOPER_MODE
       // @todo move to OpenGLMesh
-      uint32 totalVertices = mesh->vertices.size();
-      uint32 totalTriangles = mesh->faceElements.size() / 3;
+      u32 totalVertices = mesh->vertices.size();
+      u32 totalTriangles = mesh->faceElements.size() / 3;
 
       Console::log("[Gamma] OpenGLMesh created:", totalVertices, "vertices,", totalTriangles, "triangles");
     #endif
@@ -1252,9 +1252,9 @@ namespace Gamma {
 
     glProbes[name] = probe;
 
-    std::vector<uint8> order = { 1, 0, 3, 2, 5, 4 };
+    std::vector<u8> order = { 1, 0, 3, 2, 5, 4 };
 
-    for (uint8 i = 0; i < 6; i++) {
+    for (u8 i = 0; i < 6; i++) {
       auto& direction = CUBE_MAP_DIRECTIONS[order[i]];
       auto& upDirection = CUBE_MAP_UP_DIRECTIONS[order[i]];
       float farDistance = 1000.0f;
@@ -1299,7 +1299,7 @@ namespace Gamma {
     }
   }
 
-  void OpenGLRenderer::renderSurfaceToScreen(SDL_Surface* surface, uint32 x, uint32 y, const Vec3f& color, const Vec4f& background) {
+  void OpenGLRenderer::renderSurfaceToScreen(SDL_Surface* surface, u32 x, u32 y, const Vec3f& color, const Vec4f& background) {
     auto& window = gmContext->window;
     float offsetX = -1.0f + (2 * x + surface->w) / (float)window.size.width;
     float offsetY = 1.0f - (2 * y + surface->h) / (float)window.size.height;
@@ -1324,7 +1324,7 @@ namespace Gamma {
     OpenGLScreenQuad::render();
   }
 
-  void OpenGLRenderer::renderText(TTF_Font* font, const char* message, uint32 x, uint32 y, const Vec3f& color, const Vec4f& background) {
+  void OpenGLRenderer::renderText(TTF_Font* font, const char* message, u32 x, u32 y, const Vec3f& color, const Vec4f& background) {
     SDL_Surface* text = TTF_RenderText_Blended(font, message, { 255, 255, 255 });
 
     renderSurfaceToScreen(text, x, y, color, background);

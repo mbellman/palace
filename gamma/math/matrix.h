@@ -9,7 +9,7 @@ namespace Gamma {
   struct Matrix4f {
     float m[16] = { 0.0f };
 
-    static Matrix4f glPerspective(const Area<uint32>& area, float fov, float near, float far);
+    static Matrix4f glPerspective(const Area<u32>& area, float fov, float near, float far);
     static Matrix4f identity();
     static Matrix4f lookAt(const Vec3f& eye, const Vec3f& direction, const Vec3f& top);
     static Matrix4f orthographic(float top, float bottom, float left, float right, float near, float far);

@@ -12,8 +12,8 @@ namespace Gamma {
     OpenGLMesh(const Mesh* mesh);
     ~OpenGLMesh();
 
-    uint16 getId() const;
-    uint16 getObjectCount() const;
+    u16 getId() const;
+    u16 getObjectCount() const;
     const Mesh* getSourceMesh() const;
     bool hasNormalMap() const;
     bool hasTexture() const;

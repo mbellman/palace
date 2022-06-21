@@ -26,7 +26,7 @@ void commitMove(MoveQueue& moves, MoveDirection move) {
   moves.queue[moves.size++] = move;
 }
 
-MoveDirection checkNextMove(MoveQueue& moves, Gamma::uint8 movesAhead) {
+MoveDirection checkNextMove(MoveQueue& moves, u8 movesAhead) {
   if (moves.size <= movesAhead) {
     return MoveDirection::NONE;
   }
@@ -41,7 +41,7 @@ MoveDirection takeNextMove(MoveQueue& moves) {
 
   auto move = moves.queue[0];
 
-  for (uint8 i = 0; i < moves.size; i++) {
+  for (u8 i = 0; i < moves.size; i++) {
     moves.queue[i] = moves.queue[i + 1];
   }
 

@@ -78,7 +78,7 @@ namespace Gamma {
     auto properties = Gm_SplitString(propertyChain, ".");
     auto* currentObject = &object;
 
-    for (uint32 i = 0; i < properties.size() - 1; i++) {
+    for (u32 i = 0; i < properties.size() - 1; i++) {
       currentObject = currentObject->at(properties[i]).object;
     }
 

@@ -8,7 +8,7 @@
 #include "system/type_aliases.h"
 
 namespace Gamma {
-  enum class Key : uint64 {
+  enum class Key : u64 {
     A = 1ULL << 0,
     B = 1ULL << 1,
     C = 1ULL << 2,
@@ -69,13 +69,13 @@ namespace Gamma {
 
   class InputSystem : public Signaler {
   public:
-    uint64 getLastKeyDown() const;
+    u64 getLastKeyDown() const;
     void handleEvent(const SDL_Event& event);
     bool isKeyHeld(Key key);
 
   private:
-    uint64 keyState = 0;
-    uint64 lastKeyDown = 0;
+    u64 keyState = 0;
+    u64 lastKeyDown = 0;
 
     void handleKeyDown(const SDL_Keycode& code);
     void handleKeyUp(const SDL_Keycode& code);

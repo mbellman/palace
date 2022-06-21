@@ -2,7 +2,7 @@
 #include "system/type_aliases.h"
 
 namespace Gamma {
-  static uint32 internalFlags =
+  static u32 internalFlags =
     GammaFlags::RENDER_REFLECTIONS |
     GammaFlags::RENDER_REFRACTIVE_GEOMETRY |
     GammaFlags::RENDER_SHADOWS |
@@ -12,7 +12,7 @@ namespace Gamma {
     GammaFlags::RENDER_DEV_BUFFERS |
     GammaFlags::ENABLE_DENOISING;
 
-  static uint32 previousFlags = internalFlags;
+  static u32 previousFlags = internalFlags;
 
   void Gm_DisableFlags(GammaFlags flags) {
     internalFlags &= ~flags;
@@ -30,7 +30,7 @@ namespace Gamma {
     return !(previousFlags & flag) && (internalFlags & flag);
   }
 
-  uint32 Gm_GetFlags() {
+  u32 Gm_GetFlags() {
     return internalFlags;
   }
 

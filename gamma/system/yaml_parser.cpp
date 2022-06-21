@@ -44,7 +44,7 @@ namespace Gamma {
 
     objectStack.push_back(root);
 
-    for (uint32 i = 0; i < lines.size(); i++) {
+    for (u32 i = 0; i < lines.size(); i++) {
       auto trimmedLine = Gm_TrimString(lines[i]);
 
       if (trimmedLine[0] == '}') {
@@ -79,8 +79,8 @@ namespace Gamma {
           property.value = array;
         } else {
           // Other leaf properties (strings, numbers, or booleans)
-          uint32 vStart = trimmedLine.find(":") + 1;
-          uint32 vLength = trimmedLine.find(",") - vStart;
+          u32 vStart = trimmedLine.find(":") + 1;
+          u32 vLength = trimmedLine.find(",") - vStart;
           auto value = Gm_TrimString(trimmedLine.substr(vStart, vLength));
 
           property.value = Gm_ParsePrimitiveValue(value);

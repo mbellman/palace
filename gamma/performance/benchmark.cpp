@@ -4,26 +4,26 @@
 
 #include "performance/benchmark.h"
 
-Gamma::uint64 Gm_GetMicroseconds() {
+u64 Gm_GetMicroseconds() {
   auto now = std::chrono::system_clock::now();
 
   return std::chrono::time_point_cast<std::chrono::microseconds>(now).time_since_epoch().count();
 }
 
 namespace Gamma {
-  void Gm_CompareBenchmarks(uint64 a, uint64 b) {
+  void Gm_CompareBenchmarks(u64 a, u64 b) {
     if (a > b) {
-      uint32 improvement = (uint32)(100.0f * (1.0f - (float)b / (float)a));
+      u32 improvement = (u32)(100.0f * (1.0f - (float)b / (float)a));
 
       std::cout << a << "ms -> " << b << "ms (-" << improvement << "%)\n";
     } else {
-      uint32 slowdown = (uint32)(100.0f * (1.0f - (float)a / (float)b));
+      u32 slowdown = (u32)(100.0f * (1.0f - (float)a / (float)b));
 
       std::cout << a << "ms -> " << b << "ms (+" << slowdown << "%)\n";
     }
   }
 
-  uint64 Gm_RepeatBenchmarkTest(const std::function<void()>& test, uint32 times) {
+  u64 Gm_RepeatBenchmarkTest(const std::function<void()>& test, u32 times) {
     // Warmup run - without this, the first timed test
     // invocation may take longer than usual. (Might be
     // instruction cache-related)
@@ -31,7 +31,7 @@ namespace Gamma {
 
     auto getTime = Gm_CreateTimer();
 
-    for (uint32 i = 0; i < times; i++) {
+    for (u32 i = 0; i < times; i++) {
       test();
     }
 
@@ -43,7 +43,7 @@ namespace Gamma {
     return milliseconds;
   }
 
-  uint64 Gm_RunBenchmarkTest(const std::function<void()>& test) {
+  u64 Gm_RunBenchmarkTest(const std::function<void()>& test) {
     auto getTime = Gm_CreateTimer();
 
     test();
@@ -57,14 +57,14 @@ namespace Gamma {
     return milliseconds;
   }
 
-  void Gm_RunLoopedBenchmarkTest(const std::function<void()>& test, uint32 pause) {
+  void Gm_RunLoopedBenchmarkTest(const std::function<void()>& test, u32 pause) {
     while (true) {
       Gm_RunBenchmarkTest(test);
       Gm_Sleep(pause);
     }
   }
 
-  void Gm_Sleep(uint32 milliseconds) {
+  void Gm_Sleep(u32 milliseconds) {
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
   }
 }

@@ -39,7 +39,7 @@ namespace Gamma {
     
     // Buffer vertex element data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceElements.size() * sizeof(uint32), faceElements.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceElements.size() * sizeof(u32), faceElements.data(), GL_STATIC_DRAW);
 
     // Define vertex attributes
     glBindBuffer(GL_ARRAY_BUFFER, buffers[GLBuffer::VERTEX]);
@@ -65,7 +65,7 @@ namespace Gamma {
     // Define matrix attributes
     glBindBuffer(GL_ARRAY_BUFFER, buffers[GLBuffer::MATRIX]);
 
-    for (uint32 i = 0; i < 4; i++) {
+    for (u32 i = 0; i < 4; i++) {
       glEnableVertexAttribArray(GLAttribute::MODEL_MATRIX + i);
       glVertexAttribPointer(GLAttribute::MODEL_MATRIX + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4f), (void*)(i * 4 * sizeof(float)));
       glVertexAttribDivisor(GLAttribute::MODEL_MATRIX + i, 1);
@@ -101,11 +101,11 @@ namespace Gamma {
     }
   }
 
-  uint16 OpenGLMesh::getId() const {
+  u16 OpenGLMesh::getId() const {
     return sourceMesh->id;
   }
 
-  uint16 OpenGLMesh::getObjectCount() const {
+  u16 OpenGLMesh::getObjectCount() const {
     return sourceMesh->objects.totalActive();
   }
 
@@ -174,7 +174,7 @@ namespace Gamma {
         // Render all instances using the last LOD
         auto& lod = mesh.lods.back();
 
-        glDrawElementsInstanced(primitiveMode, lod.elementCount, GL_UNSIGNED_INT, (void*)(lod.elementOffset * sizeof(uint32)), mesh.objects.totalVisible());
+        glDrawElementsInstanced(primitiveMode, lod.elementCount, GL_UNSIGNED_INT, (void*)(lod.elementOffset * sizeof(u32)), mesh.objects.totalVisible());
       } else {
         // Generate draw commands for mesh instances at each
         // level of detail, and dispatch them all together
@@ -182,7 +182,7 @@ namespace Gamma {
         // @todo preallocate draw commands array
         auto* commands = new GlDrawElementsIndirectCommand[mesh.lods.size()];
 
-        for (uint32 i = 0; i < mesh.lods.size(); i++) {
+        for (u32 i = 0; i < mesh.lods.size(); i++) {
           auto& command = commands[i];
           auto& lod = mesh.lods[i];
 

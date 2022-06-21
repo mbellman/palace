@@ -12,6 +12,6 @@ namespace Gamma {
   };
 
   void Gm_InitDrawIndirectBuffer();
-  void Gm_BufferDrawElementsIndirectCommands(const GlDrawElementsIndirectCommand* commands, uint32 total);
+  void Gm_BufferDrawElementsIndirectCommands(const GlDrawElementsIndirectCommand* commands, u32 total);
   void Gm_DestroyDrawIndirectBuffer();
 }

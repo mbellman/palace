@@ -10,7 +10,7 @@ namespace Gamma {
    * ObjectPool
    * ----------
    */
-  Object& ObjectPool::operator[](uint32 index) {
+  Object& ObjectPool::operator[](u32 index) {
     return objects[index];
   }
 
@@ -19,14 +19,14 @@ namespace Gamma {
   }
 
   Object& ObjectPool::createObject() {
-    uint16 id = runningId++;
+    u16 id = runningId++;
 
     assert(max() > totalActive(), "Object Pool out of space: " + std::to_string(max()) + " objects allowed in this pool");
     // @todo cycle through indices until an unoccupied slot is found
     assert(indices[id] == UNUSED_OBJECT_INDEX, "Attempted to create an Object in an occupied slot");
 
     // Retrieve and initialize object
-    uint16 index = totalActiveObjects;
+    u16 index = totalActiveObjects;
     Object& object = objects[index];
 
     object._record.id = id;
@@ -50,7 +50,7 @@ namespace Gamma {
   }
 
   void ObjectPool::free() {
-    for (uint16 i = 0; i < USHRT_MAX; i++) {
+    for (u16 i = 0; i < USHRT_MAX; i++) {
       indices[i] = UNUSED_OBJECT_INDEX;
     }
 
@@ -71,8 +71,8 @@ namespace Gamma {
     colors = nullptr;
   }
 
-  Object* ObjectPool::getById(uint16 objectId) const {
-    uint16 index = indices[objectId];
+  Object* ObjectPool::getById(u16 objectId) const {
+    u16 index = indices[objectId];
 
     return index == UNUSED_OBJECT_INDEX ? nullptr : &objects[index];
   }
@@ -95,14 +95,14 @@ namespace Gamma {
     return matrices;
   }
 
-  uint16 ObjectPool::max() const {
+  u16 ObjectPool::max() const {
     return maxObjects;
   }
 
   // @todo consolidate logic in partitionByDistance/partitionByVisibility
-  uint16 ObjectPool::partitionByDistance(uint16 start, float distance, const Vec3f& cameraPosition) {
-    uint16 current = start;
-    uint16 end = totalVisible();
+  u16 ObjectPool::partitionByDistance(u16 start, float distance, const Vec3f& cameraPosition) {
+    u16 current = start;
+    u16 end = totalVisible();
 
     while (end > current) {
       float currentObjectDistance = (objects[current].position - cameraPosition).magnitude();
@@ -134,8 +134,8 @@ namespace Gamma {
   // in-frame/partially out-of-frame objects
   // @todo use camera FoV to determine dot product threshold
   void ObjectPool::partitionByVisibility(const Camera& camera) {
-    uint16 current = 0;
-    uint16 end = totalActive();
+    u16 current = 0;
+    u16 end = totalActive();
     Vec3f cameraDirection = camera.orientation.getDirection();
 
     while (end > current) {
@@ -159,8 +159,8 @@ namespace Gamma {
     totalVisibleObjects = current;
   }
 
-  void ObjectPool::removeById(uint16 objectId) {
-    uint16 index = indices[objectId];
+  void ObjectPool::removeById(u16 objectId) {
+    u16 index = indices[objectId];
 
     if (index == UNUSED_OBJECT_INDEX) {
       return;
@@ -169,7 +169,7 @@ namespace Gamma {
     totalActiveObjects--;
     totalVisibleObjects--;
 
-    uint16 lastIndex = totalActiveObjects;
+    u16 lastIndex = totalActiveObjects;
 
     // Move last object/matrix/color into removed index
     objects[index] = objects[lastIndex];
@@ -181,7 +181,7 @@ namespace Gamma {
     indices[objectId] = UNUSED_OBJECT_INDEX;
   }
 
-  void ObjectPool::reserve(uint16 size) {
+  void ObjectPool::reserve(u16 size) {
     free();
 
     maxObjects = size;
@@ -192,7 +192,7 @@ namespace Gamma {
     colors = new pVec4[size];
   }
 
-  void ObjectPool::swapObjects(uint16 indexA, uint16 indexB) {
+  void ObjectPool::swapObjects(u16 indexA, u16 indexB) {
     Object objectA = objects[indexA];
     Matrix4f matrixA = matrices[indexA];
     pVec4 colorA = colors[indexA];
@@ -209,19 +209,19 @@ namespace Gamma {
     indices[objects[indexB]._record.id] = indexB;
   }
 
-  void ObjectPool::setColorById(uint16 objectId, const pVec4& color) {
+  void ObjectPool::setColorById(u16 objectId, const pVec4& color) {
     colors[indices[objectId]] = color;
   }
 
-  uint16 ObjectPool::totalActive() const {
+  u16 ObjectPool::totalActive() const {
     return totalActiveObjects;
   }
 
-  uint16 ObjectPool::totalVisible() const {
+  u16 ObjectPool::totalVisible() const {
     return totalVisibleObjects;
   }
 
-  void ObjectPool::transformById(uint16 objectId, const Matrix4f& matrix) {
+  void ObjectPool::transformById(u16 objectId, const Matrix4f& matrix) {
     matrices[indices[objectId]] = matrix;
   }
 }

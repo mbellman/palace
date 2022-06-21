@@ -5,10 +5,10 @@
 
 #include "system/type_aliases.h"
 
-Gamma::uint64 Gm_GetMicroseconds();
+u64 Gm_GetMicroseconds();
 
 namespace Gamma {
-  void Gm_CompareBenchmarks(uint64 a, uint64 b);
+  void Gm_CompareBenchmarks(u64 a, u64 b);
 
   auto Gm_CreateTimer() {
     auto start = std::chrono::system_clock::now();
@@ -22,8 +22,8 @@ namespace Gamma {
     };
   };
 
-  uint64 Gm_RepeatBenchmarkTest(const std::function<void()>& test, uint32 times = 1);
-  uint64 Gm_RunBenchmarkTest(const std::function<void()>& test);
-  void Gm_RunLoopedBenchmarkTest(const std::function<void()>& test, uint32 pause = 1000);
-  void Gm_Sleep(uint32 milliseconds);
+  u64 Gm_RepeatBenchmarkTest(const std::function<void()>& test, u32 times = 1);
+  u64 Gm_RunBenchmarkTest(const std::function<void()>& test);
+  void Gm_RunLoopedBenchmarkTest(const std::function<void()>& test, u32 pause = 1000);
+  void Gm_Sleep(u32 milliseconds);
 }

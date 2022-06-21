@@ -30,23 +30,23 @@ namespace Gamma {
     virtual void init() override;
     virtual void destroy() override;
     void addColorAttachment(ColorFormat format);
-    void addColorAttachment(ColorFormat format, uint32 unit);
-    void addColorAttachment(ColorFormat format, uint32 unit, GLint clamp);
+    void addColorAttachment(ColorFormat format, u32 unit);
+    void addColorAttachment(ColorFormat format, u32 unit, GLint clamp);
     void addDepthAttachment();
     void addDepthStencilAttachment();
     void bindColorAttachments();
-    void read(uint32 offset = 0);
-    void setSize(const Area<uint32>& size);
+    void read(u32 offset = 0);
+    void setSize(const Area<u32>& size);
     void shareDepthStencilAttachment(const OpenGLFrameBuffer& target);
     void write();
-    void writeToAttachment(uint32 attachment);
+    void writeToAttachment(u32 attachment);
 
   private:
     GLuint fbo = 0;
     GLuint depthTextureId = 0;
     GLuint depthStencilTextureId = 0;
     std::vector<ColorAttachment> colorAttachments;
-    Area<uint32> size;
+    Area<u32> size;
   };
 
   class OpenGLCubeMap : public Initable, public Destroyable {
@@ -54,18 +54,18 @@ namespace Gamma {
     virtual void init() override;
     virtual void destroy() override;
     void read();
-    void addColorAttachment(ColorFormat format, uint32 unit);
-    void addDepthAttachment(uint32 unit);
+    void addColorAttachment(ColorFormat format, u32 unit);
+    void addDepthAttachment(u32 unit);
     void bindColorAttachments();
-    void setSize(const Area<uint32>& size);
+    void setSize(const Area<u32>& size);
     void write();
-    void writeToFace(uint8 face);
+    void writeToFace(u8 face);
 
   private:
     GLuint fbo = 0;
     GLenum depthTextureUnit;
     GLuint depthTextureId = 0;
     std::vector<ColorAttachment> colorAttachments;
-    Area<uint32> size;
+    Area<u32> size;
   };
 }
