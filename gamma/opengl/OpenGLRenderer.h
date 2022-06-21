@@ -94,6 +94,7 @@ namespace Gamma {
     virtual const RenderStats& getRenderStats() override;
     virtual void present() override;
     virtual void renderText(TTF_Font* font, const char* message, uint32 x, uint32 y, const Vec3f& color, const Vec4f& background) override;
+    virtual void resetShadowMaps() override;
 
   private:
     SDL_GLContext glContext;

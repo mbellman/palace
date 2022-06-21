@@ -414,16 +414,15 @@ static void addInvisibleEntityIndicators(args()) {
         break;
       }
     }
-
   }
 
-  // @todo use spheres
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
     switch (trigger->type) {
       case WORLD_ORIENTATION_CHANGE: {
         auto& indicator = createObjectFrom("indicator");
 
-        indicator.position = gridCoordinatesToWorldPosition(coordinates) + Vec3f(1.f);
+        indicator.position = gridCoordinatesToWorldPosition(coordinates);
+        indicator.rotation = Vec3f(Gm_PI / 4.f, Gm_PI / 4.f, 0);
         indicator.scale = 0.5f;
         indicator.color = pVec4(255,0,0);
 
@@ -464,6 +463,8 @@ void initializeGame(args()) {
         auto& indicators = *mesh("indicator");
 
         indicators.disabled = !indicators.disabled;
+
+        context->renderer->resetShadowMaps();
       }
     #endif
   });

@@ -12,6 +12,7 @@
 #include "opengl/OpenGLRenderer.h"
 #include "opengl/OpenGLScreenQuad.h"
 #include "opengl/renderer_setup.h"
+#include "math/utilities.h"
 #include "system/camera.h"
 #include "system/console.h"
 #include "system/context.h"
@@ -1263,11 +1264,11 @@ namespace Gamma {
       probeCamera.position = position;
       probeCamera.orientation.face(direction, upDirection);
 
-      Matrix4f matProjection = Matrix4f::glPerspective({ 1024, 1024 }, 90.0f, 1.0f, farDistance).transpose();
+      Matrix4f matProjection = Matrix4f::glPerspective({ 1024, 1024 }, 90.f, 1.f, farDistance).transpose();
 
       if (i == 2 || i == 3) {
         // @hack @todo there may be a bug in Orientation::face()
-        probeCamera.orientation.yaw += (3.141592f / 2.0f);
+        probeCamera.orientation.yaw += Gm_PI / 2.f;
       }
 
       probeCamera.rotation = probeCamera.orientation.toQuaternion();
@@ -1329,6 +1330,16 @@ namespace Gamma {
     renderSurfaceToScreen(text, x, y, color, background);
 
     SDL_FreeSurface(text);
+  }
+
+  void OpenGLRenderer::resetShadowMaps() {
+    for (auto* glShadowMap : glSpotShadowMaps) {
+      glShadowMap->isRendered = false;
+    }
+
+    for (auto* glShadowMap : glPointShadowMaps) {
+      glShadowMap->isRendered = false;
+    }
   }
 
   void OpenGLRenderer::swapAccumulationBuffers() {
