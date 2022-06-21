@@ -33,9 +33,11 @@ void showStaticEntityPlacementPreview(args()) {
   }
 
   if (canPlaceEntity) {
+    Vec3f targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+
     // @todo use proper scale/color based on entity type
     preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 2.f) * 0.1f);
-    preview.position = gridCoordinatesToWorldPosition(previewCoordinates);
+    preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
     preview.color = Vec3f(1.f, 0.7f, 0.3f);
   } else {
     preview.scale = 0.f;

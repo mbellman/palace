@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <math.h>
 
-#include "math/Vector.h"
+#include "math/vector.h"
+#include "math/utilities.h"
 
 namespace Gamma {
   /**
@@ -96,6 +97,14 @@ namespace Gamma {
 
   Vec3f Vec3f::invert() const {
     return *this * -1.0f;
+  }
+
+  Vec3f Vec3f::lerp(const Vec3f& v1, const Vec3f& v2, float alpha) {
+    return Vec3f(
+      Gm_Lerpf(v1.x, v2.x, alpha),
+      Gm_Lerpf(v1.y, v2.y, alpha),
+      Gm_Lerpf(v1.z, v2.z, alpha)
+    );
   }
 
   float Vec3f::magnitude() const {
