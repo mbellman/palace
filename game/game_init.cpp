@@ -433,41 +433,39 @@ void initializeGame(args()) {
   });
 
   #if DEVELOPMENT == 1
+    input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
+      auto key = event.key;
 
-  input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
-    auto key = event.key;
+      // Toggle free camera mode
+      if (key == Key::C) {
+        if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+          Gm_DisableFlags(FREE_CAMERA_MODE);
+        } else {
+          Gm_EnableFlags(FREE_CAMERA_MODE);
+        }
 
-    // Toggle free camera mode
-    if (key == Key::C) {
-      if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
-        Gm_DisableFlags(FREE_CAMERA_MODE);
-      } else {
-        Gm_EnableFlags(FREE_CAMERA_MODE);
+        if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
+        }
       }
 
-      if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
-        getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
+      // Toggle entity/trigger indicators
+      if (key == Key::E) {
+        auto& entityIndicators = *mesh("entity-indicator");
+        auto& triggerIndicators = *mesh("trigger-indicator");
+
+        entityIndicators.disabled = !entityIndicators.disabled;
+        triggerIndicators.disabled = !triggerIndicators.disabled;
+
+        context->renderer->resetShadowMaps();
       }
-    }
+    });
 
-    // Toggle entity/trigger indicators
-    if (key == Key::E) {
-      auto& entityIndicators = *mesh("entity-indicator");
-      auto& triggerIndicators = *mesh("trigger-indicator");
-
-      entityIndicators.disabled = !entityIndicators.disabled;
-      triggerIndicators.disabled = !triggerIndicators.disabled;
-
-      context->renderer->resetShadowMaps();
-    }
-  });
-
-  input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
-    if (SDL_GetRelativeMouseMode()) {
-      maybePlaceStaticEntity(params());
-    }
-  });
-
+    input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
+      if (SDL_GetRelativeMouseMode()) {
+        tryPlacingStaticEntity(params());
+      }
+    });
   #endif
 
   addKeyHandlers(params());

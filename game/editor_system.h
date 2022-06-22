@@ -10,4 +10,4 @@ struct WorldEditor {
 };
 
 void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
-void maybePlaceStaticEntity(GmContext* context, GameState& state);
+void tryPlacingStaticEntity(GmContext* context, GameState& state);
