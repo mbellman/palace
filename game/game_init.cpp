@@ -4,6 +4,7 @@
 #include "orientation_system.h"
 #include "grid_utilities.h"
 #include "world_system.h"
+#include "editor_system.h"
 #include "game_macros.h"
 #include "game_state.h"
 #include "build_flags.h"
@@ -356,16 +357,15 @@ static void addParticles(args()) {
 }
 
 static void addEntityObjects(args()) {
-  // @todo count entities by type
   auto& grid = state.world.grid;
 
-  addMesh("ground-tile", grid.count<Ground>() + 1, Mesh::Cube());
-  addMesh("staircase", grid.count<Staircase>(), Mesh::Model("./game/models/staircase/model.obj"));
+  addMesh("ground-tile", 0xffff, Mesh::Cube());
+  addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
   for (auto& [ coordinates, entity ] : grid) {
     switch (entity->type) {
       case GROUND: {
-        // @todo createGroundTileObject()
+        // @todo world_system -> createGroundTileObject()
         auto& ground = createObjectFrom("ground-tile");
 
         ground.position = gridCoordinatesToWorldPosition(coordinates);
@@ -376,7 +376,7 @@ static void addEntityObjects(args()) {
         break;
       }
       case STAIRCASE: {
-        // @todo createStaircaseObject()
+        // @todo world_system -> createStaircaseObject()
         auto& staircase = createObjectFrom("staircase");
         auto* stairs = (Staircase*)entity;
 
@@ -403,14 +403,16 @@ static void addEntityObjects(args()) {
 }
 
 static void addInvisibleEntityIndicators(args()) {
-  auto totalEntities = (s16)state.world.grid.size() + (s16)state.world.triggers.size();
+  auto totalEntities = (s16)state.world.grid.size();
+  auto totalTriggers = (s16)state.world.triggers.size();
 
-  addMesh("indicator", totalEntities, Mesh::Cube());
+  addMesh("entity-indicator", totalEntities, Mesh::Cube());
+  addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
 
   for (auto& [ coordinates, entity ] : state.world.grid) {
     switch (entity->type) {
       case WALKABLE_SPACE: {
-        auto& indicator = createObjectFrom("indicator");
+        auto& indicator = createObjectFrom("entity-indicator");
 
         indicator.position = gridCoordinatesToWorldPosition(coordinates);
         indicator.scale = 0.5f;
@@ -425,7 +427,7 @@ static void addInvisibleEntityIndicators(args()) {
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
     switch (trigger->type) {
       case WORLD_ORIENTATION_CHANGE: {
-        auto& indicator = createObjectFrom("indicator");
+        auto& indicator = createObjectFrom("trigger-indicator");
 
         indicator.position = gridCoordinatesToWorldPosition(coordinates);
         indicator.rotation = Vec3f(Gm_PI / 4.f, Gm_PI / 4.f, 0);
@@ -451,33 +453,43 @@ void initializeGame(args()) {
     }
   });
 
+  #if DEVELOPMENT == 1
+
   input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
     auto key = event.key;
 
-    #if DEVELOPMENT == 1
-      // Toggle free camera mode
-      if (key == Key::C) {
-        if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
-          Gm_DisableFlags(FREE_CAMERA_MODE);
-        } else {
-          Gm_EnableFlags(FREE_CAMERA_MODE);
-        }
-
-        if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
-          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
-        }
+    // Toggle free camera mode
+    if (key == Key::C) {
+      if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+        Gm_DisableFlags(FREE_CAMERA_MODE);
+      } else {
+        Gm_EnableFlags(FREE_CAMERA_MODE);
       }
 
-      // Toggle entity indicators
-      if (key == Key::E) {
-        auto& indicators = *mesh("indicator");
-
-        indicators.disabled = !indicators.disabled;
-
-        context->renderer->resetShadowMaps();
+      if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+        getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
       }
-    #endif
+    }
+
+    // Toggle entity/trigger indicators
+    if (key == Key::E) {
+      auto& entityIndicators = *mesh("entity-indicator");
+      auto& triggerIndicators = *mesh("trigger-indicator");
+
+      entityIndicators.disabled = !entityIndicators.disabled;
+      triggerIndicators.disabled = !triggerIndicators.disabled;
+
+      context->renderer->resetShadowMaps();
+    }
   });
+
+  input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
+    if (SDL_GetRelativeMouseMode()) {
+      maybePlaceStaticEntity(params());
+    }
+  });
+
+  #endif
 
   addKeyHandlers(params());
   addOrientationTestLayout(params());

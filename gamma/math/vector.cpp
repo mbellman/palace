@@ -9,6 +9,10 @@ namespace Gamma {
    * Vec3f
    * -----
    */
+  bool Vec3f::operator==(const Vec3f& vector) const {
+    return x == vector.x && y == vector.y && z == vector.z;
+  }
+
   Vec3f Vec3f::operator+(const Vec3f& vector) const {
     return {
       x + vector.x,
