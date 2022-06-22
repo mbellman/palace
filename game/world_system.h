@@ -1,10 +1,12 @@
 #pragma once
 
-#include <string>
 #include <unordered_map>
 
 #include "grid_utilities.h"
 #include "game_entities.h"
+
+struct GmContext;
+struct GameState;
 
 struct GridCoordinatesHasher {
   std::size_t operator()(const GridCoordinates& coordinates) const {
@@ -76,3 +78,7 @@ struct World {
   GridMap<TriggerEntity> triggers;
   DynamicEntityManager entities;
 };
+
+Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
+void createGroundObject(GmContext* context, GameState& state, const GridCoordinates& coordinates);
+void createStaircaseObject(GmContext* context, GameState& state, const GridCoordinates& coordinates, const Gamma::Orientation& orientation);

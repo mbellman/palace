@@ -364,33 +364,12 @@ static void addEntityObjects(args()) {
 
   for (auto& [ coordinates, entity ] : grid) {
     switch (entity->type) {
-      case GROUND: {
-        // @todo world_system -> createGroundTileObject()
-        auto& ground = createObjectFrom("ground-tile");
-
-        ground.position = gridCoordinatesToWorldPosition(coordinates);
-        ground.scale = HALF_TILE_SIZE * 0.98f;
-        ground.color = Vec3f(1.f, 0.7f, 0.3f);
-
-        commit(ground);
+      case GROUND:
+        createGroundObject(params(), coordinates);
         break;
-      }
-      case STAIRCASE: {
-        // @todo world_system -> createStaircaseObject()
-        auto& staircase = createObjectFrom("staircase");
-        auto* stairs = (Staircase*)entity;
-
-        staircase.position = gridCoordinatesToWorldPosition(coordinates);
-        staircase.color = Vec3f(0.5f);
-        staircase.scale = HALF_TILE_SIZE;
-        staircase.rotation.x = stairs->orientation.pitch;
-        // @todo use proper model orientation to avoid the -PI/2 offset here
-        staircase.rotation.y = -Gm_PI / 2.f + stairs->orientation.yaw;
-        staircase.rotation.z = -stairs->orientation.roll;
-
-        commit(staircase);
+      case STAIRCASE:
+        createStaircaseObject(params(), coordinates, ((Staircase*)entity)->orientation);        
         break;
-      }
       default:
         break;
     }

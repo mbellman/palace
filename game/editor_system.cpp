@@ -2,6 +2,7 @@
 
 #include "grid_utilities.h"
 #include "editor_system.h"
+#include "world_system.h"
 #include "game_state.h"
 #include "game_macros.h"
 #include "build_flags.h"
@@ -11,16 +12,14 @@ using namespace Gamma;
 #if DEVELOPMENT == 1
 
 static void removeObjectAtPosition(args(), ObjectPool& objects, const Vec3f& position) {
-  for (auto& object : objects) {
-    if (object.position == position) {
-      remove(object);
+  auto* object = queryObjectByPosition(params(), objects, position);
 
-      break;
-    }
+  if (object != nullptr) {
+    remove(*object);
   }
 }
 
-static void removeStaticEntityAtGridCoordinates(args(), const GridCoordinates& coordinates) {
+static void removeStaticEntityObjectAtGridCoordinates(args(), const GridCoordinates& coordinates) {
   auto& grid = state.world.grid;
   auto* entity = grid.get(coordinates);
 
@@ -29,20 +28,22 @@ static void removeStaticEntityAtGridCoordinates(args(), const GridCoordinates& c
   }
 
   auto objectPosition = gridCoordinatesToWorldPosition(coordinates);
+  Mesh* mesh;
 
   switch (entity->type) {
+    default:
     case GROUND:
-      removeObjectAtPosition(params(), mesh("ground-tile")->objects, objectPosition);
+      mesh = mesh("ground-tile");
       break;
     case STAIRCASE:
-      removeObjectAtPosition(params(), mesh("staircase")->objects, objectPosition);
+      mesh = mesh("staircase");
       break;
     case WALKABLE_SPACE:
-      removeObjectAtPosition(params(), mesh("entity-indicator")->objects, objectPosition);
-      break;
-    default:
+      mesh = mesh("entity-indicator");
       break;
   }
+
+  removeObjectAtPosition(params(), mesh->objects, objectPosition);
 }
 
 static bool findStaticEntityPlacementCoordinates(args(), GridCoordinates& coordinates) {
@@ -89,38 +90,33 @@ void showStaticEntityPlacementPreview(args()) {
 }
 
 void maybePlaceStaticEntity(args()) {
-  auto& grid = state.world.grid;
   GridCoordinates targetCoordinates;
-  StaticEntity* entity;
-  Object object;
 
   if (!findStaticEntityPlacementCoordinates(params(), targetCoordinates)) {
     return;
   }
 
+  auto& grid = state.world.grid;
+  StaticEntity* entity;
+
+  removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
+
   switch (state.editor.currentSelectedEntityType) {
     default:
     case GROUND:
-      // @todo world_system -> createGroundTileObject()
       entity = new Ground;
-      object = createObjectFrom("ground-tile");
-      object.scale = HALF_TILE_SIZE * 0.98f;
-      object.color = Vec3f(1.f, 0.7f, 0.3f);
+
+      createGroundObject(params(), targetCoordinates);
       break;
     case STAIRCASE:
-      // @todo world_system -> createStaircaseObject()
       entity = new Staircase;
-      object = createObjectFrom("staircase");
+      // @todo set staircase orientation
+
+      createStaircaseObject(params(), targetCoordinates, { 0.f, 0.f, 0.f });
       break;
   }
 
-  removeStaticEntityAtGridCoordinates(params(), targetCoordinates);
-
   grid.set(targetCoordinates, entity);
-
-  object.position = gridCoordinatesToWorldPosition(targetCoordinates);
-
-  commit(object);
 }
 
 #endif
