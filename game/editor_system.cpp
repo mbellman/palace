@@ -70,11 +70,15 @@ using namespace Gamma;
     return canPlaceEntity;
   }
 
-  static void addEditAction(args(), EditAction& action) {
+  static void storeEditAction(args(), EditAction& action) {
     auto& editor = state.editor;
 
     if (editor.totalEditActions == MAX_EDIT_ACTIONS) {
       if (editor.editActions[0].oldEntity != nullptr) {
+        // When shifting the first edit action off the queue,
+        // we delete the copy of the old entity which existed
+        // prior to that action, since the action can no
+        // longer be undone.
         delete editor.editActions[0].oldEntity;
       }
 
@@ -88,7 +92,7 @@ using namespace Gamma;
     editor.editActions[editor.totalEditActions++] = action;
   }
 
-  static StaticEntity* copyStaticEntity(StaticEntity* source) {
+  static StaticEntity* copyStaticEntity(const StaticEntity* source) {
     if (source == nullptr) {
       return nullptr;
     }
@@ -141,11 +145,6 @@ using namespace Gamma;
     EditAction action;
     StaticEntity* entity;
 
-    action.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
-    action.coordinates = targetCoordinates;
-
-    removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
-
     switch (state.editor.currentSelectedEntityType) {
       default:
       case GROUND:
@@ -155,14 +154,20 @@ using namespace Gamma;
         entity = new Staircase;
         // @todo set staircase orientation
         break;
+      case WALKABLE_SPACE:
+        entity = new WalkableSpace;
+        break;
     }
 
+    action.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
+    action.newEntity = entity;
+    action.coordinates = targetCoordinates;
+
+    removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
     createObjectFromStaticEntity(params(), entity, targetCoordinates);
 
-    action.newEntity = entity;
-
     grid.set(targetCoordinates, entity);
-    addEditAction(params(), action);
+    storeEditAction(params(), action);
   }
 
   void undoPreviousEditAction(args()) {
@@ -173,14 +178,18 @@ using namespace Gamma;
     }
 
     auto& grid = state.world.grid;
-    auto& lastAction = editor.editActions[editor.totalEditActions - 1];
+    auto& lastEditAction = editor.editActions[editor.totalEditActions - 1];
+    auto& coordinates = lastEditAction.coordinates;
+    auto* oldEntity = lastEditAction.oldEntity;
 
-    removeStaticEntityObjectAtGridCoordinates(params(), lastAction.coordinates);
-    grid.clear(lastAction.coordinates);
+    // Undo the last entity/object placement
+    removeStaticEntityObjectAtGridCoordinates(params(), coordinates);
+    grid.clear(coordinates);
 
-    if (lastAction.oldEntity != nullptr) {
-      createObjectFromStaticEntity(params(), lastAction.oldEntity, lastAction.coordinates);
-      grid.set(lastAction.coordinates, lastAction.oldEntity);
+    if (oldEntity != nullptr) {
+      // Restore the object/entity which existed before
+      createObjectFromStaticEntity(params(), oldEntity, coordinates);
+      grid.set(coordinates, oldEntity);
     }
 
     editor.totalEditActions--;

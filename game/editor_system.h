@@ -5,14 +5,14 @@
 #include "game_entities.h"
 #include "grid_utilities.h"
 
-#define MAX_EDIT_ACTIONS 3
+#define MAX_EDIT_ACTIONS 5
 
 struct GmContext;
 struct GameState;
 
 struct EditAction {
-  StaticEntity* newEntity = nullptr;
   StaticEntity* oldEntity = nullptr;
+  StaticEntity* newEntity = nullptr;
   GridCoordinates coordinates;
 };
 
