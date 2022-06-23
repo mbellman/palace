@@ -29,10 +29,10 @@ struct WorldEditor {
 };
 
 #if DEVELOPMENT == 1
+  void selectRangeFrom(GmContext* context, GameState& state);
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void tryPlacingStaticEntity(GmContext* context, GameState& state);
-  void selectRangeFrom(GmContext* context, GameState& state);
   void fillStaticEntitiesWithinCurrentRange(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
 #endif

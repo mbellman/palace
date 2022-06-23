@@ -116,6 +116,15 @@ using namespace Gamma;
     return copy;
   }
 
+  void selectRangeFrom(args()) {
+    GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
+
+    findStaticEntityPlacementCoordinates(params(), rangeFrom);
+
+    state.editor.rangeFrom = rangeFrom;
+    state.editor.rangeFromSelected = true;
+  }
+
   void showStaticEntityPlacementPreview(args()) {
     auto& preview = object("preview");
     GridCoordinates previewCoordinates;
@@ -177,6 +186,15 @@ using namespace Gamma;
         }
       }
     }
+
+    for (auto& preview : objects("range-preview")) {
+      auto baseSize = HALF_TILE_SIZE / 4.f;
+      auto sizeRange = baseSize * 0.1f;
+
+      preview.scale = baseSize + sinf(getRunningTime() * 3.f) * sizeRange;
+
+      commit(preview);
+    }
   }
 
   void tryPlacingStaticEntity(args()) {
@@ -216,15 +234,6 @@ using namespace Gamma;
     storeEditAction(params(), action);
   }
 
-  void selectRangeFrom(args()) {
-    GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
-
-    findStaticEntityPlacementCoordinates(params(), rangeFrom);
-
-    state.editor.rangeFrom = rangeFrom;
-    state.editor.rangeFromSelected = true;
-  }
-
   void fillStaticEntitiesWithinCurrentRange(args()) {
     auto& grid = state.world.grid;
     auto start = state.editor.rangeFrom;
@@ -256,6 +265,8 @@ using namespace Gamma;
     }
 
     state.editor.rangeFromSelected = false;
+
+    objects("range-preview").reset();
   }
 
   void undoPreviousEditAction(args()) {
