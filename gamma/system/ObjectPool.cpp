@@ -181,6 +181,16 @@ namespace Gamma {
     indices[objectId] = UNUSED_OBJECT_INDEX;
   }
 
+  void ObjectPool::reset() {
+    for (u16 i = 0; i < totalActiveObjects; i++) {
+      indices[objects[i]._record.id] = UNUSED_OBJECT_INDEX;
+    }
+
+    totalActiveObjects = 0;
+    totalVisibleObjects = 0;
+    runningId = 0;
+  }
+
   void ObjectPool::reserve(u16 size) {
     free();
 

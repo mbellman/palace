@@ -61,7 +61,11 @@ void updateGame(args(), float dt) {
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {
-      showStaticEntityPlacementPreview(params());
+      if (state.editor.rangeFromSelected) {
+        showRangedEntityPlacementPreview(params());
+      } else {
+        showStaticEntityPlacementPreview(params());
+      }
     }
 
     addDebugMessages(params());

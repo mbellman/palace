@@ -134,6 +134,51 @@ using namespace Gamma;
     commit(preview);
   }
 
+  void showRangedEntityPlacementPreview(args()) {
+    if (!state.editor.rangeFromSelected) {
+      return;
+    }
+
+    auto start = state.editor.rangeFrom;
+    GridCoordinates end = worldPositionToGridCoordinates(getCamera().position);
+
+    findStaticEntityPlacementCoordinates(params(), end);
+
+    if (end != state.editor.rangeTo) {
+      state.editor.rangeTo = end;
+
+      objects("range-preview").reset();
+
+      // @todo define a helper for this
+      if (start.x > end.x) {
+        std::swap(start.x, end.x);
+      }
+
+      if (start.y > end.y) {
+        std::swap(start.y, end.y);
+      }
+
+      if (start.z > end.z) {
+        std::swap(start.z, end.z);
+      }
+
+      // @todo define a macro/helper for this
+      for (s16 x = start.x; x <= end.x; x++) {
+        for (s16 y = start.y; y <= end.y; y++) {
+          for (s16 z = start.z; z <= end.z; z++) {
+            auto& preview = createObjectFrom("range-preview");
+
+            preview.scale = HALF_TILE_SIZE / 4.f;
+            preview.color = Vec3f(0, 1.f, 0);
+            preview.position = gridCoordinatesToWorldPosition({ x, y, z });
+
+            commit(preview);
+          }
+        }
+      }
+    }
+  }
+
   void tryPlacingStaticEntity(args()) {
     GridCoordinates targetCoordinates;
 
@@ -182,10 +227,8 @@ using namespace Gamma;
 
   void fillStaticEntitiesWithinCurrentRange(args()) {
     auto& grid = state.world.grid;
-    auto& start = state.editor.rangeFrom;
-    GridCoordinates end = worldPositionToGridCoordinates(getCamera().position);
-
-    findStaticEntityPlacementCoordinates(params(), end);
+    auto start = state.editor.rangeFrom;
+    auto end = state.editor.rangeTo;
 
     // @todo define a helper for this
     if (start.x > end.x) {

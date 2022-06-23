@@ -348,12 +348,17 @@ static void addMeshes(args()) {
   addMesh("ground-tile", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
-  // Entity/trigger indicators
-  auto totalEntities = (s16)state.world.grid.size();
-  auto totalTriggers = (s16)state.world.triggers.size();
+  #if DEVELOPMENT == 1
+    // Entity/trigger indicators
+    auto totalEntities = (s16)state.world.grid.size();
+    auto totalTriggers = (s16)state.world.triggers.size();
 
-  addMesh("entity-indicator", totalEntities, Mesh::Cube());
-  addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
+    addMesh("entity-indicator", totalEntities, Mesh::Cube());
+    addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
+
+    // Ranged placement preview
+    addMesh("range-preview", 0xffff, Mesh::Cube());
+  #endif
 }
 
 static void addEntityObjects(args()) {
@@ -435,6 +440,8 @@ void initializeGame(args()) {
 
         if (!state.editor.useRange) {
           state.editor.rangeFromSelected = false;
+
+          objects("range-preview").reset();
         }
       }
 

@@ -34,6 +34,7 @@ namespace Gamma {
     u16 partitionByDistance(u16 start, float distance, const Vec3f& cameraPosition);
     void partitionByVisibility(const Camera& camera);
     void removeById(u16 objectId);
+    void reset();
     void reserve(u16 size);
     void setColorById(u16 objectId, const pVec4& color);
     u16 totalActive() const;
