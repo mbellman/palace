@@ -80,4 +80,17 @@ struct World {
 };
 
 Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
-void createObjectFromStaticEntity(GmContext* context, GameState& state, StaticEntity* entity, const GridCoordinates& coordinates);
+void createObjectFromCoordinates(GmContext* context, GameState& state, const GridCoordinates& coordinates);
+
+template<typename E>
+void setStaticEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
+  auto& grid = state.world.grid;
+
+  for (s16 x = start.x; x <= end.x; x++) {
+    for (s16 y = start.y; y <= end.y; y++) {
+      for (s16 z = start.z; z <= end.z; z++) {
+        grid.set({ x, y, z }, new E);
+      }
+    }
+  }
+}

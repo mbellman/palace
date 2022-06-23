@@ -38,9 +38,12 @@ static void addDebugMessages(args()) {
 
   std::string worldOrientationLabel = "World orientation: " + worldOrientationToString(state.worldOrientationState.worldOrientation);
 
+  std::string entitiesLabel = "Total static entities: " + std::to_string(state.world.grid.size());
+
   addDebugMessage(positionLabel);
   addDebugMessage(orientationLabel);
   addDebugMessage(worldOrientationLabel);
+  addDebugMessage(entitiesLabel);
 }
 
 void updateGame(args(), float dt) {

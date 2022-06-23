@@ -164,10 +164,55 @@ using namespace Gamma;
     action.coordinates = targetCoordinates;
 
     removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
-    createObjectFromStaticEntity(params(), entity, targetCoordinates);
 
     grid.set(targetCoordinates, entity);
+    createObjectFromCoordinates(params(), targetCoordinates);
+
     storeEditAction(params(), action);
+  }
+
+  void selectRangeFrom(args()) {
+    GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
+
+    findStaticEntityPlacementCoordinates(params(), rangeFrom);
+
+    state.editor.rangeFrom = rangeFrom;
+    state.editor.rangeFromSelected = true;
+  }
+
+  void fillStaticEntitiesWithinCurrentRange(args()) {
+    auto& grid = state.world.grid;
+    auto& start = state.editor.rangeFrom;
+    GridCoordinates end = worldPositionToGridCoordinates(getCamera().position);
+
+    findStaticEntityPlacementCoordinates(params(), end);
+
+    // @todo define a helper for this
+    if (start.x > end.x) {
+      std::swap(start.x, end.x);
+    }
+
+    if (start.y > end.y) {
+      std::swap(start.y, end.y);
+    }
+
+    if (start.z > end.z) {
+      std::swap(start.z, end.z);
+    }
+
+    // @todo use entity corresponding to the current selected entity type
+    setStaticEntityOverRange<Ground>(params(), start, end);
+
+    // @todo define a macro/helper for this
+    for (s16 x = start.x; x <= end.x; x++) {
+      for (s16 y = start.y; y <= end.y; y++) {
+        for (s16 z = start.z; z <= end.z; z++) {
+          createObjectFromCoordinates(params(), { x, y, z });
+        }
+      }
+    }
+
+    state.editor.rangeFromSelected = false;
   }
 
   void undoPreviousEditAction(args()) {
@@ -188,8 +233,8 @@ using namespace Gamma;
 
     if (oldEntity != nullptr) {
       // Restore the object/entity which existed before
-      createObjectFromStaticEntity(params(), oldEntity, coordinates);
       grid.set(coordinates, oldEntity);
+      createObjectFromCoordinates(params(), coordinates);
     }
 
     editor.totalEditActions--;

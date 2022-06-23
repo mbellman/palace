@@ -35,19 +35,6 @@ static void addKeyHandlers(args()) {
   });
 }
 
-template<typename E>
-static void addEntityOverRange(args(), const GridCoordinates& start, const GridCoordinates& end) {
-  auto& grid = state.world.grid;
-
-  for (s16 x = start.x; x <= end.x; x++) {
-    for (s16 y = start.y; y <= end.y; y++) {
-      for (s16 z = start.z; z <= end.z; z++) {
-        grid.set({ x, y, z }, new E);
-      }
-    }
-  }
-}
-
 static void addOrientationTestLayout(args()) {
   auto& grid = state.world.grid;
   auto& triggers = state.world.triggers;
@@ -62,40 +49,40 @@ static void addOrientationTestLayout(args()) {
   };
 
   // Bottom area
-  addEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
+  setStaticEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { -5, -3, -5 }, { 5, -3, 5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -3, -5 }, { 5, -3, 5 });
 
   // Left area
-  addEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
+  setStaticEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { -7, -1, -5 }, { -7, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -7, -1, -5 }, { -7, 9, 5 });
 
   // Right area
-  addEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
+  setStaticEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { 7, -1, -5 }, { 7, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { 7, -1, -5 }, { 7, 9, 5 });
   
   // Top area
-  addEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
+  setStaticEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { -5, 11, -5 }, { 5, 11, 5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -5, 11, -5 }, { 5, 11, 5 });
 
   // Back area
-  addEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
+  setStaticEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { -5, -1, -7 }, { 5, 9, -7 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -1, -7 }, { 5, 9, -7 });
 
   // Front area
-  addEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
-  addEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
+  setStaticEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
   // Outdoors
-  addEntityOverRange<WalkableSpace>(params(), { -5, -1, 7 }, { 5, 9, 7 });
+  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -1, 7 }, { 5, 9, 7 });
 
   // Pathway outdoors
   grid.clear({ 3, 1, -5 });
@@ -373,7 +360,7 @@ static void addEntityObjects(args()) {
   auto& grid = state.world.grid;
 
   for (auto& [ coordinates, entity ] : grid) {
-    createObjectFromStaticEntity(params(), entity, coordinates);
+    createObjectFromCoordinates(params(), coordinates);
   }
 
   // @todo move to editor_system; replace preview object
@@ -442,6 +429,15 @@ void initializeGame(args()) {
         }
       }
 
+      // Toggle ranged tile placement
+      if (key == Key::R) {
+        state.editor.useRange = !state.editor.useRange;
+
+        if (!state.editor.useRange) {
+          state.editor.rangeFromSelected = false;
+        }
+      }
+
       // Toggle entity/trigger indicators
       if (key == Key::I) {
         auto& entityIndicators = *mesh("entity-indicator");
@@ -464,7 +460,16 @@ void initializeGame(args()) {
 
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
       if (SDL_GetRelativeMouseMode() && state.editor.enabled) {
-        tryPlacingStaticEntity(params());
+        // @todo clean up
+        if (state.editor.useRange) {
+          if (state.editor.rangeFromSelected) {
+            fillStaticEntitiesWithinCurrentRange(params());
+          } else {
+            selectRangeFrom(params());
+          }
+        } else {
+          tryPlacingStaticEntity(params());
+        }
       }
     });
   #endif

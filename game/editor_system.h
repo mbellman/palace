@@ -19,7 +19,10 @@ struct EditAction {
 
 struct WorldEditor {
   bool enabled = false;
+  bool useRange = false;
+  bool rangeFromSelected = false;
   StaticEntityType currentSelectedEntityType = GROUND;  // @todo make adjustable
+  GridCoordinates rangeFrom;
   EditAction editActions[MAX_EDIT_ACTIONS];
   u8 totalEditActions = 0;
 };
@@ -27,5 +30,7 @@ struct WorldEditor {
 #if DEVELOPMENT == 1
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void tryPlacingStaticEntity(GmContext* context, GameState& state);
+  void selectRangeFrom(GmContext* context, GameState& state);
+  void fillStaticEntitiesWithinCurrentRange(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
 #endif

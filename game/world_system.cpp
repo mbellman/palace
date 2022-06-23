@@ -49,7 +49,13 @@ Object* queryObjectByPosition(args(), ObjectPool& objects, const Vec3f& position
   return nullptr;
 }
 
-void createObjectFromStaticEntity(args(), StaticEntity* entity, const GridCoordinates& coordinates) {
+void createObjectFromCoordinates(args(), const GridCoordinates& coordinates) {
+  auto* entity = state.world.grid.get(coordinates);
+
+  if (entity == nullptr) {
+    return;
+  }
+
   switch (entity->type) {
     case GROUND:
       createGroundObject(params(), coordinates);
