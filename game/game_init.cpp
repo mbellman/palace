@@ -368,11 +368,16 @@ static void addEntityObjects(args()) {
     createObjectFromCoordinates(params(), coordinates);
   }
 
-  // @todo move to editor_system; replace preview object
-  // whenever switching current selected entity type
-  auto& preview = createObjectFrom("ground-tile");
+  #if DEVELOPMENT == 1
+    // @todo move to editor_system; replace preview object
+    // whenever switching current selected entity type
+    auto& preview = createObjectFrom("ground-tile");
+    
+    preview.scale = 0.f;
 
-  save("preview", preview);
+    save("preview", preview);
+    commit(preview);
+  #endif
 }
 
 static void addTriggerEntityIndicators(args()) {
