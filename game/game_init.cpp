@@ -356,23 +356,24 @@ static void addParticles(args()) {
   particles.spawn = gridCoordinatesToWorldPosition({ 0, 4, 0 });
 }
 
-static void addEntityObjects(args()) {
-  auto& grid = state.world.grid;
-
+static void addMeshes(args()) {
+  // Static entity objects
   addMesh("ground-tile", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
+  // Entity/trigger indicators
+  auto totalEntities = (s16)state.world.grid.size();
+  auto totalTriggers = (s16)state.world.triggers.size();
+
+  addMesh("entity-indicator", totalEntities, Mesh::Cube());
+  addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
+}
+
+static void addEntityObjects(args()) {
+  auto& grid = state.world.grid;
+
   for (auto& [ coordinates, entity ] : grid) {
-    switch (entity->type) {
-      case GROUND:
-        createGroundObject(params(), coordinates);
-        break;
-      case STAIRCASE:
-        createStaircaseObject(params(), coordinates, ((Staircase*)entity)->orientation);        
-        break;
-      default:
-        break;
-    }
+    createObjectFromStaticEntity(params(), entity, coordinates);
   }
 
   // @temporary
@@ -381,28 +382,7 @@ static void addEntityObjects(args()) {
   save("preview", preview);
 }
 
-static void addInvisibleEntityIndicators(args()) {
-  auto totalEntities = (s16)state.world.grid.size();
-  auto totalTriggers = (s16)state.world.triggers.size();
-
-  addMesh("entity-indicator", totalEntities, Mesh::Cube());
-  addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
-
-  for (auto& [ coordinates, entity ] : state.world.grid) {
-    switch (entity->type) {
-      case WALKABLE_SPACE: {
-        auto& indicator = createObjectFrom("entity-indicator");
-
-        indicator.position = gridCoordinatesToWorldPosition(coordinates);
-        indicator.scale = 0.5f;
-        indicator.color = pVec4(0,0,255);
-
-        commit(indicator);
-        break;
-      }
-    }
-  }
-
+static void addTriggerEntityIndicators(args()) {
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
     switch (trigger->type) {
       case WORLD_ORIENTATION_CHANGE: {
@@ -433,7 +413,7 @@ void initializeGame(args()) {
   });
 
   #if DEVELOPMENT == 1
-    input.on<KeyboardEvent>("keydown", [context, &state](const KeyboardEvent& event) {
+    input.on<KeyboardEvent>("keyup", [context, &state, &input](const KeyboardEvent& event) {
       auto key = event.key;
 
       // Toggle free camera mode
@@ -459,6 +439,10 @@ void initializeGame(args()) {
 
         context->renderer->resetShadowMaps();
       }
+
+      if (key == Key::Z && input.isKeyHeld(Key::CONTROL)) {
+        undoPreviousEditAction(params());
+      }
     });
 
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
@@ -472,10 +456,11 @@ void initializeGame(args()) {
   addOrientationTestLayout(params());
   addParticles(params());
 
+  addMeshes(params());
   addEntityObjects(params());
 
   #if DEVELOPMENT == 1
-    addInvisibleEntityIndicators(params());
+    addTriggerEntityIndicators(params());
   #endif
 
   auto& light = createLight(POINT_SHADOWCASTER);

@@ -70,6 +70,48 @@ using namespace Gamma;
     return canPlaceEntity;
   }
 
+  static void addEditAction(args(), EditAction& action) {
+    auto& editor = state.editor;
+
+    if (editor.totalEditActions == MAX_EDIT_ACTIONS) {
+      if (editor.editActions[0].oldEntity != nullptr) {
+        delete editor.editActions[0].oldEntity;
+      }
+
+      for (u8 i = 0; i < MAX_EDIT_ACTIONS - 1; i++) {
+        editor.editActions[i] = editor.editActions[i + 1];
+      }
+
+      editor.totalEditActions--;
+    }
+
+    editor.editActions[editor.totalEditActions++] = action;
+  }
+
+  static StaticEntity* copyStaticEntity(StaticEntity* source) {
+    if (source == nullptr) {
+      return nullptr;
+    }
+
+    StaticEntity* copy = nullptr;
+
+    switch (source->type) {
+      case GROUND:
+        copy = new Ground;
+        break;
+      case STAIRCASE:
+        copy = new Staircase((Staircase*)source);
+        break;
+      case WALKABLE_SPACE:
+        copy = new WalkableSpace;
+        break;
+      default:
+        break;
+    }
+
+    return copy;
+  }
+
   void showStaticEntityPlacementPreview(args()) {
     auto& preview = object("preview");
     GridCoordinates previewCoordinates;
@@ -96,7 +138,11 @@ using namespace Gamma;
     }
 
     auto& grid = state.world.grid;
+    EditAction action;
     StaticEntity* entity;
+
+    action.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
+    action.coordinates = targetCoordinates;
 
     removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
 
@@ -104,17 +150,39 @@ using namespace Gamma;
       default:
       case GROUND:
         entity = new Ground;
-
-        createGroundObject(params(), targetCoordinates);
         break;
       case STAIRCASE:
         entity = new Staircase;
         // @todo set staircase orientation
-
-        createStaircaseObject(params(), targetCoordinates, { 0.f, 0.f, 0.f });
         break;
     }
 
+    createObjectFromStaticEntity(params(), entity, targetCoordinates);
+
+    action.newEntity = entity;
+
     grid.set(targetCoordinates, entity);
+    addEditAction(params(), action);
+  }
+
+  void undoPreviousEditAction(args()) {
+    auto& editor = state.editor;
+
+    if (editor.totalEditActions == 0) {
+      return;
+    }
+
+    auto& grid = state.world.grid;
+    auto& lastAction = editor.editActions[editor.totalEditActions - 1];
+
+    removeStaticEntityObjectAtGridCoordinates(params(), lastAction.coordinates);
+    grid.clear(lastAction.coordinates);
+
+    if (lastAction.oldEntity != nullptr) {
+      createObjectFromStaticEntity(params(), lastAction.oldEntity, lastAction.coordinates);
+      grid.set(lastAction.coordinates, lastAction.oldEntity);
+    }
+
+    editor.totalEditActions--;
   }
 #endif

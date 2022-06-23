@@ -27,6 +27,10 @@ struct Ground : StaticEntity {
 struct Staircase : StaticEntity {
   Staircase(): StaticEntity(STAIRCASE) {};
 
+  Staircase(const Staircase* staircase): Staircase() {
+    orientation = staircase->orientation;
+  }
+
   Gamma::Orientation orientation;
 };
 

@@ -80,5 +80,4 @@ struct World {
 };
 
 Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
-void createGroundObject(GmContext* context, GameState& state, const GridCoordinates& coordinates);
-void createStaircaseObject(GmContext* context, GameState& state, const GridCoordinates& coordinates, const Gamma::Orientation& orientation);
+void createObjectFromStaticEntity(GmContext* context, GameState& state, StaticEntity* entity, const GridCoordinates& coordinates);

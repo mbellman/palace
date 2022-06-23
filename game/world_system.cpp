@@ -5,17 +5,7 @@
 
 using namespace Gamma;
 
-Object* queryObjectByPosition(args(), ObjectPool& objects, const Vec3f& position) {
-  for (auto& object : objects) {
-    if (object.position == position) {
-      return &object;
-    }
-  }
-
-  return nullptr;
-}
-
-void createGroundObject(args(), const GridCoordinates& coordinates) {
+static void createGroundObject(args(), const GridCoordinates& coordinates) {
   auto& ground = createObjectFrom("ground-tile");
 
   ground.position = gridCoordinatesToWorldPosition(coordinates);
@@ -25,7 +15,7 @@ void createGroundObject(args(), const GridCoordinates& coordinates) {
   commit(ground);
 }
 
-void createStaircaseObject(args(), const GridCoordinates& coordinates, const Orientation& orientation) {
+static void createStaircaseObject(args(), const GridCoordinates& coordinates, const Orientation& orientation) {
   auto& staircase = createObjectFrom("staircase");
 
   staircase.position = gridCoordinatesToWorldPosition(coordinates);
@@ -37,4 +27,42 @@ void createStaircaseObject(args(), const GridCoordinates& coordinates, const Ori
   staircase.rotation.z = -orientation.roll;
 
   commit(staircase);
+}
+
+static void createWalkableSpaceIndicator(args(), const GridCoordinates& coordinates) {
+  auto& indicator = createObjectFrom("entity-indicator");
+
+  indicator.position = gridCoordinatesToWorldPosition(coordinates);
+  indicator.scale = 0.5f;
+  indicator.color = pVec4(0,0,255);
+
+  commit(indicator);
+}
+
+Object* queryObjectByPosition(args(), ObjectPool& objects, const Vec3f& position) {
+  for (auto& object : objects) {
+    if (object.position == position) {
+      return &object;
+    }
+  }
+
+  return nullptr;
+}
+
+void createObjectFromStaticEntity(args(), StaticEntity* entity, const GridCoordinates& coordinates) {
+  switch (entity->type) {
+    case GROUND:
+      createGroundObject(params(), coordinates);
+      break;
+    case STAIRCASE:
+      createStaircaseObject(params(), coordinates, ((Staircase*)entity)->orientation);        
+      break;
+    case WALKABLE_SPACE:
+      #if DEVELOPMENT == 1
+        createWalkableSpaceIndicator(params(), coordinates);
+      #endif
+      break;
+    default:
+      break;
+  }
 }
