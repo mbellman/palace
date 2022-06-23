@@ -376,7 +376,8 @@ static void addEntityObjects(args()) {
     createObjectFromStaticEntity(params(), entity, coordinates);
   }
 
-  // @temporary
+  // @todo move to editor_system; replace preview object
+  // whenever switching current selected entity type
   auto& preview = createObjectFrom("ground-tile");
 
   save("preview", preview);
@@ -413,7 +414,7 @@ void initializeGame(args()) {
   });
 
   #if DEVELOPMENT == 1
-    input.on<KeyboardEvent>("keyup", [context, &state, &input](const KeyboardEvent& event) {
+    input.on<KeyboardEvent>("keyup", [context, &state](const KeyboardEvent& event) {
       auto key = event.key;
 
       // Toggle free camera mode
@@ -425,12 +426,24 @@ void initializeGame(args()) {
         }
 
         if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
+          // @todo do a sweep of neighboring coordinates and
+          // place the camera at the closest walkable tile
           getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
         }
       }
 
-      // Toggle entity/trigger indicators
+      // Toggle world editor
       if (key == Key::E) {
+        state.editor.enabled = !state.editor.enabled;
+
+        if (!state.editor.enabled) {
+          object("preview").scale = 0.f;
+          commit(object("preview"));
+        }
+      }
+
+      // Toggle entity/trigger indicators
+      if (key == Key::I) {
         auto& entityIndicators = *mesh("entity-indicator");
         auto& triggerIndicators = *mesh("trigger-indicator");
 
@@ -439,14 +452,18 @@ void initializeGame(args()) {
 
         context->renderer->resetShadowMaps();
       }
+    });
 
-      if (key == Key::Z && input.isKeyHeld(Key::CONTROL)) {
+    input.on<KeyboardEvent>("keydown", [context, &state, &input](const KeyboardEvent& event) {
+      auto key = event.key;
+
+      if (input.isKeyHeld(Key::CONTROL) && key == Key::Z && state.editor.enabled) {
         undoPreviousEditAction(params());
       }
     });
 
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
-      if (SDL_GetRelativeMouseMode()) {
+      if (SDL_GetRelativeMouseMode() && state.editor.enabled) {
         tryPlacingStaticEntity(params());
       }
     });

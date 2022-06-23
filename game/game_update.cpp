@@ -57,7 +57,10 @@ void updateGame(args(), float dt) {
   handleWorldOrientation(params(), dt);
 
   #if DEVELOPMENT == 1
-    showStaticEntityPlacementPreview(params());
+    if (state.editor.enabled) {
+      showStaticEntityPlacementPreview(params());
+    }
+
     addDebugMessages(params());
   #endif
 }
