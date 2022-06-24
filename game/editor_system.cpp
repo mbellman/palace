@@ -74,14 +74,23 @@ using namespace Gamma;
     auto& editor = state.editor;
 
     if (editor.totalEditActions == MAX_EDIT_ACTIONS) {
-      if (editor.editActions[0].oldEntity != nullptr) {
-        // When shifting the first edit action off the queue,
-        // we delete the copy of the old entity which existed
-        // prior to that action, since the action can no
-        // longer be undone.
-        delete editor.editActions[0].oldEntity;
+      auto& firstEditAction = editor.editActions[0];
+
+      // When shifting the first edit action off the queue,
+      // delete the old entity/replaced entity copies, since
+      // the action can no longer be undone, and those entities
+      // cannot be restored
+      if (firstEditAction.oldEntity != nullptr) {
+        delete firstEditAction.oldEntity;
+      } else if (firstEditAction.replacedEntityRecords.size() > 0) {
+        for (auto& record : firstEditAction.replacedEntityRecords) {
+          delete record.entity;
+        }
+
+        firstEditAction.replacedEntityRecords.clear();
       }
 
+      // Move existing edit actions back one
       for (u8 i = 0; i < MAX_EDIT_ACTIONS - 1; i++) {
         editor.editActions[i] = editor.editActions[i + 1];
       }
@@ -264,6 +273,14 @@ using namespace Gamma;
     overRange(start, end, {
       GridCoordinates coordinates = { x, y, z };
 
+      // Keep track of any replaced entities so we can potentially restore them
+      if (grid.has(coordinates)) {
+        action.replacedEntityRecords.push_back({
+          coordinates,
+          copyStaticEntity(grid.get(coordinates))
+        });
+      }
+
       removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
       // @todo use entity corresponding to the current selected entity type
       grid.set(coordinates, new Ground);
@@ -288,12 +305,21 @@ using namespace Gamma;
     auto& lastEditAction = editor.editActions[editor.totalEditActions - 1];
 
     if (lastEditAction.isRangedPlacementAction) {
+      // Remove objects/entities placed over the range
       overRange(lastEditAction.rangeFrom, lastEditAction.rangeTo, {
         GridCoordinates coordinates = { x, y, z };
 
         removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
         grid.clear(coordinates);
       });
+
+      // Restore the entities/objects replaced by the edit action
+      for (auto& record : lastEditAction.replacedEntityRecords) {
+        grid.set(record.coordinates, record.entity);
+        createObjectFromCoordinates(globals, record.coordinates);
+      }
+
+      lastEditAction.replacedEntityRecords.clear();
     } else {
       auto& coordinates = lastEditAction.coordinates;
       auto* oldEntity = lastEditAction.oldEntity;
@@ -303,7 +329,7 @@ using namespace Gamma;
       grid.clear(coordinates);
 
       if (oldEntity != nullptr) {
-        // Restore the object/entity which existed before
+        // Restore the entity/object which existed before
         grid.set(coordinates, oldEntity);
         createObjectFromCoordinates(globals, coordinates);
       }

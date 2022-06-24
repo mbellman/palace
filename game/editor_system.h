@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Gamma.h"
 
 #include "game_entities.h"
@@ -11,6 +13,11 @@
 struct GmContext;
 struct GameState;
 
+struct ReplacedEntityRecord {
+  GridCoordinates coordinates;
+  StaticEntity* entity = nullptr;
+};
+
 struct EditAction {
   StaticEntity* oldEntity = nullptr;
   StaticEntity* newEntity = nullptr;
@@ -19,7 +26,7 @@ struct EditAction {
   bool isRangedPlacementAction = false;
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
-  // @todo provide the ability to save copies of replaced entities so they can be restored on undo
+  std::vector<ReplacedEntityRecord> replacedEntityRecords;
 };
 
 struct WorldEditor {
