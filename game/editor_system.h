@@ -32,6 +32,7 @@ struct WorldEditor {
 #if DEVELOPMENT == 1
   void selectRangeFrom(GmContext* context, GameState& state);
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
+  void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void tryPlacingStaticEntity(GmContext* context, GameState& state);
   void placeStaticEntitiesOverCurrentRange(GmContext* context, GameState& state);

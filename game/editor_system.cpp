@@ -123,19 +123,45 @@ using namespace Gamma;
 
     state.editor.rangeFrom = rangeFrom;
     state.editor.rangeFromSelected = true;
+
+    object("tile-preview").scale = 0.f;
+    commit(object("tile-preview"));
   }
 
   void showStaticEntityPlacementPreview(args()) {
-    auto& preview = object("preview");
+    auto& preview = object("tile-preview");
     GridCoordinates previewCoordinates;
 
     if (findStaticEntityPlacementCoordinates(params(), previewCoordinates)) {
-      Vec3f targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+      auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
 
       // @todo use proper scale/color based on entity type
       preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
       preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
       preview.color = Vec3f(1.f, 0.7f, 0.3f);
+    } else {
+      preview.scale = 0.f;
+    }
+
+    commit(preview);
+  }
+
+  void showRangeFromSelectionPreview(GmContext* context, GameState& state) {
+    auto& preview = object("tile-preview");
+    GridCoordinates previewCoordinates;
+
+    if (findStaticEntityPlacementCoordinates(params(), previewCoordinates)) {
+      // @todo use proper color based on entity type
+      const static auto defaultColor = Vec3f(1.f, 0.7f, 0.3f);
+      const static auto fadeColor = Vec3f(0, 1.f, 0);
+      auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+
+      #define sinewave(speed) sinf(getRunningTime() * speed)
+
+      // @todo use proper scale based on entity type
+      preview.scale = HALF_TILE_SIZE * (0.9f + sinewave(3.f) * 0.1f);
+      preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
+      preview.color = Vec3f::lerp(defaultColor, fadeColor, sinewave(5.f) * 0.5f + 0.5f);
     } else {
       preview.scale = 0.f;
     }

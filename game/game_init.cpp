@@ -376,7 +376,7 @@ static void addEntityObjects(args()) {
     
     preview.scale = 0.f;
 
-    save("preview", preview);
+    save("tile-preview", preview);
     commit(preview);
   #endif
 }
@@ -435,8 +435,8 @@ void initializeGame(args()) {
         state.editor.enabled = !state.editor.enabled;
 
         if (!state.editor.enabled) {
-          object("preview").scale = 0.f;
-          commit(object("preview"));
+          object("tile-preview").scale = 0.f;
+          commit(object("tile-preview"));
         }
       }
 
