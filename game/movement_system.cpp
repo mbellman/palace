@@ -89,6 +89,8 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
   auto* targetTileTwoBelow = grid.get(targetBelowCoordinates + downGridCoordinates);
 
   if (
+    // Entering onto a downward staircase
+    typeOfEntity(targetTileTwoBelow) == STAIRCASE ||
     // Walking down a staircase
     (
       typeOfEntity(currentTileBelow) == STAIRCASE &&
@@ -98,9 +100,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
       // if the tile isn't technically on a staircase in
       // the current world orientation.
       typeOfEntity(triggers.get(targetBelowCoordinates)) == WORLD_ORIENTATION_CHANGE
-    ) ||
-    // Entering onto a downward staircase
-    typeOfEntity(targetTileTwoBelow) == STAIRCASE
+    )
   ) {
     targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
 
@@ -111,12 +111,29 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     typeOfEntity(targetTile) == STAIRCASE) ||
     // Exiting off of an upward staircase
     (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTileAbove) == WALKABLE_SPACE)
+    typeOfEntity(targetTileBelow) == GROUND)
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
     return true;
-  } else if (typeOfEntity(targetTile) == WALKABLE_SPACE) {
+  } else if (
+    // Allow world orientation changes to be moved into,
+    // operating on the assumption that the changed orientation
+    // will result in a valid standing position
+    typeOfEntity(triggers.get(targetGridCoordinates)) == WORLD_ORIENTATION_CHANGE
+  ) {
+    return true;
+  } else if (
+    // Walking on a regular ground tile
+    typeOfEntity(targetTileTwoBelow) == GROUND &&
+    // Ground tiles are only walkable if the tile
+    // immediately below is empty or a staircase,
+    // and the target tile is empty
+    (
+      (targetTileBelow == nullptr || typeOfEntity(targetTileBelow) == STAIRCASE) &&
+      targetTile == nullptr
+    )
+  ) {
     return true;
   }
 

@@ -9,8 +9,7 @@
  */
 enum StaticEntityType {
   GROUND,
-  STAIRCASE,
-  WALKABLE_SPACE
+  STAIRCASE
 };
 
 struct StaticEntity {
@@ -32,10 +31,6 @@ struct Staircase : StaticEntity {
   }
 
   Gamma::Orientation orientation;
-};
-
-struct WalkableSpace : StaticEntity {
-  WalkableSpace(): StaticEntity(WALKABLE_SPACE) {};
 };
 
 /**

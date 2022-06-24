@@ -37,9 +37,6 @@ using namespace Gamma;
       case STAIRCASE:
         mesh = mesh("staircase");
         break;
-      case WALKABLE_SPACE:
-        mesh = mesh("entity-indicator");
-        break;
     }
 
     removeObjectAtPosition(globals, mesh->objects, objectPosition);
@@ -114,9 +111,6 @@ using namespace Gamma;
         break;
       case STAIRCASE:
         copy = new Staircase((Staircase*)source);
-        break;
-      case WALKABLE_SPACE:
-        copy = new WalkableSpace;
         break;
       default:
         break;
@@ -237,9 +231,6 @@ using namespace Gamma;
       case STAIRCASE:
         entity = new Staircase;
         // @todo set staircase orientation
-        break;
-      case WALKABLE_SPACE:
-        entity = new WalkableSpace;
         break;
     }
 

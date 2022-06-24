@@ -29,16 +29,6 @@ static void createStaircaseObject(Globals, const GridCoordinates& coordinates, c
   commit(staircase);
 }
 
-static void createWalkableSpaceIndicator(Globals, const GridCoordinates& coordinates) {
-  auto& indicator = createObjectFrom("entity-indicator");
-
-  indicator.position = gridCoordinatesToWorldPosition(coordinates);
-  indicator.scale = 0.5f;
-  indicator.color = pVec4(0,0,255);
-
-  commit(indicator);
-}
-
 Object* queryObjectByPosition(Globals, ObjectPool& objects, const Vec3f& position) {
   for (auto& object : objects) {
     if (object.position == position) {
@@ -62,11 +52,6 @@ void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
       break;
     case STAIRCASE:
       createStaircaseObject(globals, coordinates, ((Staircase*)entity)->orientation);        
-      break;
-    case WALKABLE_SPACE:
-      #if DEVELOPMENT == 1
-        createWalkableSpaceIndicator(globals, coordinates);
-      #endif
       break;
     default:
       break;

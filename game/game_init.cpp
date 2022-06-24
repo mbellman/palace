@@ -51,50 +51,28 @@ static void addOrientationTestLayout(Globals) {
 
   // Bottom area
   setStaticEntityOverRange<Ground>(globals, { -4, -1, -4 }, { 4, -1, 4 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 1, -4 }, { 4, 1, 4 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -3, -5 }, { 5, -3, 5 });
 
   // Left area
   setStaticEntityOverRange<Ground>(globals, { -5, -1, -4 }, { -5, 8, 4 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { -3, 1, -4 }, { -3, 8, 4 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { -7, -1, -5 }, { -7, 9, 5 });
 
   // Right area
   setStaticEntityOverRange<Ground>(globals, { 5, -1, -4 }, { 5, 8, 4 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { 3, 1, -4 }, { 3, 8, 4 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { 7, -1, -5 }, { 7, 9, 5 });
   
   // Top area
   setStaticEntityOverRange<Ground>(globals, { -5, 9, -4 }, { 5, 9, 4 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 7, -4 }, { 4, 7, 4 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { -5, 11, -5 }, { 5, 11, 5 });
 
   // Back area
   setStaticEntityOverRange<Ground>(globals, { -5, -1, -5 }, { 5, 9, -5 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 0, -3 }, { 4, 8, -3 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -1, -7 }, { 5, 9, -7 });
 
   // Front area
   setStaticEntityOverRange<Ground>(globals, { -5, -1, 5 }, { 5, 9, 5 });
-  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 0, 3 }, { 4, 8, 3 });
-  // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -1, 7 }, { 5, 9, 7 });
 
   // Pathway outdoors
   grid.clear({ 3, 1, -5 });
   grid.clear({ 3, 0, -5 });
-  grid.set({ 3, 1, -5 }, new WalkableSpace);
   grid.set({ 3, -1, -6 }, new Ground);
   grid.set({ 3, -1, -7 }, new Ground);
   grid.set({ 2, -1, -7 }, new Ground);
-  grid.set({ 3, 1, -6 }, new WalkableSpace);
-  grid.set({ 3, 1, -7 }, new WalkableSpace);
-  grid.set({ 2, 1, -7 }, new WalkableSpace);
 
   createWorldOrientationChange({ 3, 1, -7 }, POSITIVE_Y_UP);
   createWorldOrientationChange({ 2, 1, -7 }, NEGATIVE_Z_UP);
