@@ -35,6 +35,7 @@ static void addKeyHandlers(args()) {
   });
 }
 
+// @todo move to a separate file
 static void addOrientationTestLayout(args()) {
   auto& grid = state.world.grid;
   auto& triggers = state.world.triggers;
@@ -472,10 +473,10 @@ void initializeGame(args()) {
 
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
       if (SDL_GetRelativeMouseMode() && state.editor.enabled) {
-        // @todo clean up
+        // @todo create a mousedown handler in editor_system
         if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
-            fillStaticEntitiesWithinCurrentRange(params());
+            placeStaticEntitiesOverCurrentRange(params());
           } else {
             selectRangeFrom(params());
           }

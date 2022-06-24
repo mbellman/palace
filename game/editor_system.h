@@ -11,6 +11,7 @@
 struct GmContext;
 struct GameState;
 
+// @todo support storing/undoing ranged placement actions
 struct EditAction {
   StaticEntity* oldEntity = nullptr;
   StaticEntity* newEntity = nullptr;
@@ -33,6 +34,6 @@ struct WorldEditor {
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void tryPlacingStaticEntity(GmContext* context, GameState& state);
-  void fillStaticEntitiesWithinCurrentRange(GmContext* context, GameState& state);
+  void placeStaticEntitiesOverCurrentRange(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
 #endif

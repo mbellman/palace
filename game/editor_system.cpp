@@ -158,33 +158,17 @@ using namespace Gamma;
 
       objects("range-preview").reset();
 
-      // @todo define a helper for this
-      if (start.x > end.x) {
-        std::swap(start.x, end.x);
-      }
+      checkRange(start, end);
 
-      if (start.y > end.y) {
-        std::swap(start.y, end.y);
-      }
+      overRange(start, end, {
+        auto& preview = createObjectFrom("range-preview");
 
-      if (start.z > end.z) {
-        std::swap(start.z, end.z);
-      }
+        preview.scale = HALF_TILE_SIZE / 4.f;
+        preview.color = Vec3f(0, 1.f, 0);
+        preview.position = gridCoordinatesToWorldPosition({ x, y, z });
 
-      // @todo define a macro/helper for this
-      for (s16 x = start.x; x <= end.x; x++) {
-        for (s16 y = start.y; y <= end.y; y++) {
-          for (s16 z = start.z; z <= end.z; z++) {
-            auto& preview = createObjectFrom("range-preview");
-
-            preview.scale = HALF_TILE_SIZE / 4.f;
-            preview.color = Vec3f(0, 1.f, 0);
-            preview.position = gridCoordinatesToWorldPosition({ x, y, z });
-
-            commit(preview);
-          }
-        }
-      }
+        commit(preview);
+      });
     }
 
     for (auto& preview : objects("range-preview")) {
@@ -234,35 +218,19 @@ using namespace Gamma;
     storeEditAction(params(), action);
   }
 
-  void fillStaticEntitiesWithinCurrentRange(args()) {
+  void placeStaticEntitiesOverCurrentRange(args()) {
     auto& grid = state.world.grid;
     auto start = state.editor.rangeFrom;
     auto end = state.editor.rangeTo;
 
-    // @todo define a helper for this
-    if (start.x > end.x) {
-      std::swap(start.x, end.x);
-    }
-
-    if (start.y > end.y) {
-      std::swap(start.y, end.y);
-    }
-
-    if (start.z > end.z) {
-      std::swap(start.z, end.z);
-    }
+    checkRange(start, end);
 
     // @todo use entity corresponding to the current selected entity type
     setStaticEntityOverRange<Ground>(params(), start, end);
 
-    // @todo define a macro/helper for this
-    for (s16 x = start.x; x <= end.x; x++) {
-      for (s16 y = start.y; y <= end.y; y++) {
-        for (s16 z = start.z; z <= end.z; z++) {
-          createObjectFromCoordinates(params(), { x, y, z });
-        }
-      }
-    }
+    overRange(start, end, {
+      createObjectFromCoordinates(params(), { x, y, z });
+    });
 
     state.editor.rangeFromSelected = false;
 

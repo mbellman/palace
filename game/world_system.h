@@ -5,6 +5,27 @@
 #include "grid_utilities.h"
 #include "game_entities.h"
 
+#define checkRange(start, end) \
+  if (start.x > end.x) std::swap(start.x, end.x);\
+  if (start.y > end.y) std::swap(start.y, end.y);\
+  if (start.z > end.z) std::swap(start.z, end.z);\
+
+#define overRange(start, end, ...) \
+  for (s16 x = start.x; x <= end.x; x++) {\
+    for (s16 y = start.y; y <= end.y; y++) {\
+      for (s16 z = start.z; z <= end.z; z++) {\
+        if (\
+          x != start.x && x != end.x &&\
+          y != start.y && y != end.y &&\
+          z != start.z && z != end.z\
+        ) {\
+          continue;\
+        }\
+        __VA_ARGS__\
+      }\
+    }\
+  }\
+
 struct GmContext;
 struct GameState;
 
@@ -81,16 +102,15 @@ struct World {
 
 Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
 void createObjectFromCoordinates(GmContext* context, GameState& state, const GridCoordinates& coordinates);
+// @todo std::string serializedWorldGrid();
+// @todo void loadSerializedWorldGrid(const std::string& data);
 
+// @todo we probably won't need this once level loading is in place
 template<typename E>
 void setStaticEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
   auto& grid = state.world.grid;
 
-  for (s16 x = start.x; x <= end.x; x++) {
-    for (s16 y = start.y; y <= end.y; y++) {
-      for (s16 z = start.z; z <= end.z; z++) {
-        grid.set({ x, y, z }, new E);
-      }
-    }
-  }
+  overRange(start, end, {
+    grid.set({ x, y, z }, new E);
+  });
 }
