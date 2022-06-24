@@ -97,7 +97,7 @@ const static std::map<OrientationTransition, OrientationHandler> orientationHand
   }}
 };
 
-void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
+void updateCameraFromMouseMoveEvent(Globals, const MouseMoveEvent& event) {
   auto& camera = getCamera();
   auto mDeltaY = event.deltaY / 1000.f;
   auto mDeltaX = event.deltaX / 1000.f;
@@ -131,7 +131,7 @@ void updateCameraFromMouseMoveEvent(args(), const MouseMoveEvent& event) {
   wrap(camera.orientation.roll);
 }
 
-void setWorldOrientation(args(), WorldOrientation targetWorldOrientation) {
+void setWorldOrientation(Globals, WorldOrientation targetWorldOrientation) {
   auto& camera = getCamera();
   auto currentWorldOrientation = state.worldOrientationState.worldOrientation;
 
@@ -206,7 +206,7 @@ void setWorldOrientation(args(), WorldOrientation targetWorldOrientation) {
   camera.orientation = state.worldOrientationState.orientationTo;
 }
 
-void handleWorldOrientation(args(), float dt) {
+void handleWorldOrientation(Globals, float dt) {
   auto& camera = getCamera();
   auto& orientationFrom = state.worldOrientationState.orientationFrom;
   auto& orientationTo = state.worldOrientationState.orientationTo;

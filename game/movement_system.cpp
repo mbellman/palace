@@ -14,11 +14,11 @@ using namespace Gamma;
 #define abs(n) (n < 0.f ? -n : n)
 #define typeOfEntity(entity) entity != nullptr && entity->type
 
-static inline bool isMoving(args()) {
+static inline bool isMoving(Globals) {
   return state.currentMove.startTime != 0.f;
 }
 
-static Vec3f worldDirectionToGridDirection(args(), const Vec3f& worldDirection) {
+static Vec3f worldDirectionToGridDirection(Globals, const Vec3f& worldDirection) {
   Vec3f movementPlaneAlignedWorldDirection = worldDirection * state.worldOrientationState.movementPlane;
 
   auto absX = abs(movementPlaneAlignedWorldDirection.x);
@@ -52,11 +52,11 @@ static MoveDirection gridDirectionToMoveDirection(const Vec3f& gridDirection) {
   return MoveDirection::NONE;
 }
 
-static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
+static MoveDirection getMoveDirectionFromKeyboardInput(Globals) {
   auto& camera = getCamera();
   auto& input = getInput();
-  auto forwardGridDirection = worldDirectionToGridDirection(params(), camera.orientation.getDirection());
-  auto leftGridDirection = worldDirectionToGridDirection(params(), camera.orientation.getLeftDirection());
+  auto forwardGridDirection = worldDirectionToGridDirection(globals, camera.orientation.getDirection());
+  auto leftGridDirection = worldDirectionToGridDirection(globals, camera.orientation.getLeftDirection());
   auto move = MoveDirection::NONE;
 
   #define keyPressed(key) input.getLastKeyDown() == (u64)key && input.isKeyHeld(key)
@@ -74,7 +74,7 @@ static MoveDirection getMoveDirectionFromKeyboardInput(args()) {
   return move;
 }
 
-static bool isNextMoveValid(args(), const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
+static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
   auto& grid = state.world.grid;
   auto& triggers = state.world.triggers;
   auto worldOrientation = state.worldOrientationState.worldOrientation;
@@ -123,15 +123,15 @@ static bool isNextMoveValid(args(), const GridCoordinates& currentGridCoordinate
   return false;
 }
 
-static void handleTriggerEntitiesBeforeMove(args(), const GridCoordinates& targetGridCoordinates) {
+static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates) {
   auto* targetTrigger = state.world.triggers.get(targetGridCoordinates);
 
   if (typeOfEntity(targetTrigger) == WORLD_ORIENTATION_CHANGE) {
-    setWorldOrientation(params(), ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
+    setWorldOrientation(globals, ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
   }
 }
 
-static void handleNextMove(args()) {
+static void handleNextMove(Globals) {
   auto& camera = getCamera();
   auto runningTime = getRunningTime();
   auto nextMove = takeNextMove(state.moves);
@@ -173,15 +173,15 @@ static void handleNextMove(args()) {
   moveDelta *= state.worldOrientationState.movementPlane;
   targetCameraPosition += moveDelta;
 
-  if (!isNextMoveValid(params(), currentGridCoordinates, targetCameraPosition)) {
+  if (!isNextMoveValid(globals, currentGridCoordinates, targetCameraPosition)) {
     return;
   }
 
   auto& targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
-  handleTriggerEntitiesBeforeMove(params(), targetGridCoordinates);
+  handleTriggerEntitiesBeforeMove(globals, targetGridCoordinates);
 
-  if (!isMoving(params()) || timeSinceCurrentMoveBegan > 0.4f) {
+  if (!isMoving(globals) || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
     // or after having sufficiently slowed down from a
     // prior move sequence. An in-out easing works best
@@ -203,7 +203,7 @@ static void handleNextMove(args()) {
   // @todo reduce tween time based on proximity to the target position
 }
 
-static void movePlayer(args(), float dt) {
+static void movePlayer(Globals, float dt) {
   auto& camera = getCamera();
   auto& from = state.currentMove.from;
   auto& to = state.currentMove.to;
@@ -249,11 +249,11 @@ static void movePlayer(args(), float dt) {
   }
 }
 
-void handlePlayerMovement(args(), float dt) {
+void handlePlayerMovement(Globals, float dt) {
   auto& camera = getCamera();
   auto& input = getInput();
   auto runningTime = getRunningTime();
-  auto move = getMoveDirectionFromKeyboardInput(params());
+  auto move = getMoveDirectionFromKeyboardInput(globals);
   auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
   auto commitMoveTimeDelay = checkNextMove(state.moves) == move ? 0.175f : 0.1f;
 
@@ -273,11 +273,11 @@ void handlePlayerMovement(args(), float dt) {
     state.moves.size > 0 &&
     timeSinceCurrentMoveBegan > 0.2f
   ) {
-    handleNextMove(params());
+    handleNextMove(globals);
   }
 
-  if (isMoving(params())) {
-    movePlayer(params(), dt);
+  if (isMoving(globals)) {
+    movePlayer(globals, dt);
   }
 
   #if DEVELOPMENT == 1

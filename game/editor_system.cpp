@@ -10,15 +10,15 @@
 using namespace Gamma;
 
 #if DEVELOPMENT == 1
-  static void removeObjectAtPosition(args(), ObjectPool& objects, const Vec3f& position) {
-    auto* object = queryObjectByPosition(params(), objects, position);
+  static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
+    auto* object = queryObjectByPosition(globals, objects, position);
 
     if (object != nullptr) {
       remove(*object);
     }
   }
 
-  static void removeStaticEntityObjectAtGridCoordinates(args(), const GridCoordinates& coordinates) {
+  static void removeStaticEntityObjectAtGridCoordinates(Globals, const GridCoordinates& coordinates) {
     auto& grid = state.world.grid;
     auto* entity = grid.get(coordinates);
 
@@ -42,10 +42,10 @@ using namespace Gamma;
         break;
     }
 
-    removeObjectAtPosition(params(), mesh->objects, objectPosition);
+    removeObjectAtPosition(globals, mesh->objects, objectPosition);
   }
 
-  static bool findStaticEntityPlacementCoordinates(args(), GridCoordinates& coordinates) {
+  static bool findStaticEntityPlacementCoordinates(Globals, GridCoordinates& coordinates) {
     auto& camera = getCamera();
     auto& grid = state.world.grid;
     float offset = TILE_SIZE * 2.f;
@@ -70,7 +70,7 @@ using namespace Gamma;
     return canPlaceEntity;
   }
 
-  static void storeEditAction(args(), EditAction& action) {
+  static void storeEditAction(Globals, EditAction& action) {
     auto& editor = state.editor;
 
     if (editor.totalEditActions == MAX_EDIT_ACTIONS) {
@@ -116,10 +116,10 @@ using namespace Gamma;
     return copy;
   }
 
-  void selectRangeFrom(args()) {
+  void selectRangeFrom(Globals) {
     GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
 
-    findStaticEntityPlacementCoordinates(params(), rangeFrom);
+    findStaticEntityPlacementCoordinates(globals, rangeFrom);
 
     state.editor.rangeFrom = rangeFrom;
     state.editor.rangeFromSelected = true;
@@ -128,11 +128,11 @@ using namespace Gamma;
     commit(object("tile-preview"));
   }
 
-  void showStaticEntityPlacementPreview(args()) {
+  void showStaticEntityPlacementPreview(Globals) {
     auto& preview = object("tile-preview");
     GridCoordinates previewCoordinates;
 
-    if (findStaticEntityPlacementCoordinates(params(), previewCoordinates)) {
+    if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
       auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
 
       // @todo use proper scale/color based on entity type
@@ -150,7 +150,7 @@ using namespace Gamma;
     auto& preview = object("tile-preview");
     GridCoordinates previewCoordinates;
 
-    if (findStaticEntityPlacementCoordinates(params(), previewCoordinates)) {
+    if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
       // @todo use proper color based on entity type
       const static auto defaultColor = Vec3f(1.f, 0.7f, 0.3f);
       const static auto fadeColor = Vec3f(0, 1.f, 0);
@@ -169,7 +169,7 @@ using namespace Gamma;
     commit(preview);
   }
 
-  void showRangedEntityPlacementPreview(args()) {
+  void showRangedEntityPlacementPreview(Globals) {
     if (!state.editor.rangeFromSelected) {
       return;
     }
@@ -177,7 +177,7 @@ using namespace Gamma;
     auto start = state.editor.rangeFrom;
     GridCoordinates end = worldPositionToGridCoordinates(getCamera().position);
 
-    findStaticEntityPlacementCoordinates(params(), end);
+    findStaticEntityPlacementCoordinates(globals, end);
 
     if (end != state.editor.rangeTo) {
       state.editor.rangeTo = end;
@@ -207,10 +207,10 @@ using namespace Gamma;
     }
   }
 
-  void tryPlacingStaticEntity(args()) {
+  void tryPlacingStaticEntity(Globals) {
     GridCoordinates targetCoordinates;
 
-    if (!findStaticEntityPlacementCoordinates(params(), targetCoordinates)) {
+    if (!findStaticEntityPlacementCoordinates(globals, targetCoordinates)) {
       return;
     }
 
@@ -236,15 +236,15 @@ using namespace Gamma;
     action.newEntity = entity;
     action.coordinates = targetCoordinates;
 
-    removeStaticEntityObjectAtGridCoordinates(params(), targetCoordinates);
+    removeStaticEntityObjectAtGridCoordinates(globals, targetCoordinates);
 
     grid.set(targetCoordinates, entity);
-    createObjectFromCoordinates(params(), targetCoordinates);
+    createObjectFromCoordinates(globals, targetCoordinates);
 
-    storeEditAction(params(), action);
+    storeEditAction(globals, action);
   }
 
-  void placeStaticEntitiesOverCurrentRange(args()) {
+  void placeStaticEntitiesOverCurrentRange(Globals) {
     auto& grid = state.world.grid;
     auto start = state.editor.rangeFrom;
     auto end = state.editor.rangeTo;
@@ -252,10 +252,10 @@ using namespace Gamma;
     checkRange(start, end);
 
     // @todo use entity corresponding to the current selected entity type
-    setStaticEntityOverRange<Ground>(params(), start, end);
+    setStaticEntityOverRange<Ground>(globals, start, end);
 
     overRange(start, end, {
-      createObjectFromCoordinates(params(), { x, y, z });
+      createObjectFromCoordinates(globals, { x, y, z });
     });
 
     state.editor.rangeFromSelected = false;
@@ -263,7 +263,7 @@ using namespace Gamma;
     objects("range-preview").reset();
   }
 
-  void undoPreviousEditAction(args()) {
+  void undoPreviousEditAction(Globals) {
     auto& editor = state.editor;
 
     if (editor.totalEditActions == 0) {
@@ -276,13 +276,13 @@ using namespace Gamma;
     auto* oldEntity = lastEditAction.oldEntity;
 
     // Undo the last entity/object placement
-    removeStaticEntityObjectAtGridCoordinates(params(), coordinates);
+    removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
     grid.clear(coordinates);
 
     if (oldEntity != nullptr) {
       // Restore the object/entity which existed before
       grid.set(coordinates, oldEntity);
-      createObjectFromCoordinates(params(), coordinates);
+      createObjectFromCoordinates(globals, coordinates);
     }
 
     editor.totalEditActions--;

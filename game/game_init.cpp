@@ -11,7 +11,7 @@
 
 using namespace Gamma;
 
-static void addKeyHandlers(args()) {
+static void addKeyHandlers(Globals) {
   auto& input = getInput();
 
   input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
@@ -36,7 +36,7 @@ static void addKeyHandlers(args()) {
 }
 
 // @todo move to a separate file
-static void addOrientationTestLayout(args()) {
+static void addOrientationTestLayout(Globals) {
   auto& grid = state.world.grid;
   auto& triggers = state.world.triggers;
 
@@ -50,40 +50,40 @@ static void addOrientationTestLayout(args()) {
   };
 
   // Bottom area
-  setStaticEntityOverRange<Ground>(params(), { -4, -1, -4 }, { 4, -1, 4 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 1, -4 }, { 4, 1, 4 });
+  setStaticEntityOverRange<Ground>(globals, { -4, -1, -4 }, { 4, -1, 4 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 1, -4 }, { 4, 1, 4 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -3, -5 }, { 5, -3, 5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -3, -5 }, { 5, -3, 5 });
 
   // Left area
-  setStaticEntityOverRange<Ground>(params(), { -5, -1, -4 }, { -5, 8, 4 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { -3, 1, -4 }, { -3, 8, 4 });
+  setStaticEntityOverRange<Ground>(globals, { -5, -1, -4 }, { -5, 8, 4 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -3, 1, -4 }, { -3, 8, 4 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { -7, -1, -5 }, { -7, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -7, -1, -5 }, { -7, 9, 5 });
 
   // Right area
-  setStaticEntityOverRange<Ground>(params(), { 5, -1, -4 }, { 5, 8, 4 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { 3, 1, -4 }, { 3, 8, 4 });
+  setStaticEntityOverRange<Ground>(globals, { 5, -1, -4 }, { 5, 8, 4 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { 3, 1, -4 }, { 3, 8, 4 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { 7, -1, -5 }, { 7, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { 7, -1, -5 }, { 7, 9, 5 });
   
   // Top area
-  setStaticEntityOverRange<Ground>(params(), { -5, 9, -4 }, { 5, 9, 4 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 7, -4 }, { 4, 7, 4 });
+  setStaticEntityOverRange<Ground>(globals, { -5, 9, -4 }, { 5, 9, 4 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 7, -4 }, { 4, 7, 4 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { -5, 11, -5 }, { 5, 11, 5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -5, 11, -5 }, { 5, 11, 5 });
 
   // Back area
-  setStaticEntityOverRange<Ground>(params(), { -5, -1, -5 }, { 5, 9, -5 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 0, -3 }, { 4, 8, -3 });
+  setStaticEntityOverRange<Ground>(globals, { -5, -1, -5 }, { 5, 9, -5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 0, -3 }, { 4, 8, -3 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -1, -7 }, { 5, 9, -7 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -1, -7 }, { 5, 9, -7 });
 
   // Front area
-  setStaticEntityOverRange<Ground>(params(), { -5, -1, 5 }, { 5, 9, 5 });
-  setStaticEntityOverRange<WalkableSpace>(params(), { -4, 0, 3 }, { 4, 8, 3 });
+  setStaticEntityOverRange<Ground>(globals, { -5, -1, 5 }, { 5, 9, 5 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -4, 0, 3 }, { 4, 8, 3 });
   // Outdoors
-  setStaticEntityOverRange<WalkableSpace>(params(), { -5, -1, 7 }, { 5, 9, 7 });
+  setStaticEntityOverRange<WalkableSpace>(globals, { -5, -1, 7 }, { 5, 9, 7 });
 
   // Pathway outdoors
   grid.clear({ 3, 1, -5 });
@@ -331,7 +331,7 @@ static void addOrientationTestLayout(args()) {
   createWorldOrientationChange({ 2, 4, -3 }, POSITIVE_Z_UP);
 }
 
-static void addParticles(args()) {
+static void addParticles(Globals) {
   addMesh("particles", 1000, Mesh::Particles());
 
   auto& particles = mesh("particles")->particleSystem;
@@ -344,7 +344,7 @@ static void addParticles(args()) {
   particles.spawn = gridCoordinatesToWorldPosition({ 0, 4, 0 });
 }
 
-static void addMeshes(args()) {
+static void addMeshes(Globals) {
   // Static entity objects
   addMesh("ground-tile", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
@@ -362,11 +362,11 @@ static void addMeshes(args()) {
   #endif
 }
 
-static void addEntityObjects(args()) {
+static void addEntityObjects(Globals) {
   auto& grid = state.world.grid;
 
   for (auto& [ coordinates, entity ] : grid) {
-    createObjectFromCoordinates(params(), coordinates);
+    createObjectFromCoordinates(globals, coordinates);
   }
 
   #if DEVELOPMENT == 1
@@ -381,7 +381,7 @@ static void addEntityObjects(args()) {
   #endif
 }
 
-static void addTriggerEntityIndicators(args()) {
+static void addTriggerEntityIndicators(Globals) {
   for (auto& [ coordinates, trigger ] : state.world.triggers) {
     switch (trigger->type) {
       case WORLD_ORIENTATION_CHANGE: {
@@ -399,7 +399,7 @@ static void addTriggerEntityIndicators(args()) {
   }
 }
 
-void initializeGame(args()) {
+void initializeGame(Globals) {
   Gm_EnableFlags(GammaFlags::VSYNC);
 
   auto& input = getInput();
@@ -407,7 +407,7 @@ void initializeGame(args()) {
 
   input.on<MouseMoveEvent>("mousemove", [context, &state](const MouseMoveEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
-      updateCameraFromMouseMoveEvent(params(), event);
+      updateCameraFromMouseMoveEvent(globals, event);
     }
   });
 
@@ -467,7 +467,7 @@ void initializeGame(args()) {
       auto key = event.key;
 
       if (input.isKeyHeld(Key::CONTROL) && key == Key::Z && state.editor.enabled) {
-        undoPreviousEditAction(params());
+        undoPreviousEditAction(globals);
       }
     });
 
@@ -476,26 +476,26 @@ void initializeGame(args()) {
         // @todo create a mousedown handler in editor_system
         if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
-            placeStaticEntitiesOverCurrentRange(params());
+            placeStaticEntitiesOverCurrentRange(globals);
           } else {
-            selectRangeFrom(params());
+            selectRangeFrom(globals);
           }
         } else {
-          tryPlacingStaticEntity(params());
+          tryPlacingStaticEntity(globals);
         }
       }
     });
   #endif
 
-  addKeyHandlers(params());
-  addOrientationTestLayout(params());
-  addParticles(params());
+  addKeyHandlers(globals);
+  addOrientationTestLayout(globals);
+  addParticles(globals);
 
-  addMeshes(params());
-  addEntityObjects(params());
+  addMeshes(globals);
+  addEntityObjects(globals);
 
   #if DEVELOPMENT == 1
-    addTriggerEntityIndicators(params());
+    addTriggerEntityIndicators(globals);
   #endif
 
   auto& light = createLight(POINT_SHADOWCASTER);

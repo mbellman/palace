@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   Gm_OpenWindow(context, "Palace", { 900, 600 });
   Gm_SetRenderMode(context, GmRenderMode::OPENGL);
 
-  initializeGame(params());
+  initializeGame(globals);
 
   while (!context->window.closed) {
     float dt = Gm_GetDeltaTime(context);
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     Gm_LogFrameStart(context);
     Gm_HandleEvents(context);
 
-    updateGame(params(), dt);
+    updateGame(globals, dt);
 
     Gm_RenderScene(context);
     Gm_LogFrameEnd(context);

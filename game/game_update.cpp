@@ -22,7 +22,7 @@ std::string worldOrientationToString(WorldOrientation worldOrientation) {
   }
 }
 
-static void addDebugMessages(args()) {
+static void addDebugMessages(Globals) {
   auto& camera = getCamera();
   auto& coordinates = worldPositionToGridCoordinates(camera.position);
 
@@ -46,30 +46,30 @@ static void addDebugMessages(args()) {
   addDebugMessage(entitiesLabel);
 }
 
-void updateGame(args(), float dt) {
+void updateGame(Globals, float dt) {
   #if DEVELOPMENT == 1
     if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
       Gm_HandleFreeCameraMode(context, dt);
     } else {
-      handlePlayerMovement(params(), dt);
+      handlePlayerMovement(globals, dt);
     }
   #else
-    handlePlayerMovement(params(), dt);
+    handlePlayerMovement(globals, dt);
   #endif
 
-  handleWorldOrientation(params(), dt);
+  handleWorldOrientation(globals, dt);
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {
       if (state.editor.rangeFromSelected) {
-        showRangedEntityPlacementPreview(params());
+        showRangedEntityPlacementPreview(globals);
       } else if (state.editor.useRange) {
-        showRangeFromSelectionPreview(params());
+        showRangeFromSelectionPreview(globals);
       } else {
-        showStaticEntityPlacementPreview(params());
+        showStaticEntityPlacementPreview(globals);
       }
     }
 
-    addDebugMessages(params());
+    addDebugMessages(globals);
   #endif
 }

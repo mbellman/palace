@@ -5,7 +5,7 @@
 
 using namespace Gamma;
 
-static void createGroundObject(args(), const GridCoordinates& coordinates) {
+static void createGroundObject(Globals, const GridCoordinates& coordinates) {
   auto& ground = createObjectFrom("ground-tile");
 
   ground.position = gridCoordinatesToWorldPosition(coordinates);
@@ -15,7 +15,7 @@ static void createGroundObject(args(), const GridCoordinates& coordinates) {
   commit(ground);
 }
 
-static void createStaircaseObject(args(), const GridCoordinates& coordinates, const Orientation& orientation) {
+static void createStaircaseObject(Globals, const GridCoordinates& coordinates, const Orientation& orientation) {
   auto& staircase = createObjectFrom("staircase");
 
   staircase.position = gridCoordinatesToWorldPosition(coordinates);
@@ -29,7 +29,7 @@ static void createStaircaseObject(args(), const GridCoordinates& coordinates, co
   commit(staircase);
 }
 
-static void createWalkableSpaceIndicator(args(), const GridCoordinates& coordinates) {
+static void createWalkableSpaceIndicator(Globals, const GridCoordinates& coordinates) {
   auto& indicator = createObjectFrom("entity-indicator");
 
   indicator.position = gridCoordinatesToWorldPosition(coordinates);
@@ -39,7 +39,7 @@ static void createWalkableSpaceIndicator(args(), const GridCoordinates& coordina
   commit(indicator);
 }
 
-Object* queryObjectByPosition(args(), ObjectPool& objects, const Vec3f& position) {
+Object* queryObjectByPosition(Globals, ObjectPool& objects, const Vec3f& position) {
   for (auto& object : objects) {
     if (object.position == position) {
       return &object;
@@ -49,7 +49,7 @@ Object* queryObjectByPosition(args(), ObjectPool& objects, const Vec3f& position
   return nullptr;
 }
 
-void createObjectFromCoordinates(args(), const GridCoordinates& coordinates) {
+void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
   auto* entity = state.world.grid.get(coordinates);
 
   if (entity == nullptr) {
@@ -58,14 +58,14 @@ void createObjectFromCoordinates(args(), const GridCoordinates& coordinates) {
 
   switch (entity->type) {
     case GROUND:
-      createGroundObject(params(), coordinates);
+      createGroundObject(globals, coordinates);
       break;
     case STAIRCASE:
-      createStaircaseObject(params(), coordinates, ((Staircase*)entity)->orientation);        
+      createStaircaseObject(globals, coordinates, ((Staircase*)entity)->orientation);        
       break;
     case WALKABLE_SPACE:
       #if DEVELOPMENT == 1
-        createWalkableSpaceIndicator(params(), coordinates);
+        createWalkableSpaceIndicator(globals, coordinates);
       #endif
       break;
     default:
