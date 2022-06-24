@@ -11,11 +11,15 @@
 struct GmContext;
 struct GameState;
 
-// @todo support storing/undoing ranged placement actions
 struct EditAction {
   StaticEntity* oldEntity = nullptr;
   StaticEntity* newEntity = nullptr;
   GridCoordinates coordinates;
+
+  bool isRangedPlacementAction = false;
+  GridCoordinates rangeFrom;
+  GridCoordinates rangeTo;
+  // @todo provide the ability to save copies of replaced entities so they can be restored on undo
 };
 
 struct WorldEditor {

@@ -124,7 +124,11 @@ using namespace Gamma;
     state.editor.rangeFrom = rangeFrom;
     state.editor.rangeFromSelected = true;
 
+    // Hide the single tile placement preview
+    // and ensure it isn't removed when placing
+    // new entities over the range
     object("tile-preview").scale = 0.f;
+    object("tile-preview").position += Vec3f(1.f);
     commit(object("tile-preview"));
   }
 
@@ -214,8 +218,6 @@ using namespace Gamma;
       return;
     }
 
-    auto& grid = state.world.grid;
-    EditAction action;
     StaticEntity* entity;
 
     switch (state.editor.currentSelectedEntityType) {
@@ -232,12 +234,14 @@ using namespace Gamma;
         break;
     }
 
+    auto& grid = state.world.grid;
+    EditAction action;
+
     action.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
     action.newEntity = entity;
     action.coordinates = targetCoordinates;
 
     removeStaticEntityObjectAtGridCoordinates(globals, targetCoordinates);
-
     grid.set(targetCoordinates, entity);
     createObjectFromCoordinates(globals, targetCoordinates);
 
@@ -251,16 +255,26 @@ using namespace Gamma;
 
     checkRange(start, end);
 
-    // @todo use entity corresponding to the current selected entity type
-    setStaticEntityOverRange<Ground>(globals, start, end);
+    EditAction action;
+
+    action.isRangedPlacementAction = true;
+    action.rangeFrom = start;
+    action.rangeTo = end;
 
     overRange(start, end, {
-      createObjectFromCoordinates(globals, { x, y, z });
+      GridCoordinates coordinates = { x, y, z };
+
+      removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
+      // @todo use entity corresponding to the current selected entity type
+      grid.set(coordinates, new Ground);
+      createObjectFromCoordinates(globals, coordinates);
     });
 
-    state.editor.rangeFromSelected = false;
+    storeEditAction(globals, action);
 
     objects("range-preview").reset();
+
+    state.editor.rangeFromSelected = false;
   }
 
   void undoPreviousEditAction(Globals) {
@@ -272,17 +286,27 @@ using namespace Gamma;
 
     auto& grid = state.world.grid;
     auto& lastEditAction = editor.editActions[editor.totalEditActions - 1];
-    auto& coordinates = lastEditAction.coordinates;
-    auto* oldEntity = lastEditAction.oldEntity;
 
-    // Undo the last entity/object placement
-    removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
-    grid.clear(coordinates);
+    if (lastEditAction.isRangedPlacementAction) {
+      overRange(lastEditAction.rangeFrom, lastEditAction.rangeTo, {
+        GridCoordinates coordinates = { x, y, z };
 
-    if (oldEntity != nullptr) {
-      // Restore the object/entity which existed before
-      grid.set(coordinates, oldEntity);
-      createObjectFromCoordinates(globals, coordinates);
+        removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
+        grid.clear(coordinates);
+      });
+    } else {
+      auto& coordinates = lastEditAction.coordinates;
+      auto* oldEntity = lastEditAction.oldEntity;
+
+      // Undo the last entity/object placement
+      removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
+      grid.clear(coordinates);
+
+      if (oldEntity != nullptr) {
+        // Restore the object/entity which existed before
+        grid.set(coordinates, oldEntity);
+        createObjectFromCoordinates(globals, coordinates);
+      }
     }
 
     editor.totalEditActions--;
