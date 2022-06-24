@@ -329,10 +329,8 @@ static void addMeshes(Globals) {
 
   #if DEVELOPMENT == 1
     // Entity/trigger indicators
-    auto totalEntities = (s16)state.world.grid.size();
     auto totalTriggers = (s16)state.world.triggers.size();
 
-    addMesh("entity-indicator", totalEntities, Mesh::Cube());
     addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
 
     // Ranged placement preview
@@ -418,26 +416,31 @@ void initializeGame(Globals) {
         }
       }
 
-      // Toggle ranged tile placement
-      if (key == Key::R) {
-        state.editor.useRange = !state.editor.useRange;
-
-        if (!state.editor.useRange) {
-          state.editor.rangeFromSelected = false;
-
-          objects("range-preview").reset();
-        }
-      }
-
       // Toggle entity/trigger indicators
       if (key == Key::I) {
-        auto& entityIndicators = *mesh("entity-indicator");
         auto& triggerIndicators = *mesh("trigger-indicator");
 
-        entityIndicators.disabled = !entityIndicators.disabled;
         triggerIndicators.disabled = !triggerIndicators.disabled;
 
         context->renderer->resetShadowMaps();
+      }
+
+      // Editor controls
+      // @todo allow staircase orientations to be controlled, or heuristically determined
+      if (state.editor.enabled) {
+        // Toggle ranged tile placement
+        if (key == Key::R) {
+          state.editor.useRange = !state.editor.useRange;
+
+          if (!state.editor.useRange) {
+            state.editor.rangeFromSelected = false;
+
+            objects("range-preview").reset();
+          }
+        }
+
+        if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
+        if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
       }
     });
 
@@ -466,7 +469,7 @@ void initializeGame(Globals) {
   #endif
 
   addKeyHandlers(globals);
-  addOrientationTestLayout(globals);
+  // addOrientationTestLayout(globals);
   addParticles(globals);
 
   addMeshes(globals);

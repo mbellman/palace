@@ -41,6 +41,7 @@ struct WorldEditor {
 };
 
 #if DEVELOPMENT == 1
+  void setCurrentSelectedEntityType(GmContext* context, GameState& state, StaticEntityType type);
   void selectRangeFrom(GmContext* context, GameState& state);
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);

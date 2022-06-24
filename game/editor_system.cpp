@@ -119,6 +119,25 @@ using namespace Gamma;
     return copy;
   }
 
+  void setCurrentSelectedEntityType(Globals, StaticEntityType type) {
+    state.editor.currentSelectedEntityType = type;
+    
+    auto& existingPreviewPosition = object("tile-preview").position;
+    std::string previewMeshName;
+
+    remove(object("tile-preview"));
+
+    // @todo define a map for this
+    if (type == GROUND) previewMeshName = "ground-tile";
+    if (type == STAIRCASE) previewMeshName = "staircase";
+
+    auto& preview = createObjectFrom(previewMeshName);
+
+    preview.position = existingPreviewPosition;
+
+    save("tile-preview", preview);
+  }
+
   void selectRangeFrom(Globals) {
     GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
 
