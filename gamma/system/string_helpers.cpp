@@ -38,7 +38,7 @@ namespace Gamma {
     for (u32 i = 0; i < segments.size(); i++) {
       joined += segments[i];
 
-      if (i != segments.size() - 1) {
+      if (i < segments.size() - 1) {
         joined += delimiter;
       }
     }

@@ -36,14 +36,47 @@ static void addKeyHandlers(Globals) {
 }
 
 #if DEVELOPMENT == 1
-  static void saveWorldData(Globals) {
+  #include <fstream>
+
+  static void saveEditorWorldData(Globals) {
     auto serialized = serializeWorldGrid(globals);
 
     Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
   }
 
-  static void loadWorldData(Globals) {
-    // @todo
+  static void loadEditorWorldData(Globals) {
+    auto& grid = state.world.grid;
+    StaticEntityType currentEntityType;
+    std::ifstream file("./game/world/raw_data.txt");
+
+    if (file.fail()) {
+      return;
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+      // @todo handle other entity types
+      if (line == "ground") {
+        currentEntityType = GROUND;
+      } else {
+        auto coords = Gm_SplitString(line, ",");
+        auto x = (s16)stoi(coords[0]);
+        auto y = (s16)stoi(coords[1]);
+        auto z = (s16)stoi(coords[2]);
+
+        switch (currentEntityType) {
+          case GROUND:
+            grid.set({ x, y, z }, new Ground);
+            break;
+          case STAIRCASE:
+            // @todo
+            break;
+        }
+      }
+    }
+
+    file.close();
   }
 #endif
 
@@ -460,7 +493,7 @@ void initializeGame(Globals) {
 
       if (state.editor.enabled && input.isKeyHeld(Key::CONTROL) && key == Key::Z) {
         undoPreviousEditAction(globals);
-        saveWorldData(globals);
+        saveEditorWorldData(globals);
       }
     });
 
@@ -470,13 +503,13 @@ void initializeGame(Globals) {
         if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
             placeStaticEntitiesOverCurrentRange(globals);
-            saveWorldData(globals);
+            saveEditorWorldData(globals);
           } else {
             selectRangeFrom(globals);
           }
         } else {
           tryPlacingStaticEntity(globals);
-          saveWorldData(globals);
+          saveEditorWorldData(globals);
         }
       }
     });
@@ -484,6 +517,11 @@ void initializeGame(Globals) {
 
   addKeyHandlers(globals);
   // addOrientationTestLayout(globals);
+
+  #if DEVELOPMENT == 1
+    loadEditorWorldData(globals);
+  #endif
+
   addParticles(globals);
 
   addMeshes(globals);

@@ -13,4 +13,5 @@
 #include "system/macros.h"
 #include "system/random.h"
 #include "system/scene.h"
+#include "system/string_helpers.h"
 #include "system/type_aliases.h"
