@@ -35,6 +35,18 @@ static void addKeyHandlers(Globals) {
   });
 }
 
+#if DEVELOPMENT == 1
+  static void saveWorldData(Globals) {
+    auto serialized = serializeWorldGrid(globals);
+
+    Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
+  }
+
+  static void loadWorldData(Globals) {
+    // @todo
+  }
+#endif
+
 // @todo move to a separate file
 static void addOrientationTestLayout(Globals) {
   auto& grid = state.world.grid;
@@ -446,8 +458,9 @@ void initializeGame(Globals) {
     input.on<KeyboardEvent>("keydown", [context, &state, &input](const KeyboardEvent& event) {
       auto key = event.key;
 
-      if (input.isKeyHeld(Key::CONTROL) && key == Key::Z && state.editor.enabled) {
+      if (state.editor.enabled && input.isKeyHeld(Key::CONTROL) && key == Key::Z) {
         undoPreviousEditAction(globals);
+        saveWorldData(globals);
       }
     });
 
@@ -457,11 +470,13 @@ void initializeGame(Globals) {
         if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
             placeStaticEntitiesOverCurrentRange(globals);
+            saveWorldData(globals);
           } else {
             selectRangeFrom(globals);
           }
         } else {
           tryPlacingStaticEntity(globals);
+          saveWorldData(globals);
         }
       }
     });

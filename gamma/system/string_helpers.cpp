@@ -27,6 +27,26 @@ namespace Gamma {
   }
 
   /**
+   * Gm_JoinString
+   * -------------
+   *
+   * @todo description
+   */  
+  std::string Gm_JoinString(const std::vector<std::string>& segments, const std::string& delimiter) {
+    std::string joined;
+
+    for (u32 i = 0; i < segments.size(); i++) {
+      joined += segments[i];
+
+      if (i != segments.size() - 1) {
+        joined += delimiter;
+      }
+    }
+
+    return joined;
+  }
+
+  /**
    * Gm_TrimString
    * -------------
    *

@@ -8,6 +8,7 @@
 #include "system/console.h"
 #include "system/context.h"
 #include "system/entities.h"
+#include "system/file.h"
 #include "system/flags.h"
 #include "system/macros.h"
 #include "system/random.h"

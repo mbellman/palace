@@ -57,3 +57,23 @@ void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
       break;
   }
 }
+
+// @todo write a helper for serializing coordinate
+// @todo serialize staircase entities + orientations
+std::string serializeWorldGrid(Globals) {
+  std::string serialized;
+
+  serialized += "ground\n";
+
+  for (auto& [ coordinates, entity ] : state.world.grid) {
+    if (entity->type == GROUND) {
+      serialized += std::to_string(coordinates.x) + "," + std::to_string(coordinates.y) + "," + std::to_string(coordinates.z) + "\n";
+    }
+  }
+
+  return serialized;
+}
+
+void loadSerializedWorldGrid(Globals, const std::string& data) {
+  // @todo
+}

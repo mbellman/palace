@@ -102,8 +102,8 @@ struct World {
 
 Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
 void createObjectFromCoordinates(GmContext* context, GameState& state, const GridCoordinates& coordinates);
-// @todo std::string serializedWorldGrid();
-// @todo void loadSerializedWorldGrid(const std::string& data);
+std::string serializeWorldGrid(GmContext* context, GameState& state);
+void loadSerializedWorldGrid(GmContext* context, GameState& state, const std::string& data);
 
 // @todo we probably won't need this once level loading is in place
 template<typename E>
