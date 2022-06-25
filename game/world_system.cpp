@@ -6,7 +6,7 @@
 using namespace Gamma;
 
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
-  auto& ground = createObjectFrom("ground-tile");
+  auto& ground = createObjectFrom("ground");
 
   ground.position = gridCoordinatesToWorldPosition(coordinates);
   ground.scale = HALF_TILE_SIZE * 0.98f;

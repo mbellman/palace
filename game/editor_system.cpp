@@ -32,7 +32,7 @@ using namespace Gamma;
     switch (entity->type) {
       default:
       case GROUND:
-        mesh = mesh("ground-tile");
+        mesh = mesh("ground");
         break;
       case STAIRCASE:
         mesh = mesh("staircase");
@@ -122,20 +122,20 @@ using namespace Gamma;
   void setCurrentSelectedEntityType(Globals, StaticEntityType type) {
     state.editor.currentSelectedEntityType = type;
     
-    auto& existingPreviewPosition = object("tile-preview").position;
+    auto& existingPreviewPosition = object("placement-preview").position;
     std::string previewMeshName;
 
-    remove(object("tile-preview"));
+    remove(object("placement-preview"));
 
     // @todo define a map for this
-    if (type == GROUND) previewMeshName = "ground-tile";
+    if (type == GROUND) previewMeshName = "ground";
     if (type == STAIRCASE) previewMeshName = "staircase";
 
     auto& preview = createObjectFrom(previewMeshName);
 
     preview.position = existingPreviewPosition;
 
-    save("tile-preview", preview);
+    save("placement-preview", preview);
   }
 
   void selectRangeFrom(Globals) {
@@ -149,13 +149,13 @@ using namespace Gamma;
     // Hide the single tile placement preview
     // and ensure it isn't removed when placing
     // new entities over the range
-    object("tile-preview").scale = 0.f;
-    object("tile-preview").position += Vec3f(1.f);
-    commit(object("tile-preview"));
+    object("placement-preview").scale = 0.f;
+    object("placement-preview").position += Vec3f(1.f);
+    commit(object("placement-preview"));
   }
 
   void showStaticEntityPlacementPreview(Globals) {
-    auto& preview = object("tile-preview");
+    auto& preview = object("placement-preview");
     GridCoordinates previewCoordinates;
 
     if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
@@ -173,7 +173,7 @@ using namespace Gamma;
   }
 
   void showRangeFromSelectionPreview(GmContext* context, GameState& state) {
-    auto& preview = object("tile-preview");
+    auto& preview = object("placement-preview");
     GridCoordinates previewCoordinates;
 
     if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {

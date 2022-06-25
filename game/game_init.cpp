@@ -324,7 +324,7 @@ static void addParticles(Globals) {
 
 static void addMeshes(Globals) {
   // Static entity objects
-  addMesh("ground-tile", 0xffff, Mesh::Cube());
+  addMesh("ground", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
   #if DEVELOPMENT == 1
@@ -346,13 +346,12 @@ static void addEntityObjects(Globals) {
   }
 
   #if DEVELOPMENT == 1
-    // @todo move to editor_system; replace preview object
-    // whenever switching current selected entity type
-    auto& preview = createObjectFrom("ground-tile");
+    // @todo move to editor_system
+    auto& preview = createObjectFrom("ground");
     
     preview.scale = 0.f;
 
-    save("tile-preview", preview);
+    save("placement-preview", preview);
     commit(preview);
   #endif
 }
@@ -411,8 +410,8 @@ void initializeGame(Globals) {
         state.editor.enabled = !state.editor.enabled;
 
         if (!state.editor.enabled) {
-          object("tile-preview").scale = 0.f;
-          commit(object("tile-preview"));
+          object("placement-preview").scale = 0.f;
+          commit(object("placement-preview"));
         }
       }
 
