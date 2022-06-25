@@ -265,6 +265,8 @@ using namespace Gamma;
     createObjectFromCoordinates(globals, targetCoordinates);
 
     storeEditAction(globals, action);
+
+    context->renderer->resetShadowMaps();
   }
 
   void placeStaticEntitiesOverCurrentRange(Globals) {
@@ -298,10 +300,11 @@ using namespace Gamma;
     });
 
     storeEditAction(globals, action);
-
     objects("range-preview").reset();
 
     state.editor.rangeFromSelected = false;
+
+    context->renderer->resetShadowMaps();
   }
 
   void undoPreviousEditAction(Globals) {
@@ -346,5 +349,7 @@ using namespace Gamma;
     }
 
     editor.totalEditActions--;
+
+    context->renderer->resetShadowMaps();
   }
 #endif
