@@ -9,7 +9,7 @@ static void createGroundObject(Globals, const GridCoordinates& coordinates) {
   auto& ground = createObjectFrom("ground");
 
   ground.position = gridCoordinatesToWorldPosition(coordinates);
-  ground.scale = HALF_TILE_SIZE * 0.98f;
+  ground.scale = HALF_TILE_SIZE * 0.99f;
   ground.color = Vec3f(1.f, 0.7f, 0.3f);
 
   commit(ground);
