@@ -38,8 +38,28 @@ static void addKeyHandlers(Globals) {
 #if DEVELOPMENT == 1
   #include <fstream>
 
+  #define serializeCoordinates(coordinates) std::to_string(coordinates.x) + "," + std::to_string(coordinates.y) + "," + std::to_string(coordinates.z)
+
+  // @todo serialize staircase orientations
   static void saveEditorWorldData(Globals) {
-    auto serialized = serializeWorldGrid(globals);
+    std::string serialized;
+
+    serialized += "ground\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == GROUND) {
+        serialized += serializeCoordinates(coordinates) + "\n";
+      }
+    }
+
+    serialized += "staircase\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == STAIRCASE) {
+        serialized += serializeCoordinates(coordinates) + "\n";
+        // @todo serialize orientation
+      }
+    }
 
     Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
   }
@@ -59,6 +79,8 @@ static void addKeyHandlers(Globals) {
       // @todo handle other entity types
       if (line == "ground") {
         currentEntityType = GROUND;
+      } else if (line == "staircase") {
+        currentEntityType = STAIRCASE;
       } else {
         auto coords = Gm_SplitString(line, ",");
         auto x = (s16)stoi(coords[0]);
@@ -70,7 +92,8 @@ static void addKeyHandlers(Globals) {
             grid.set({ x, y, z }, new Ground);
             break;
           case STAIRCASE:
-            // @todo
+            grid.set({ x, y, z }, new Staircase);
+            // @todo load + set orientation
             break;
         }
       }
@@ -352,6 +375,13 @@ static void addOrientationTestLayout(Globals) {
 
   createWorldOrientationChange({ 3, 4, -2 }, NEGATIVE_X_UP);
   createWorldOrientationChange({ 2, 4, -3 }, POSITIVE_Z_UP);
+
+  auto& light = createLight(POINT_SHADOWCASTER);
+
+  light.color = Vec3f(1.f, 0.8f, 0.4f);
+  light.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
+  light.radius = 500.f;
+  light.isStatic = true;
 }
 
 static void addParticles(Globals) {
@@ -530,13 +560,6 @@ void initializeGame(Globals) {
   #if DEVELOPMENT == 1
     addTriggerEntityIndicators(globals);
   #endif
-
-  auto& light = createLight(POINT_SHADOWCASTER);
-
-  light.color = Vec3f(1.f, 0.8f, 0.4f);
-  light.position = gridCoordinatesToWorldPosition({ 0, 4, 0 });
-  light.radius = 500.f;
-  light.isStatic = true;
 
   auto& sunlight = createLight(DIRECTIONAL_SHADOWCASTER);
 
