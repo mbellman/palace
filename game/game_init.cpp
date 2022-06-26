@@ -38,7 +38,7 @@ static void addKeyHandlers(Globals) {
 #if DEVELOPMENT == 1
   #include <fstream>
 
-  #define serializeCoordinates(coordinates) std::to_string(coordinates.x) + "," + std::to_string(coordinates.y) + "," + std::to_string(coordinates.z)
+  #define serialize3Vector(value) std::to_string(value.x) + "," + std::to_string(value.y) + "," + std::to_string(value.z)
 
   static void saveEditorWorldData(Globals) {
     std::string serialized;
@@ -47,7 +47,7 @@ static void addKeyHandlers(Globals) {
 
     for (auto& [ coordinates, entity ] : state.world.grid) {
       if (entity->type == GROUND) {
-        serialized += serializeCoordinates(coordinates) + "\n";
+        serialized += serialize3Vector(coordinates) + "\n";
       }
     }
 
@@ -55,8 +55,10 @@ static void addKeyHandlers(Globals) {
 
     for (auto& [ coordinates, entity ] : state.world.grid) {
       if (entity->type == STAIRCASE) {
-        serialized += serializeCoordinates(coordinates) + "\n";
-        // @todo serialize orientation
+        auto orientationAsVec3f = ((Staircase*)entity)->orientation.toVec3f();
+
+        serialized += serialize3Vector(coordinates) + ",";
+        serialized += serialize3Vector(orientationAsVec3f) + "\n";
       }
     }
 
@@ -75,7 +77,6 @@ static void addKeyHandlers(Globals) {
     std::string line;
 
     while (std::getline(file, line)) {
-      // @todo handle other entity types
       if (line == "ground") {
         currentEntityType = GROUND;
       } else if (line == "staircase") {
@@ -90,10 +91,17 @@ static void addKeyHandlers(Globals) {
           case GROUND:
             grid.set({ x, y, z }, new Ground);
             break;
-          case STAIRCASE:
-            grid.set({ x, y, z }, new Staircase);
-            // @todo load + set orientation
+          case STAIRCASE: {
+            auto pitch = (float)stof(coords[3]);
+            auto yaw = (float)stof(coords[4]);
+            auto roll = (float)stof(coords[5]);
+            auto* staircase = new Staircase;
+
+            staircase->orientation = { roll, pitch, yaw };
+
+            grid.set({ x, y, z }, staircase);
             break;
+          }
         }
       }
     }

@@ -11,6 +11,7 @@ namespace Gamma {
     float yaw = 0.0f;
 
     Orientation() {};
+    // @todo pitch, yaw, roll
     Orientation(float roll, float pitch, float yaw): roll(roll), pitch(pitch), yaw(yaw) {};
 
     void operator+=(const Orientation& orientation);
