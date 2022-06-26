@@ -7,6 +7,12 @@
 #include "math/vector.h"
 
 namespace Gamma {
+  void Orientation::operator+=(const Orientation& orientation) {
+    roll += orientation.roll;
+    pitch += orientation.pitch;
+    yaw += orientation.yaw;
+  }
+
   Vec3f Orientation::getDirection() const {
     const static Vec3f forward = Vec3f(0, 0, 1.f);
 

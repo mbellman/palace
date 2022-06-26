@@ -13,6 +13,8 @@ namespace Gamma {
     Orientation() {};
     Orientation(float roll, float pitch, float yaw): roll(roll), pitch(pitch), yaw(yaw) {};
 
+    void operator+=(const Orientation& orientation);
+
     Vec3f getDirection() const;
     Vec3f getLeftDirection() const;
     Vec3f getRightDirection() const;

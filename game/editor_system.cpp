@@ -143,6 +143,7 @@ using namespace Gamma;
     state.editor.deleting = false;
     
     auto existingPreviewPosition = object("placement-preview").position;
+    auto existingPreviewRotation = object("placement-preview").rotation;
     std::string previewMeshName;
 
     remove(object("placement-preview"));
@@ -158,8 +159,14 @@ using namespace Gamma;
     auto& preview = createObjectFrom(previewMeshName);
 
     preview.position = existingPreviewPosition;
+    preview.rotation = existingPreviewRotation;
 
     save("placement-preview", preview);
+  }
+
+  // @todo switch roll/pitch depending on camera facing direction
+  void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Orientation& adjustment) {
+    state.editor.entityOrientation += adjustment;
   }
 
   void selectRangeFrom(Globals) {
@@ -197,8 +204,9 @@ using namespace Gamma;
       if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
 
-        // @todo use proper scale/color based on entity type
         preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
+        preview.rotation = Vec3f::lerp(preview.rotation, state.editor.entityOrientation.toVec3f(), 0.5f);
+        // @todo use proper scale/color based on entity type
         preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
         preview.color = Vec3f(1.f, 0.7f, 0.3f);
       }

@@ -33,7 +33,8 @@ struct WorldEditor {
   bool useRange = false;
   bool rangeFromSelected = false;
   bool deleting = false;
-  StaticEntityType currentSelectedEntityType = GROUND;  // @todo make adjustable
+  StaticEntityType currentSelectedEntityType = GROUND;
+  Gamma::Orientation entityOrientation;
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
   EditAction editActions[MAX_EDIT_ACTIONS];
@@ -42,6 +43,7 @@ struct WorldEditor {
 
 #if DEVELOPMENT == 1
   void setCurrentSelectedEntityType(GmContext* context, GameState& state, StaticEntityType type);
+  void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);

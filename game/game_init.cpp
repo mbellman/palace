@@ -534,6 +534,11 @@ void initializeGame(Globals) {
         if (key == Key::NUM_0) state.editor.deleting = true;
         if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
         if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
+
+        if (key == Key::ARROW_UP) adjustCurrentEntityOrientation(globals, { 0, -Gm_HALF_PI, 0 });
+        if (key == Key::ARROW_DOWN) adjustCurrentEntityOrientation(globals, { 0, Gm_HALF_PI, 0 });
+        if (key == Key::ARROW_LEFT) adjustCurrentEntityOrientation(globals, { 0, 0, -Gm_HALF_PI });
+        if (key == Key::ARROW_RIGHT) adjustCurrentEntityOrientation(globals, { 0, 0, Gm_HALF_PI });
       }
     });
 

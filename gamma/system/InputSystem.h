@@ -45,13 +45,17 @@ namespace Gamma {
     NUM_7 = 1ULL << 33,
     NUM_8 = 1ULL << 34,
     NUM_9 = 1ULL << 35,
-    SPACE = 1ULL << 36,
-    SHIFT = 1ULL << 37,
-    ESCAPE = 1ULL << 38,
-    ENTER = 1ULL << 39,
-    CONTROL = 1ULL << 40,
-    BACKSPACE = 1ULL << 41,
-    TAB = 1ULL << 42
+    ARROW_LEFT = 1ULL << 36,
+    ARROW_RIGHT = 1ULL << 37,
+    ARROW_UP = 1ULL << 38,
+    ARROW_DOWN = 1ULL << 39,
+    SPACE = 1ULL << 40,
+    SHIFT = 1ULL << 41,
+    ESCAPE = 1ULL << 42,
+    ENTER = 1ULL << 43,
+    CONTROL = 1ULL << 44,
+    BACKSPACE = 1ULL << 45,
+    TAB = 1ULL << 46
   };
 
   struct MouseMoveEvent {
