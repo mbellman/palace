@@ -34,7 +34,7 @@ struct WorldEditor {
   bool rangeFromSelected = false;
   bool deleting = false;
   StaticEntityType currentSelectedEntityType = GROUND;
-  Gamma::Orientation entityOrientation;
+  Gamma::Orientation currentEntityOrientation;
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
   EditAction editActions[MAX_EDIT_ACTIONS];

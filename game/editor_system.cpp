@@ -142,11 +142,12 @@ using namespace Gamma;
     state.editor.currentSelectedEntityType = type;
     state.editor.deleting = false;
     
-    auto existingPreviewPosition = object("placement-preview").position;
-    auto existingPreviewRotation = object("placement-preview").rotation;
+    auto& existingPreview = object("placement-preview");
+    auto existingPreviewPosition = existingPreview.position;
+    auto existingPreviewRotation = existingPreview.rotation;
     std::string previewMeshName;
 
-    remove(object("placement-preview"));
+    remove(existingPreview);
 
     if (state.editor.deleting) {
       previewMeshName = "ground";
@@ -166,7 +167,7 @@ using namespace Gamma;
 
   // @todo switch roll/pitch depending on camera facing direction
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Orientation& adjustment) {
-    state.editor.entityOrientation += adjustment;
+    state.editor.currentEntityOrientation += adjustment;
   }
 
   void selectRangeFrom(Globals) {
@@ -205,7 +206,7 @@ using namespace Gamma;
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
 
         preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
-        preview.rotation = Vec3f::lerp(preview.rotation, state.editor.entityOrientation.toVec3f(), 0.5f);
+        preview.rotation = Vec3f::lerp(preview.rotation, state.editor.currentEntityOrientation.toVec3f(), 0.5f);
         // @todo use proper scale/color based on entity type
         preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
         preview.color = Vec3f(1.f, 0.7f, 0.3f);
@@ -300,7 +301,7 @@ using namespace Gamma;
           break;
         case STAIRCASE:
           newEntity = new Staircase;
-          // @todo set staircase orientation
+          ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
           break;
       }
     }
