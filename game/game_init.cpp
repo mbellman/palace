@@ -40,7 +40,6 @@ static void addKeyHandlers(Globals) {
 
   #define serializeCoordinates(coordinates) std::to_string(coordinates.x) + "," + std::to_string(coordinates.y) + "," + std::to_string(coordinates.z)
 
-  // @todo serialize staircase orientations
   static void saveEditorWorldData(Globals) {
     std::string serialized;
 
@@ -535,8 +534,8 @@ void initializeGame(Globals) {
         if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
         if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
 
-        if (key == Key::ARROW_UP) adjustCurrentEntityOrientation(globals, { 0, -Gm_HALF_PI, 0 });
-        if (key == Key::ARROW_DOWN) adjustCurrentEntityOrientation(globals, { 0, Gm_HALF_PI, 0 });
+        if (key == Key::ARROW_UP) adjustCurrentEntityOrientation(globals, { 0, Gm_HALF_PI, 0 });
+        if (key == Key::ARROW_DOWN) adjustCurrentEntityOrientation(globals, { 0, -Gm_HALF_PI, 0 });
         if (key == Key::ARROW_LEFT) adjustCurrentEntityOrientation(globals, { 0, 0, -Gm_HALF_PI });
         if (key == Key::ARROW_RIGHT) adjustCurrentEntityOrientation(globals, { 0, 0, Gm_HALF_PI });
       }

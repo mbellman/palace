@@ -22,8 +22,7 @@ static void createStaircaseObject(Globals, const GridCoordinates& coordinates, c
   staircase.color = Vec3f(0.5f);
   staircase.scale = HALF_TILE_SIZE;
   staircase.rotation.x = orientation.pitch;
-  // @todo use proper model orientation to avoid the -PI/2 offset here
-  staircase.rotation.y = -Gm_PI / 2.f + orientation.yaw;
+  staircase.rotation.y = orientation.yaw;
   staircase.rotation.z = -orientation.roll;
 
   commit(staircase);
