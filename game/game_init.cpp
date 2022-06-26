@@ -462,8 +462,18 @@ void initializeGame(Globals) {
   });
 
   #if DEVELOPMENT == 1
-    input.on<KeyboardEvent>("keyup", [context, &state](const KeyboardEvent& event) {
+    input.on<KeyboardEvent>("keydown", [context, &state, &input](const KeyboardEvent& event) {
+      if (context->commander.isOpen()) {
+        return;
+      }
+
       auto key = event.key;
+
+      // Undo editor actions
+      if (state.editor.enabled && input.isKeyHeld(Key::CONTROL) && key == Key::Z) {
+        undoPreviousEditAction(globals);
+        saveEditorWorldData(globals);
+      }
 
       // Toggle free camera mode
       if (key == Key::C) {
@@ -479,6 +489,14 @@ void initializeGame(Globals) {
           getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
         }
       }
+    });
+
+    input.on<KeyboardEvent>("keyup", [context, &state](const KeyboardEvent& event) {
+      if (context->commander.isOpen()) {
+        return;
+      }
+
+      auto key = event.key;
 
       // Toggle world editor
       if (key == Key::E) {
@@ -513,32 +531,24 @@ void initializeGame(Globals) {
           }
         }
 
+        if (key == Key::NUM_0) state.editor.deleting = true;
         if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
         if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
       }
     });
 
-    input.on<KeyboardEvent>("keydown", [context, &state, &input](const KeyboardEvent& event) {
-      auto key = event.key;
-
-      if (state.editor.enabled && input.isKeyHeld(Key::CONTROL) && key == Key::Z) {
-        undoPreviousEditAction(globals);
-        saveEditorWorldData(globals);
-      }
-    });
-
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
-      if (SDL_GetRelativeMouseMode() && state.editor.enabled) {
+      if (state.editor.enabled && SDL_GetRelativeMouseMode()) {
         // @todo create a mousedown handler in editor_system
         if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
-            placeStaticEntitiesOverCurrentRange(globals);
+            handleEditorRangedClickAction(globals);
             saveEditorWorldData(globals);
           } else {
             selectRangeFrom(globals);
           }
         } else {
-          tryPlacingStaticEntity(globals);
+          handleEditorSingleTileClickAction(globals);
           saveEditorWorldData(globals);
         }
       }

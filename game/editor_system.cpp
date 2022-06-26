@@ -44,6 +44,7 @@ using namespace Gamma;
 
   static bool findStaticEntityPlacementCoordinates(Globals, GridCoordinates& coordinates) {
     auto& camera = getCamera();
+    auto& editor = state.editor;
     auto& grid = state.world.grid;
     float offset = TILE_SIZE * 2.f;
     bool canPlaceEntity = false;
@@ -52,10 +53,7 @@ using namespace Gamma;
       auto ray = camera.position + camera.orientation.getDirection() * offset;
       auto testCoordinates = worldPositionToGridCoordinates(ray);
 
-      if (
-        grid.has(testCoordinates) &&
-        grid.get(testCoordinates)->type == state.editor.currentSelectedEntityType
-      ) {
+      if (grid.has(testCoordinates)) {
         break;
       }
 
@@ -65,6 +63,27 @@ using namespace Gamma;
     }
 
     return canPlaceEntity;
+  }
+
+  static bool findStaticEntityDeletionCoordinates(Globals, GridCoordinates& coordinates) {
+    auto& camera = getCamera();
+    auto& editor = state.editor;
+    auto& grid = state.world.grid;
+    float offset = TILE_SIZE * 2.f;
+
+    while (offset < 150.f) {
+      auto ray = camera.position + camera.orientation.getDirection() * offset;
+      auto testCoordinates = worldPositionToGridCoordinates(ray);
+
+      if (grid.has(testCoordinates)) {
+        coordinates = testCoordinates;
+        return true;
+      }
+
+      offset += HALF_TILE_SIZE / 4.f;
+    }
+
+    return false;
   }
 
   static void storeEditAction(Globals, EditAction& action) {
@@ -121,15 +140,20 @@ using namespace Gamma;
 
   void setCurrentSelectedEntityType(Globals, StaticEntityType type) {
     state.editor.currentSelectedEntityType = type;
+    state.editor.deleting = false;
     
-    auto& existingPreviewPosition = object("placement-preview").position;
+    auto existingPreviewPosition = object("placement-preview").position;
     std::string previewMeshName;
 
     remove(object("placement-preview"));
 
-    // @todo define a map for this
-    if (type == GROUND) previewMeshName = "ground";
-    if (type == STAIRCASE) previewMeshName = "staircase";
+    if (state.editor.deleting) {
+      previewMeshName = "ground";
+    } else {
+      // @todo define a map for this
+      if (type == GROUND) previewMeshName = "ground";
+      if (type == STAIRCASE) previewMeshName = "staircase";
+    }
 
     auto& preview = createObjectFrom(previewMeshName);
 
@@ -147,9 +171,9 @@ using namespace Gamma;
     state.editor.rangeFromSelected = true;
 
     // Hide the single tile placement preview
-    // and ensure it isn't removed when placing
-    // new entities over the range
     object("placement-preview").scale = 0.f;
+    // Offset the placement preview object so it isn't
+    // caught in ranged object replacement actions
     object("placement-preview").position += Vec3f(1.f);
     commit(object("placement-preview"));
   }
@@ -158,15 +182,26 @@ using namespace Gamma;
     auto& preview = object("placement-preview");
     GridCoordinates previewCoordinates;
 
-    if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
-      auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+    preview.scale = 0.f;
 
-      // @todo use proper scale/color based on entity type
-      preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
-      preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
-      preview.color = Vec3f(1.f, 0.7f, 0.3f);
+    if (state.editor.deleting) {
+      if (findStaticEntityDeletionCoordinates(globals, previewCoordinates)) {
+        auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+        auto alpha = sinf(getRunningTime() * 3.f) * 0.5f + 0.5f;
+
+        preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
+        preview.scale = HALF_TILE_SIZE * 1.1f + alpha * 0.2f;
+        preview.color = Vec3f::lerp(Vec3f(1.f, 0, 0), Vec3f(0.7f, 0, 0), alpha);
+      }
     } else {
-      preview.scale = 0.f;
+      if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
+        auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+
+        // @todo use proper scale/color based on entity type
+        preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
+        preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
+        preview.color = Vec3f(1.f, 0.7f, 0.3f);
+      }
     }
 
     commit(preview);
@@ -179,14 +214,14 @@ using namespace Gamma;
     if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
       // @todo use proper color based on entity type
       const static auto defaultColor = Vec3f(1.f, 0.7f, 0.3f);
-      const static auto fadeColor = Vec3f(0, 1.f, 0);
+      auto fadeColor = state.editor.deleting ? Vec3f(1.f, 0, 0) : Vec3f(0, 1.f, 0);
       auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
 
       #define sinewave(speed) sinf(getRunningTime() * speed)
 
       // @todo use proper scale based on entity type
-      preview.scale = HALF_TILE_SIZE * (0.9f + sinewave(3.f) * 0.1f);
       preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
+      preview.scale = HALF_TILE_SIZE * (0.9f + sinewave(3.f) * 0.1f);
       preview.color = Vec3f::lerp(defaultColor, fadeColor, sinewave(5.f) * 0.5f + 0.5f);
     } else {
       preview.scale = 0.f;
@@ -215,8 +250,6 @@ using namespace Gamma;
       overRange(start, end, {
         auto& preview = createObjectFrom("range-preview");
 
-        preview.scale = HALF_TILE_SIZE / 4.f;
-        preview.color = Vec3f(0, 1.f, 0);
         preview.position = gridCoordinatesToWorldPosition({ x, y, z });
 
         commit(preview);
@@ -228,48 +261,59 @@ using namespace Gamma;
       auto sizeRange = baseSize * 0.1f;
 
       preview.scale = baseSize + sinf(getRunningTime() * 3.f) * sizeRange;
+      preview.color = state.editor.deleting ? Vec3f(1.f, 0, 0) : Vec3f(0, 1.f, 0);
 
       commit(preview);
     }
   }
 
-  void tryPlacingStaticEntity(Globals) {
-    GridCoordinates targetCoordinates;
-
-    if (!findStaticEntityPlacementCoordinates(globals, targetCoordinates)) {
-      return;
-    }
-
-    StaticEntity* entity;
-
-    switch (state.editor.currentSelectedEntityType) {
-      default:
-      case GROUND:
-        entity = new Ground;
-        break;
-      case STAIRCASE:
-        entity = new Staircase;
-        // @todo set staircase orientation
-        break;
-    }
-
+  void handleEditorSingleTileClickAction(Globals) {
     auto& grid = state.world.grid;
-    EditAction action;
+    GridCoordinates targetCoordinates;
+    EditAction editAction;
+    StaticEntity* newEntity = nullptr;
 
-    action.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
-    action.newEntity = entity;
-    action.coordinates = targetCoordinates;
+    if (state.editor.deleting) {
+      if (!findStaticEntityDeletionCoordinates(globals, targetCoordinates)) {
+        return;
+      }
+
+      // Offset the placement preview object so it isn't deleted
+      object("placement-preview").position += Vec3f(1.f);
+    } else {
+      if (!findStaticEntityPlacementCoordinates(globals, targetCoordinates)) {
+        return;
+      }
+
+      switch (state.editor.currentSelectedEntityType) {
+        default:
+        case GROUND:
+          newEntity = new Ground;
+          break;
+        case STAIRCASE:
+          newEntity = new Staircase;
+          // @todo set staircase orientation
+          break;
+      }
+    }
+
+    editAction.oldEntity = copyStaticEntity(grid.get(targetCoordinates));
+    editAction.coordinates = targetCoordinates;
 
     removeStaticEntityObjectAtGridCoordinates(globals, targetCoordinates);
-    grid.set(targetCoordinates, entity);
-    createObjectFromCoordinates(globals, targetCoordinates);
+    grid.clear(targetCoordinates);
 
-    storeEditAction(globals, action);
+    if (newEntity != nullptr) {
+      grid.set(targetCoordinates, newEntity);
+      createObjectFromCoordinates(globals, targetCoordinates);
+    }
+
+    storeEditAction(globals, editAction);
 
     context->renderer->resetShadowMaps();
   }
 
-  void placeStaticEntitiesOverCurrentRange(Globals) {
+  void handleEditorRangedClickAction(Globals) {
     auto& grid = state.world.grid;
     auto start = state.editor.rangeFrom;
     auto end = state.editor.rangeTo;
@@ -294,9 +338,14 @@ using namespace Gamma;
       }
 
       removeStaticEntityObjectAtGridCoordinates(globals, coordinates);
-      // @todo use entity corresponding to the current selected entity type
-      grid.set(coordinates, new Ground);
-      createObjectFromCoordinates(globals, coordinates);
+
+      if (state.editor.deleting) {
+        grid.clear(coordinates);
+      } else {
+        // @todo use entity corresponding to the current selected entity type
+        grid.set(coordinates, new Ground);
+        createObjectFromCoordinates(globals, coordinates);
+      }
     });
 
     storeEditAction(globals, action);

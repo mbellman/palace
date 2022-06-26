@@ -20,7 +20,6 @@ struct ReplacedEntityRecord {
 
 struct EditAction {
   StaticEntity* oldEntity = nullptr;
-  StaticEntity* newEntity = nullptr;
   GridCoordinates coordinates;
 
   bool isRangedPlacementAction = false;
@@ -33,6 +32,7 @@ struct WorldEditor {
   bool enabled = false;
   bool useRange = false;
   bool rangeFromSelected = false;
+  bool deleting = false;
   StaticEntityType currentSelectedEntityType = GROUND;  // @todo make adjustable
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
@@ -46,7 +46,7 @@ struct WorldEditor {
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
-  void tryPlacingStaticEntity(GmContext* context, GameState& state);
-  void placeStaticEntitiesOverCurrentRange(GmContext* context, GameState& state);
+  void handleEditorSingleTileClickAction(GmContext* context, GameState& state);
+  void handleEditorRangedClickAction(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
 #endif
