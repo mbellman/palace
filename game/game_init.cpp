@@ -2,9 +2,10 @@
 
 #include "game_init.h"
 #include "orientation_system.h"
-#include "grid_utilities.h"
 #include "world_system.h"
+#include "object_system.h"
 #include "editor_system.h"
+#include "grid_utilities.h"
 #include "game_macros.h"
 #include "game_state.h"
 #include "build_flags.h"
@@ -451,11 +452,12 @@ static void addTriggerEntityIndicators(Globals) {
     switch (trigger->type) {
       case WORLD_ORIENTATION_CHANGE: {
         auto& indicator = createObjectFrom("trigger-indicator");
+        auto& params = getObjectParameters(WORLD_ORIENTATION_CHANGE);
 
         indicator.position = gridCoordinatesToWorldPosition(coordinates);
         indicator.rotation = Vec3f(Gm_PI / 4.f, Gm_PI / 4.f, 0);
-        indicator.scale = 0.5f;
-        indicator.color = pVec4(255,0,0);
+        indicator.scale = params.scale;
+        indicator.color = params.color;
 
         commit(indicator);
         break;
@@ -544,7 +546,13 @@ void initializeGame(Globals) {
           }
         }
 
-        if (key == Key::NUM_0) state.editor.deleting = true;
+        if (key == Key::NUM_0) {
+          // Use the ground tile object for the deletion preview
+          setCurrentSelectedEntityType(globals, GROUND);
+
+          state.editor.deleting = true;
+        }
+
         if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
         if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
 

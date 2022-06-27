@@ -5,6 +5,7 @@
 #include "grid_utilities.h"
 #include "editor_system.h"
 #include "world_system.h"
+#include "object_system.h"
 #include "game_state.h"
 #include "game_macros.h"
 #include "build_flags.h"
@@ -159,13 +160,9 @@ using namespace Gamma;
 
     remove(existingPreview);
 
-    if (state.editor.deleting) {
-      previewMeshName = "ground";
-    } else {
-      // @todo define a map for this
-      if (type == GROUND) previewMeshName = "ground";
-      if (type == STAIRCASE) previewMeshName = "staircase";
-    }
+    // @todo define a map for this
+    if (type == GROUND) previewMeshName = "ground";
+    if (type == STAIRCASE) previewMeshName = "staircase";
 
     auto& preview = createObjectFrom(previewMeshName);
 
@@ -214,12 +211,12 @@ using namespace Gamma;
     } else {
       if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+        auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
 
         preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
         preview.rotation = Vec3f::lerp(preview.rotation, state.editor.currentEntityOrientation.toVec3f(), 0.5f);
-        // @todo use proper scale/color based on entity type
-        preview.scale = HALF_TILE_SIZE * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
-        preview.color = Vec3f(1.f, 0.7f, 0.3f);
+        preview.scale = params.scale * (0.9f + sinf(getRunningTime() * 3.f) * 0.1f);
+        preview.color = params.color;
       }
     }
 
@@ -231,17 +228,15 @@ using namespace Gamma;
     GridCoordinates previewCoordinates;
 
     if (findStaticEntityPlacementCoordinates(globals, previewCoordinates)) {
-      // @todo use proper color based on entity type
-      const static auto defaultColor = Vec3f(1.f, 0.7f, 0.3f);
       auto fadeColor = state.editor.deleting ? Vec3f(1.f, 0, 0) : Vec3f(0, 1.f, 0);
       auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
+      auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
 
       #define sinewave(speed) sinf(getRunningTime() * speed)
 
-      // @todo use proper scale based on entity type
       preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
-      preview.scale = HALF_TILE_SIZE * (0.9f + sinewave(3.f) * 0.1f);
-      preview.color = Vec3f::lerp(defaultColor, fadeColor, sinewave(5.f) * 0.5f + 0.5f);
+      preview.scale = params.scale * (0.9f + sinewave(3.f) * 0.1f);
+      preview.color = Vec3f::lerp(params.color, fadeColor, sinewave(5.f) * 0.5f + 0.5f);
     } else {
       preview.scale = 0.f;
     }

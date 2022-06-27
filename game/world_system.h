@@ -5,11 +5,13 @@
 #include "grid_utilities.h"
 #include "game_entities.h"
 
+// @todo move to editor_system
 #define checkRange(start, end) \
   if (start.x > end.x) std::swap(start.x, end.x);\
   if (start.y > end.y) std::swap(start.y, end.y);\
   if (start.z > end.z) std::swap(start.z, end.z);\
 
+// @todo move to editor_system
 #define overRange(start, end, ...) \
   for (s16 x = start.x; x <= end.x; x++) {\
     for (s16 y = start.y; y <= end.y; y++) {\
