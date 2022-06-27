@@ -111,7 +111,9 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     typeOfEntity(targetTile) == STAIRCASE) ||
     // Exiting off of an upward staircase
     (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTileBelow) == GROUND)
+    typeOfEntity(targetTileBelow) == GROUND &&
+    targetTile == nullptr
+    )
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
@@ -296,8 +298,4 @@ void handlePlayerMovement(Globals, float dt) {
   if (isMoving(globals)) {
     movePlayer(globals, dt);
   }
-
-  #if DEVELOPMENT == 1
-    state.lastGridCoordinates = worldPositionToGridCoordinates(camera.position);
-  #endif
 }

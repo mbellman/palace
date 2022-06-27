@@ -410,4 +410,25 @@ using namespace Gamma;
 
     context->renderer->resetShadowMaps();
   }
+
+  void placeCameraAtClosestWalkableTile(Globals) {
+    auto& camera = getCamera();
+    auto& editor = state.editor;
+    auto& grid = state.world.grid;
+    float offset = 0.f;
+
+    while (offset < 500.f) {
+      auto ray = camera.position + camera.orientation.getDirection() * offset;
+      auto testCoordinates = worldPositionToGridCoordinates(ray);
+
+      if (grid.has(testCoordinates)) {
+        // @todo smoothly interpolate to new camera position
+        camera.position = gridCoordinatesToWorldPosition(testCoordinates + GridCoordinates(0, 2, 0));
+
+        break;
+      }
+
+      offset += HALF_TILE_SIZE;
+    }
+  }
 #endif

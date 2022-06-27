@@ -51,4 +51,5 @@ struct WorldEditor {
   void handleEditorSingleTileClickAction(GmContext* context, GameState& state);
   void handleEditorRangedClickAction(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
+  void placeCameraAtClosestWalkableTile(GmContext* context, GameState& state);
 #endif

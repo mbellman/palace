@@ -498,9 +498,7 @@ void initializeGame(Globals) {
         }
 
         if (!Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
-          // @todo do a sweep of neighboring coordinates and
-          // place the camera at the closest walkable tile
-          getCamera().position = gridCoordinatesToWorldPosition(state.lastGridCoordinates);
+          placeCameraAtClosestWalkableTile(globals);
         }
       }
     });

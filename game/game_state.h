@@ -17,6 +17,5 @@ struct GameState {
 
   #if DEVELOPMENT == 1
     WorldEditor editor;
-    GridCoordinates lastGridCoordinates;
   #endif
 };
