@@ -10,7 +10,7 @@
 
 using namespace Gamma;
 
-const static std::map<u8, ObjectParameters> entityToObjectParametersMap = {
+const static std::map<EntityType, ObjectParameters> entityToObjectParametersMap = {
   {GROUND, {
     scale(HALF_TILE_SIZE * 0.99f),
     color(1.f, 0.7f, 0.3f)
@@ -25,6 +25,6 @@ const static std::map<u8, ObjectParameters> entityToObjectParametersMap = {
   }}
 };
 
-const ObjectParameters& getObjectParameters(u8 entityTypeKey) {
-  return entityToObjectParametersMap.at(entityTypeKey);
+const ObjectParameters& getObjectParameters(EntityType entityType) {
+  return entityToObjectParametersMap.at(entityType);
 }
