@@ -40,6 +40,9 @@ static void addKeyHandlers(Globals) {
 
   #define serialize3Vector(value) std::to_string(value.x) + "," + std::to_string(value.y) + "," + std::to_string(value.z)
 
+  // Wrap a value to within the [0, TAU] range
+  #define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
+
   static void saveEditorWorldData(Globals) {
     std::string serialized;
 
@@ -56,6 +59,10 @@ static void addKeyHandlers(Globals) {
     for (auto& [ coordinates, entity ] : state.world.grid) {
       if (entity->type == STAIRCASE) {
         auto orientationAsVec3f = ((Staircase*)entity)->orientation.toVec3f();
+
+        wrap(orientationAsVec3f.x);
+        wrap(orientationAsVec3f.y);
+        wrap(orientationAsVec3f.z);
 
         serialized += serialize3Vector(coordinates) + ",";
         serialized += serialize3Vector(orientationAsVec3f) + "\n";
