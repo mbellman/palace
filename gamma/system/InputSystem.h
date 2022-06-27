@@ -67,6 +67,15 @@ namespace Gamma {
     Point<int> position;
   };
 
+  struct MouseWheelEvent {
+    enum Direction {
+      UP,
+      DOWN
+    };
+
+    Direction direction = UP;
+  };
+
   struct KeyboardEvent {
     Key key;
   };
@@ -85,6 +94,7 @@ namespace Gamma {
     void handleKeyUp(const SDL_Keycode& code);
     void handleMouseDown(const SDL_MouseButtonEvent& event);
     void handleMouseMotion(const SDL_MouseMotionEvent& event);
+    void handleMouseWheel(const SDL_MouseWheelEvent& event);
     void handleTextInput(char character);
   };
 }

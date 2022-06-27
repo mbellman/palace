@@ -76,7 +76,7 @@ static void addKeyHandlers(Globals) {
 
   static void loadEditorWorldData(Globals) {
     auto& grid = state.world.grid;
-    StaticEntityType currentEntityType;
+    EntityType currentEntityType;
     std::ifstream file("./game/world/raw_data.txt");
 
     if (file.fail()) {
@@ -419,10 +419,8 @@ static void addMeshes(Globals) {
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
   #if DEVELOPMENT == 1
-    // Entity/trigger indicators
-    auto totalTriggers = (s16)state.world.triggers.size();
-
-    addMesh("trigger-indicator", totalTriggers, Mesh::Cube());
+    // Trigger entity indicators
+    addMesh("trigger-indicator", 0xffff, Mesh::Cube());
 
     // Ranged placement preview
     addMesh("range-preview", 0xffff, Mesh::Cube());
@@ -504,6 +502,41 @@ void initializeGame(Globals) {
           placeCameraAtClosestWalkableTile(globals);
         }
       }
+    });
+
+    input.on<MouseWheelEvent>("mousewheel", [context, &state](const MouseWheelEvent& event) {
+      if (
+        !state.editor.enabled ||
+        // Debounce wheel events since multiple sometimes fire in rapid succession
+        getRunningTime() - state.editor.lastEntityChangeTime < 0.1f
+      ) {
+        return;
+      }
+
+      auto& editor = state.editor;
+      auto maxEntityIndex = u8(editorEntityCycle.size() - 1);
+
+      if (event.direction == MouseWheelEvent::UP) {
+        if (editor.currentSelectedEntityIndex == 0) {
+          editor.currentSelectedEntityIndex = maxEntityIndex;
+        } else {
+          editor.currentSelectedEntityIndex--;
+        }
+      }
+
+      if (event.direction == MouseWheelEvent::DOWN) {
+        if (editor.currentSelectedEntityIndex >= maxEntityIndex) {
+          editor.currentSelectedEntityIndex = 0;
+        } else {
+          editor.currentSelectedEntityIndex++;
+        }
+      }
+
+      auto currentSelectedEntityType = (EntityType)editorEntityCycle[editor.currentSelectedEntityIndex];
+
+      setCurrentSelectedEntityType(globals, currentSelectedEntityType);
+
+      editor.lastEntityChangeTime = getRunningTime();
     });
 
     input.on<KeyboardEvent>("keyup", [context, &state](const KeyboardEvent& event) {

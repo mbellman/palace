@@ -73,6 +73,9 @@ namespace Gamma {
       case SDL_MOUSEBUTTONDOWN:
         handleMouseDown(event.button);
         break;
+      case SDL_MOUSEWHEEL:
+        handleMouseWheel(event.wheel);
+        break;
       case SDL_TEXTINPUT:
         handleTextInput(event.text.text[0]);
         break;
@@ -114,6 +117,16 @@ namespace Gamma {
     moveEvent.deltaY = event.yrel;
 
     signal("mousemove", moveEvent);
+  }
+
+  void InputSystem::handleMouseWheel(const SDL_MouseWheelEvent& event) {
+    MouseWheelEvent wheelEvent;
+
+    wheelEvent.direction = event.y < 0
+      ? MouseWheelEvent::DOWN
+      : MouseWheelEvent::UP;
+
+    signal("mousewheel", wheelEvent);
   }
 
   void InputSystem::handleTextInput(char character) {

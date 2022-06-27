@@ -13,6 +13,14 @@
 struct GmContext;
 struct GameState;
 
+const static std::vector<u8> editorEntityCycle = {
+  // Static Entities
+  GROUND,
+  STAIRCASE,
+  // Trigger Entities
+  WORLD_ORIENTATION_CHANGE
+};
+
 struct ReplacedEntityRecord {
   GridCoordinates coordinates;
   StaticEntity* entity = nullptr;
@@ -39,8 +47,9 @@ struct WorldEditor {
   bool deleting = false;
 
   // Placeable entity selection
-  StaticEntityType currentSelectedEntityType = GROUND;  // @todo deprecate
-  u8 currentSelectedEntityIndex = 0;                    // @todo use as new value
+  EntityType currentSelectedEntityType = GROUND;  // @todo deprecate
+  u8 currentSelectedEntityIndex = 0;              // @todo use as new value
+  float lastEntityChangeTime = 0;
 
   // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
@@ -58,7 +67,7 @@ struct WorldEditor {
 };
 
 #if DEVELOPMENT == 1
-  void setCurrentSelectedEntityType(GmContext* context, GameState& state, StaticEntityType type);
+  void setCurrentSelectedEntityType(GmContext* context, GameState& state, EntityType type);
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
   void showStaticEntityPlacementPreview(GmContext* context, GameState& state);

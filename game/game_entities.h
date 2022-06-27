@@ -3,19 +3,20 @@
 #include "grid_utilities.h"
 #include "orientation_system.h"
 
+enum EntityType {
+  GROUND,
+  STAIRCASE,
+  WORLD_ORIENTATION_CHANGE
+};
+
 /**
  * Static entities
  * ---------------
  */
-enum StaticEntityType {
-  GROUND,
-  STAIRCASE
-};
-
 struct StaticEntity {
-  StaticEntityType type;
+  EntityType type;
 
-  StaticEntity(StaticEntityType type): type(type) {};
+  StaticEntity(EntityType type): type(type) {};
   virtual ~StaticEntity() = default;
 };
 
@@ -37,14 +38,10 @@ struct Staircase : StaticEntity {
  * Trigger Entities
  * ----------------
  */
-enum TriggerEntityType {
-  WORLD_ORIENTATION_CHANGE
-};
-
 struct TriggerEntity {
-  TriggerEntityType type;
+  EntityType type;
 
-  TriggerEntity(TriggerEntityType type): type(type) {};
+  TriggerEntity(EntityType type): type(type) {};
 };
 
 struct WorldOrientationChange : TriggerEntity {

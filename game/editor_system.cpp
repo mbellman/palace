@@ -1,5 +1,3 @@
-#include <vector>
-
 #include "Gamma.h"
 
 #include "grid_utilities.h"
@@ -13,14 +11,6 @@
 using namespace Gamma;
 
 #if DEVELOPMENT == 1
-  const static std::vector<u32> selectedEntityCycle = {
-    // 0 - 1: Static Entities
-    GROUND,
-    STAIRCASE,
-    // 2: Trigger Entities
-    WORLD_ORIENTATION_CHANGE
-  };
-
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
     auto* object = queryObjectByPosition(globals, objects, position);
 
@@ -149,7 +139,7 @@ using namespace Gamma;
     return copy;
   }
 
-  void setCurrentSelectedEntityType(Globals, StaticEntityType type) {
+  void setCurrentSelectedEntityType(Globals, EntityType type) {
     state.editor.currentSelectedEntityType = type;
     state.editor.deleting = false;
     
@@ -163,6 +153,7 @@ using namespace Gamma;
     // @todo define a map for this
     if (type == GROUND) previewMeshName = "ground";
     if (type == STAIRCASE) previewMeshName = "staircase";
+    if (type == WORLD_ORIENTATION_CHANGE) previewMeshName = "trigger-indicator";
 
     auto& preview = createObjectFrom(previewMeshName);
 
@@ -307,6 +298,9 @@ using namespace Gamma;
         case STAIRCASE:
           newEntity = new Staircase;
           ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
+          break;
+        case WORLD_ORIENTATION_CHANGE:
+          // @todo
           break;
       }
     }
