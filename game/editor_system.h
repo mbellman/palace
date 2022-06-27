@@ -18,10 +18,13 @@ struct ReplacedEntityRecord {
   StaticEntity* entity = nullptr;
 };
 
+// @todo extends ReplacedEntityRecord
 struct EditAction {
+  // Single-tile actions
   StaticEntity* oldEntity = nullptr;
   GridCoordinates coordinates;
 
+  // Ranged actions
   bool isRangedPlacementAction = false;
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
@@ -29,14 +32,27 @@ struct EditAction {
 };
 
 struct WorldEditor {
+  // Flags
   bool enabled = false;
   bool useRange = false;
   bool rangeFromSelected = false;
   bool deleting = false;
-  StaticEntityType currentSelectedEntityType = GROUND;
+
+  // Placeable entity selection
+  StaticEntityType currentSelectedEntityType = GROUND;  // @todo deprecate
+  u8 currentSelectedEntityIndex = 0;                    // @todo use as new value
+
+  // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
+
+  // Default world orientation target for World Orientation Change triggers
+  WorldOrientation currentSelectedWorldOrientation = POSITIVE_Y_UP;
+
+  // Ranged actions
   GridCoordinates rangeFrom;
   GridCoordinates rangeTo;
+
+  // Edit action history/undo management
   EditAction editActions[MAX_EDIT_ACTIONS];
   u8 totalEditActions = 0;
 };

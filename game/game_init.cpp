@@ -36,6 +36,7 @@ static void addKeyHandlers(Globals) {
 }
 
 #if DEVELOPMENT == 1
+  // @todo move this stuff to editor_system
   #include <fstream>
 
   #define serialize3Vector(value) std::to_string(value.x) + "," + std::to_string(value.y) + "," + std::to_string(value.z)
