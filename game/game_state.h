@@ -17,5 +17,8 @@ struct GameState {
 
   #if DEVELOPMENT == 1
     WorldEditor editor;
+    Gamma::Vec3f cameraStartPosition;
+    Gamma::Vec3f cameraTargetPosition;
+    float cameraTargetStartTime = 0.f;
   #endif
 };

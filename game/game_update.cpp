@@ -70,6 +70,21 @@ void updateGame(Globals, float dt) {
       }
     }
 
+    // @todo we may actually have use for camera warp-to behavior
+    // during gameplay, so it may be useful to extract this into
+    // a gameplay_system module eventually
+    float cameraTargetAlpha = 2.f * (getRunningTime() - state.cameraTargetStartTime);
+
+    if (cameraTargetAlpha < 1.f) {
+      auto& camera = getCamera();
+
+      camera.position = Vec3f::lerp(
+        state.cameraStartPosition,
+        state.cameraTargetPosition,
+        easeInOut(0.f, 1.f, cameraTargetAlpha)
+      );
+    }
+
     addDebugMessages(globals);
   #endif
 }

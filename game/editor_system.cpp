@@ -422,8 +422,9 @@ using namespace Gamma;
       auto testCoordinates = worldPositionToGridCoordinates(ray);
 
       if (grid.has(testCoordinates)) {
-        // @todo smoothly interpolate to new camera position
-        camera.position = gridCoordinatesToWorldPosition(testCoordinates + GridCoordinates(0, 2, 0));
+        state.cameraStartPosition = camera.position;
+        state.cameraTargetPosition = gridCoordinatesToWorldPosition(testCoordinates + GridCoordinates(0, 2, 0));
+        state.cameraTargetStartTime = getRunningTime();
 
         break;
       }
