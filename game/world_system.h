@@ -101,12 +101,9 @@ struct World {
   DynamicEntityManager entities;
 };
 
-Gamma::Object* queryObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
-void createObjectFromCoordinates(GmContext* context, GameState& state, const GridCoordinates& coordinates);
-
 // @todo we probably won't need this once level loading is in place
 template<typename E>
-void setStaticEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
+void setTileEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
   auto& grid = state.world.grid;
 
   overRange(start, end, {
