@@ -23,15 +23,10 @@ const static std::vector<u8> editorEntityCycle = {
 
 struct ReplacedEntityRecord {
   GridCoordinates coordinates;
-  StaticEntity* entity = nullptr;
+  TileEntity* oldEntity = nullptr;
 };
 
-// @todo extends ReplacedEntityRecord
-struct EditAction {
-  // Single-tile actions
-  StaticEntity* oldEntity = nullptr;
-  GridCoordinates coordinates;
-
+struct EditAction : ReplacedEntityRecord {
   // Ranged actions
   bool isRangedPlacementAction = false;
   GridCoordinates rangeFrom;
@@ -70,7 +65,7 @@ struct WorldEditor {
   void setCurrentSelectedEntityType(GmContext* context, GameState& state, EntityType type);
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
-  void showStaticEntityPlacementPreview(GmContext* context, GameState& state);
+  void showTileEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void handleEditorSingleTileClickAction(GmContext* context, GameState& state);

@@ -71,6 +71,27 @@ static void addKeyHandlers(Globals) {
       }
     }
 
+    serialized += "woc\n";
+
+    // @todo define in orientation_system
+    static std::map<WorldOrientation, std::string> worldOrientationToString = {
+      { POSITIVE_Y_UP, "+Y" },
+      { NEGATIVE_Y_UP, "-Y" },
+      { POSITIVE_X_UP, "+X" },
+      { NEGATIVE_X_UP, "-X" },
+      { POSITIVE_Z_UP, "+Z" },
+      { NEGATIVE_Z_UP, "-Z" }
+    };
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == WORLD_ORIENTATION_CHANGE) {
+        auto worldOrientation = ((WorldOrientationChange*)entity)->targetWorldOrientation;
+
+        serialized += serialize3Vector(coordinates) + ",";
+        serialized += worldOrientationToString[worldOrientation] + "\n";
+      }
+    }
+
     Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
   }
 
@@ -85,11 +106,23 @@ static void addKeyHandlers(Globals) {
 
     std::string line;
 
+    // @todo define in orientation_system
+    static std::map<std::string, WorldOrientation> stringToWorldOrientation = {
+      { "+Y", POSITIVE_Y_UP },
+      { "-Y", NEGATIVE_Y_UP },
+      { "+X", POSITIVE_X_UP },
+      { "-X", NEGATIVE_X_UP },
+      { "+Z", POSITIVE_Z_UP },
+      { "-Z", NEGATIVE_Z_UP }
+    };
+
     while (std::getline(file, line)) {
       if (line == "ground") {
         currentEntityType = GROUND;
       } else if (line == "staircase") {
         currentEntityType = STAIRCASE;
+      } else if (line == "woc") {
+        currentEntityType = WORLD_ORIENTATION_CHANGE;
       } else {
         auto coords = Gm_SplitString(line, ",");
         auto x = (s16)stoi(coords[0]);
@@ -111,6 +144,15 @@ static void addKeyHandlers(Globals) {
             grid.set({ x, y, z }, staircase);
             break;
           }
+          case WORLD_ORIENTATION_CHANGE: {
+            auto worldOrientation = stringToWorldOrientation[coords[3]];
+            auto* worldOrientationChange = new WorldOrientationChange;
+
+            worldOrientationChange->targetWorldOrientation = worldOrientation;
+
+            grid.set({ x, y, z }, worldOrientationChange);
+            break;
+          }
         }
       }
     }
@@ -122,7 +164,6 @@ static void addKeyHandlers(Globals) {
 // @todo move to a separate file
 static void addOrientationTestLayout(Globals) {
   auto& grid = state.world.grid;
-  auto& triggers = state.world.triggers;
 
   // @todo define elsewhere
   auto createWorldOrientationChange = [context, &state](const GridCoordinates& coordinates, WorldOrientation target) {
@@ -130,7 +171,7 @@ static void addOrientationTestLayout(Globals) {
 
     trigger->targetWorldOrientation = target;
 
-    state.world.triggers.set(coordinates, trigger);
+    state.world.grid.set(coordinates, trigger);
   };
 
   // Bottom area
@@ -445,25 +486,6 @@ static void addEntityObjects(Globals) {
   #endif
 }
 
-static void addTriggerEntityIndicators(Globals) {
-  for (auto& [ coordinates, trigger ] : state.world.triggers) {
-    switch (trigger->type) {
-      case WORLD_ORIENTATION_CHANGE: {
-        auto& indicator = createObjectFrom("trigger-indicator");
-        auto& params = getObjectParameters(WORLD_ORIENTATION_CHANGE);
-
-        indicator.position = gridCoordinatesToWorldPosition(coordinates);
-        indicator.rotation = Vec3f(Gm_PI / 4.f, Gm_PI / 4.f, 0);
-        indicator.scale = params.scale;
-        indicator.color = params.color;
-
-        commit(indicator);
-        break;
-      }
-    }
-  }
-}
-
 void initializeGame(Globals) {
   Gm_EnableFlags(GammaFlags::VSYNC);
 
@@ -565,8 +587,22 @@ void initializeGame(Globals) {
         context->renderer->resetShadowMaps();
       }
 
+      // Reset world orientation to +Y
+      if (key == Key::O) {
+        setWorldOrientation(globals, POSITIVE_Y_UP);
+      }
+
       // Editor controls
-      // @todo allow staircase orientations to be controlled, or heuristically determined
+      #define bindEditorWorldOrientationKey(keyCode, worldOrientation) if (key == keyCode) state.editor.currentSelectedWorldOrientation = worldOrientation
+
+      bindEditorWorldOrientationKey(Key::NUM_1, POSITIVE_Y_UP);
+      bindEditorWorldOrientationKey(Key::NUM_2, NEGATIVE_Y_UP);
+      bindEditorWorldOrientationKey(Key::NUM_3, POSITIVE_X_UP);
+      bindEditorWorldOrientationKey(Key::NUM_4, NEGATIVE_X_UP);
+      bindEditorWorldOrientationKey(Key::NUM_5, POSITIVE_Z_UP);
+      bindEditorWorldOrientationKey(Key::NUM_6, NEGATIVE_Z_UP);
+
+      // Editor controls while enabled
       if (state.editor.enabled) {
         // Toggle ranged tile placement
         if (key == Key::R) {
@@ -580,14 +616,12 @@ void initializeGame(Globals) {
         }
 
         if (key == Key::NUM_0) {
-          // Use the ground tile object for the deletion preview
+          // Use the ground tile object for the deletion preview,
+          // since a plain cube will do
           setCurrentSelectedEntityType(globals, GROUND);
 
           state.editor.deleting = true;
         }
-
-        if (key == Key::NUM_1) setCurrentSelectedEntityType(globals, GROUND);
-        if (key == Key::NUM_2) setCurrentSelectedEntityType(globals, STAIRCASE);
 
         if (key == Key::ARROW_UP) adjustCurrentEntityOrientation(globals, { 0, Gm_HALF_PI, 0 });
         if (key == Key::ARROW_DOWN) adjustCurrentEntityOrientation(globals, { 0, -Gm_HALF_PI, 0 });
@@ -625,10 +659,6 @@ void initializeGame(Globals) {
 
   addMeshes(globals);
   addEntityObjects(globals);
-
-  #if DEVELOPMENT == 1
-    addTriggerEntityIndicators(globals);
-  #endif
 
   auto& sunlight = createLight(DIRECTIONAL_SHADOWCASTER);
 

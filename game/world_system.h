@@ -97,8 +97,7 @@ struct Area {
 };
 
 struct World {
-  GridMap<StaticEntity> grid;
-  GridMap<TriggerEntity> triggers;
+  GridMap<TileEntity> grid;
   DynamicEntityManager entities;
 };
 

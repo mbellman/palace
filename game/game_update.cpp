@@ -37,13 +37,14 @@ static void addDebugMessages(Globals) {
     + std::to_string(camera.orientation.roll) + " (roll)";
 
   std::string worldOrientationLabel = "World orientation: " + worldOrientationToString(state.worldOrientationState.worldOrientation);
-
   std::string entitiesLabel = "Total static entities: " + std::to_string(state.world.grid.size());
+  std::string editorWorldOrientationLabel = "Editor world orientation: " + worldOrientationToString(state.editor.currentSelectedWorldOrientation);
 
   addDebugMessage(positionLabel);
   addDebugMessage(orientationLabel);
   addDebugMessage(worldOrientationLabel);
   addDebugMessage(entitiesLabel);
+  addDebugMessage(editorWorldOrientationLabel);
 }
 
 void updateGame(Globals, float dt) {
@@ -66,7 +67,7 @@ void updateGame(Globals, float dt) {
       } else if (state.editor.useRange) {
         showRangeFromSelectionPreview(globals);
       } else {
-        showStaticEntityPlacementPreview(globals);
+        showTileEntityPlacementPreview(globals);
       }
     }
 

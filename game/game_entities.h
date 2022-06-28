@@ -10,42 +10,36 @@ enum EntityType {
 };
 
 /**
- * Static entities
- * ---------------
+ * Tile entities
+ * -------------
  */
-struct StaticEntity {
+struct TileEntity {
   EntityType type;
 
-  StaticEntity(EntityType type): type(type) {};
-  virtual ~StaticEntity() = default;
+  TileEntity(EntityType type): type(type) {};
+  virtual ~TileEntity() = default;
 };
 
-struct Ground : StaticEntity {
-  Ground(): StaticEntity(GROUND) {};
+struct Ground : TileEntity {
+  Ground(): TileEntity(GROUND) {};
 };
 
-struct Staircase : StaticEntity {
-  Staircase(): StaticEntity(STAIRCASE) {};
+struct Staircase : TileEntity {
+  Staircase(): TileEntity(STAIRCASE) {};
 
-  Staircase(const Staircase* staircase): Staircase() {
-    orientation = staircase->orientation;
+  Staircase(const Staircase* entity): Staircase() {
+    orientation = entity->orientation;
   }
 
   Gamma::Orientation orientation;
 };
 
-/**
- * Trigger Entities
- * ----------------
- */
-struct TriggerEntity {
-  EntityType type;
+struct WorldOrientationChange : TileEntity {
+  WorldOrientationChange(): TileEntity(WORLD_ORIENTATION_CHANGE) {};
 
-  TriggerEntity(EntityType type): type(type) {};
-};
-
-struct WorldOrientationChange : TriggerEntity {
-  WorldOrientationChange(): TriggerEntity(WORLD_ORIENTATION_CHANGE) {};
+  WorldOrientationChange(const WorldOrientationChange* entity): WorldOrientationChange() {
+    targetWorldOrientation = entity->targetWorldOrientation;
+  }
 
   WorldOrientation targetWorldOrientation;
 };

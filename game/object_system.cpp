@@ -20,7 +20,7 @@ const static std::map<EntityType, ObjectParameters> entityToObjectParametersMap 
     color(0.5f)
   }},
   {WORLD_ORIENTATION_CHANGE, {
-    scale(TILE_SIZE * 0.15f),
+    scale(TILE_SIZE * 0.1f),
     color(1.f, 0, 0)
   }}
 };

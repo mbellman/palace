@@ -76,7 +76,6 @@ static MoveDirection getMoveDirectionFromKeyboardInput(Globals) {
 
 static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinates, Vec3f& targetCameraPosition) {
   auto& grid = state.world.grid;
-  auto& triggers = state.world.triggers;
   auto worldOrientation = state.worldOrientationState.worldOrientation;
   auto downGridCoordinates = getDownGridCoordinates(worldOrientation);
   auto upGridCoordinates = getUpGridCoordinates(worldOrientation);
@@ -99,7 +98,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
       // of a downward staircase to be navigated to, even
       // if the tile isn't technically on a staircase in
       // the current world orientation.
-      typeOfEntity(triggers.get(targetBelowCoordinates)) == WORLD_ORIENTATION_CHANGE
+      typeOfEntity(targetTileBelow) == WORLD_ORIENTATION_CHANGE
     )
   ) {
     targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
@@ -112,8 +111,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     // Exiting off of an upward staircase
     (typeOfEntity(currentTileBelow) == STAIRCASE &&
     typeOfEntity(targetTileBelow) == GROUND &&
-    targetTile == nullptr
-    )
+    targetTile == nullptr)
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
@@ -122,7 +120,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     // Allow world orientation changes to be moved into,
     // operating on the assumption that the changed orientation
     // will result in a valid standing position
-    typeOfEntity(triggers.get(targetGridCoordinates)) == WORLD_ORIENTATION_CHANGE
+    typeOfEntity(targetTile) == WORLD_ORIENTATION_CHANGE
   ) {
     return true;
   } else if (
@@ -132,7 +130,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     // immediately below is empty or a staircase,
     // and the target tile is empty
     (
-      (targetTileBelow == nullptr || typeOfEntity(targetTileBelow) == STAIRCASE) &&
+      (targetTileBelow == nullptr || targetTileBelow->type == STAIRCASE) &&
       targetTile == nullptr
     )
   ) {
@@ -143,10 +141,10 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
 }
 
 static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates) {
-  auto* targetTrigger = state.world.triggers.get(targetGridCoordinates);
+  auto* targetEntity = state.world.grid.get(targetGridCoordinates);
 
-  if (typeOfEntity(targetTrigger) == WORLD_ORIENTATION_CHANGE) {
-    setWorldOrientation(globals, ((WorldOrientationChange*)targetTrigger)->targetWorldOrientation);
+  if (typeOfEntity(targetEntity) == WORLD_ORIENTATION_CHANGE) {
+    setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
   }
 }
 

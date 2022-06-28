@@ -3,34 +3,47 @@
 #include "grid_utilities.h"
 #include "game_state.h"
 #include "game_macros.h"
+#include "build_flags.h"
 
 using namespace Gamma;
 
 // @todo relocate to object_system
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
-  auto& ground = createObjectFrom("ground");
+  auto& object = createObjectFrom("ground");
   auto& params = getObjectParameters(GROUND);
 
-  ground.position = gridCoordinatesToWorldPosition(coordinates);
-  ground.scale = params.scale;
-  ground.color = params.color;
+  object.position = gridCoordinatesToWorldPosition(coordinates);
+  object.scale = params.scale;
+  object.color = params.color;
 
-  commit(ground);
+  commit(object);
 }
 
 // @todo relocate to object_system
 static void createStaircaseObject(Globals, const GridCoordinates& coordinates, const Orientation& orientation) {
-  auto& staircase = createObjectFrom("staircase");
+  auto& object = createObjectFrom("staircase");
   auto& params = getObjectParameters(STAIRCASE);
 
-  staircase.position = gridCoordinatesToWorldPosition(coordinates);
-  staircase.color = params.color;
-  staircase.scale = params.scale;
-  staircase.rotation.x = orientation.pitch;
-  staircase.rotation.y = orientation.yaw;
-  staircase.rotation.z = -orientation.roll;
+  object.position = gridCoordinatesToWorldPosition(coordinates);
+  object.color = params.color;
+  object.scale = params.scale;
+  object.rotation.x = orientation.pitch;
+  object.rotation.y = orientation.yaw;
+  object.rotation.z = -orientation.roll;
 
-  commit(staircase);
+  commit(object);
+}
+
+// @todo relocate to object_system
+static void createWorldOrientationChangeObject(Globals, const GridCoordinates& coordinates, WorldOrientation worldOrientation) {
+  auto& object = createObjectFrom("trigger-indicator");
+  auto& params = getObjectParameters(WORLD_ORIENTATION_CHANGE);
+
+  object.position = gridCoordinatesToWorldPosition(coordinates);
+  object.color = params.color;
+  object.scale = params.scale;
+
+  commit(object);
 }
 
 // @todo relocate to object_system
@@ -57,6 +70,11 @@ void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
       break;
     case STAIRCASE:
       createStaircaseObject(globals, coordinates, ((Staircase*)entity)->orientation);        
+      break;
+    case WORLD_ORIENTATION_CHANGE:
+      #if DEVELOPMENT == 1
+        createWorldOrientationChangeObject(globals, coordinates, ((WorldOrientationChange*)entity)->targetWorldOrientation);
+      #endif
       break;
     default:
       break;
