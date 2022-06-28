@@ -88,6 +88,18 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
   auto* targetTileTwoBelow = grid.get(targetBelowCoordinates + downGridCoordinates);
 
   if (
+    // Walking up a staircase
+    (typeOfEntity(currentTileBelow) == STAIRCASE &&
+    typeOfEntity(targetTile) == STAIRCASE) ||
+    // Exiting off of an upward staircase
+    (typeOfEntity(currentTileBelow) == STAIRCASE &&
+    typeOfEntity(targetTileBelow) == GROUND &&
+    targetTile == nullptr)
+  ) {
+    targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
+
+    return true;
+  } else if (
     // Entering onto a downward staircase
     typeOfEntity(targetTileTwoBelow) == STAIRCASE ||
     // Walking down a staircase
@@ -102,18 +114,6 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     )
   ) {
     targetCameraPosition += Vec3f(downGridCoordinates.x, downGridCoordinates.y, downGridCoordinates.z) * TILE_SIZE;
-
-    return true;
-  } else if (
-    // Walking up a staircase
-    (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTile) == STAIRCASE) ||
-    // Exiting off of an upward staircase
-    (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTileBelow) == GROUND &&
-    targetTile == nullptr)
-  ) {
-    targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
     return true;
   } else if (

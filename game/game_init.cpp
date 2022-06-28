@@ -665,5 +665,8 @@ void initializeGame(Globals) {
   sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
   sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
 
-  camera.position = gridCoordinatesToWorldPosition({ 0, 1, 0 });
+  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -2 });
+
+  state.cameraStartPosition = camera.position;
+  state.cameraTargetPosition = camera.position;
 }
