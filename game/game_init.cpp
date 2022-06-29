@@ -634,7 +634,9 @@ void initializeGame(Globals) {
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
       if (state.editor.enabled && SDL_GetRelativeMouseMode()) {
         // @todo create a mousedown handler in editor_system
-        if (state.editor.useRange) {
+        if (state.editor.isPlacingMesh) {
+          handleEditorMeshPlacementAction(globals);
+        } else if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
             handleEditorRangedClickAction(globals);
             saveEditorWorldData(globals);
@@ -648,12 +650,14 @@ void initializeGame(Globals) {
       }
     });
 
-    context->commander.on<std::string>("command", [&state](const std::string& command) {
+    context->commander.on<std::string>("command", [context, &state](const std::string& command) {
       if (Gm_StringStartsWith(command, "mesh")) {
         auto parts = Gm_SplitString(command, " ");
 
         if (parts.size() > 1) {
-          state.editor.currentMeshName = parts[1];
+          auto meshName = parts[1];
+
+          setCurrentMeshName(globals, meshName);
         }
       }
     });

@@ -46,6 +46,7 @@ struct WorldEditor {
   float lastEntityChangeTime = 0;
 
   // Placeable mesh selection
+  bool isPlacingMesh = false;
   std::string currentMeshName = "";
   // @todo handle light placement
 
@@ -66,13 +67,16 @@ struct WorldEditor {
 
 #if DEVELOPMENT == 1
   void setCurrentSelectedEntityType(GmContext* context, GameState& state, EntityType type);
+  void setCurrentMeshName(GmContext* context, GameState& state, const std::string& meshName);
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
   void showTileEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
+  void showMeshPlacementPreview(GmContext* context, GameState& state);
   void handleEditorSingleTileClickAction(GmContext* context, GameState& state);
   void handleEditorRangedClickAction(GmContext* context, GameState& state);
+  void handleEditorMeshPlacementAction(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
   void placeCameraAtClosestWalkableTile(GmContext* context, GameState& state);
 #endif

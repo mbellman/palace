@@ -62,7 +62,9 @@ void updateGame(Globals, float dt) {
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {
-      if (state.editor.rangeFromSelected) {
+      if (state.editor.isPlacingMesh) {
+        showMeshPlacementPreview(globals);
+      } else if (state.editor.rangeFromSelected) {
         showRangedEntityPlacementPreview(globals);
       } else if (state.editor.useRange) {
         showRangeFromSelectionPreview(globals);

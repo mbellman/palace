@@ -170,6 +170,22 @@ using namespace Gamma;
     save("placement-preview", preview);
   }
 
+  void setCurrentMeshName(Globals, const std::string& meshName) {
+    auto& meshMap = context->scene.meshMap;
+
+    if (meshMap.find(meshName) != meshMap.end()) {
+      state.editor.enabled = true;
+      state.editor.currentMeshName = meshName;
+      state.editor.isPlacingMesh = true;
+
+      auto& object = createObjectFrom(meshName);
+
+      object.scale = HALF_TILE_SIZE;
+
+      save("mesh-preview", object);
+    }
+  }
+
   // @todo switch roll/pitch depending on camera facing direction
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Orientation& adjustment) {
     state.editor.currentEntityOrientation += adjustment;
@@ -279,6 +295,15 @@ using namespace Gamma;
     }
   }
 
+  void showMeshPlacementPreview(Globals) {
+    auto& camera = getCamera();
+    auto& preview = object("mesh-preview");
+
+    preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 2.f;
+
+    commit(preview);
+  }
+
   void handleEditorSingleTileClickAction(Globals) {
     auto& grid = state.world.grid;
     GridCoordinates targetCoordinates;
@@ -370,6 +395,11 @@ using namespace Gamma;
     state.editor.rangeFromSelected = false;
 
     context->renderer->resetShadowMaps();
+  }
+
+  void handleEditorMeshPlacementAction(Globals) {
+    state.editor.isPlacingMesh = false;
+    state.editor.enabled = false;
   }
 
   void undoPreviousEditAction(Globals) {
