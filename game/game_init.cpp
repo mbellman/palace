@@ -459,6 +459,9 @@ static void addMeshes(Globals) {
   addMesh("ground", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
 
+  // Decorative mesh objects
+  addMesh("rock", 1000, Mesh::Model("./game/models/rock/model.obj"));
+
   #if DEVELOPMENT == 1
     // Trigger entity indicators
     addMesh("trigger-indicator", 0xffff, Mesh::Cube());
@@ -643,6 +646,10 @@ void initializeGame(Globals) {
           saveEditorWorldData(globals);
         }
       }
+    });
+
+    context->commander.on<std::string>("command", [&state](const std::string& command) {
+      // @todo
     });
   #endif
 

@@ -66,6 +66,7 @@ namespace Gamma {
 
   void Commander::processCurrentCommand() {
     constexpr static u32 totalCommands = sizeof(commands) / sizeof(Command);
+    auto command = std::string(currentCommand);
 
     if (currentCommandIncludes("enable")) {
       for (u32 i = 0; i < totalCommands; i++) {
@@ -88,6 +89,8 @@ namespace Gamma {
         }
       }
     }
+
+    signal("command", command);
 
     resetCurrentCommand();
   }

@@ -3,12 +3,13 @@
 #include <string>
 
 #include "system/InputSystem.h"
+#include "system/Signaler.h"
 #include "system/traits.h"
 
 #include "SDL_events.h"
 
 namespace Gamma {
-  class Commander {
+  class Commander : public Signaler {
   public:
     InputSystem input;
 

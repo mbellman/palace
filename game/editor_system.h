@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "Gamma.h"
@@ -14,10 +15,8 @@ struct GmContext;
 struct GameState;
 
 const static std::vector<u8> editorEntityCycle = {
-  // Static Entities
   GROUND,
   STAIRCASE,
-  // Trigger Entities
   WORLD_ORIENTATION_CHANGE
 };
 
@@ -45,6 +44,10 @@ struct WorldEditor {
   EntityType currentSelectedEntityType = GROUND;  // @todo deprecate
   u8 currentSelectedEntityIndex = 0;              // @todo use as new value
   float lastEntityChangeTime = 0;
+
+  // Placeable mesh selection
+  std::string currentMesh = "";
+  // @todo handle light placement
 
   // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
