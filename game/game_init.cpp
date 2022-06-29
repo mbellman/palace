@@ -649,7 +649,13 @@ void initializeGame(Globals) {
     });
 
     context->commander.on<std::string>("command", [&state](const std::string& command) {
-      // @todo
+      if (Gm_StringStartsWith(command, "mesh")) {
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          state.editor.currentMeshName = parts[1];
+        }
+      }
     });
   #endif
 

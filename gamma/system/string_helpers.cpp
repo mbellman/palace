@@ -6,7 +6,8 @@ namespace Gamma {
    * Gm_SplitString
    * --------------
    *
-   * @todo description
+   * Splits a string into an arbitrary number of parts,
+   * stored in a vector, based on a provided delimiter.
    */
   std::vector<std::string> Gm_SplitString(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> values;
@@ -30,7 +31,8 @@ namespace Gamma {
    * Gm_JoinString
    * -------------
    *
-   * @todo description
+   * Joins a vector of strings into a single string, using
+   * the provided delimiter as a joining character.
    */  
   std::string Gm_JoinString(const std::vector<std::string>& segments, const std::string& delimiter) {
     std::string joined;
@@ -50,7 +52,10 @@ namespace Gamma {
    * Gm_TrimString
    * -------------
    *
-   * @todo description
+   * Returns a modified version of a string with the beginning
+   * and ending whitespace removed.
+   *
+   * @todo handle tab characters
    */
   std::string Gm_TrimString(const std::string& str) {
     std::string trimmed;
@@ -63,5 +68,15 @@ namespace Gamma {
     }
 
     return str.substr(start, end - start + 1);
+  }
+
+  /**
+   * Gm_StringStartsWith
+   * -------------------
+   *
+   * Determines whether a string begins with a specified starting string.
+   */
+  bool Gm_StringStartsWith(const std::string& str, const std::string& start) {
+    return str.substr(0, start.size()) == start;
   }
 }

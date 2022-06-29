@@ -46,7 +46,7 @@ struct WorldEditor {
   float lastEntityChangeTime = 0;
 
   // Placeable mesh selection
-  std::string currentMesh = "";
+  std::string currentMeshName = "";
   // @todo handle light placement
 
   // Default orientation for placed entities
