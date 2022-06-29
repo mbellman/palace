@@ -422,6 +422,7 @@ using namespace Gamma;
     auto& camera = getCamera();
     auto& editor = state.editor;
     auto& grid = state.world.grid;
+    auto upGridCoordinates = getUpGridCoordinates(state.worldOrientationState.worldOrientation);
     float offset = 0.f;
 
     while (offset < 500.f) {
@@ -430,7 +431,7 @@ using namespace Gamma;
 
       if (grid.has(testCoordinates)) {
         state.cameraStartPosition = camera.position;
-        state.cameraTargetPosition = gridCoordinatesToWorldPosition(testCoordinates + GridCoordinates(0, 2, 0));
+        state.cameraTargetPosition = gridCoordinatesToWorldPosition(testCoordinates + upGridCoordinates + upGridCoordinates);
         state.cameraTargetStartTime = getRunningTime();
 
         break;

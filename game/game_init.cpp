@@ -487,8 +487,6 @@ static void addEntityObjects(Globals) {
 }
 
 void initializeGame(Globals) {
-  Gm_EnableFlags(GammaFlags::VSYNC);
-
   auto& input = getInput();
   auto& camera = getCamera();
 
@@ -669,4 +667,6 @@ void initializeGame(Globals) {
 
   state.cameraStartPosition = camera.position;
   state.cameraTargetPosition = camera.position;
+
+  Gm_EnableFlags(GammaFlags::VSYNC);
 }
