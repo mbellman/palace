@@ -14,10 +14,6 @@ using namespace Gamma;
 #define abs(n) (n < 0.f ? -n : n)
 #define typeOfEntity(entity) entity != nullptr && entity->type
 
-static inline bool isMoving(Globals) {
-  return state.currentMove.startTime != 0.f;
-}
-
 static Vec3f worldDirectionToGridDirection(Globals, const Vec3f& worldDirection) {
   Vec3f movementPlaneAlignedWorldDirection = worldDirection * state.worldOrientationState.movementPlane;
 
@@ -276,6 +272,10 @@ static void movePlayer(Globals, float dt) {
         break;
     }
   }
+}
+
+bool isMoving(Globals) {
+  return state.currentMove.startTime != 0.f;
 }
 
 void handlePlayerMovement(Globals, float dt) {

@@ -3,6 +3,7 @@
 #include "game_update.h"
 #include "movement_system.h"
 #include "orientation_system.h"
+#include "entity_system.h"
 #include "editor_system.h"
 #include "game_state.h"
 #include "game_macros.h"
@@ -59,6 +60,7 @@ void updateGame(Globals, float dt) {
   #endif
 
   handleWorldOrientation(globals, dt);
+  handleEntityBehavior(globals, dt);
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {
