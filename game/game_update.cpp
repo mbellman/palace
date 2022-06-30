@@ -69,7 +69,7 @@ void updateGame(Globals, float dt) {
       } else if (state.editor.useRange) {
         showRangeFromSelectionPreview(globals);
       } else {
-        showTileEntityPlacementPreview(globals);
+        showGridEntityPlacementPreview(globals);
       }
     }
 

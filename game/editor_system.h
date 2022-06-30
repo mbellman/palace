@@ -23,7 +23,7 @@ const static std::vector<u8> editorEntityCycle = {
 
 struct ReplacedEntityRecord {
   GridCoordinates coordinates;
-  TileEntity* oldEntity = nullptr;
+  GridEntity* oldEntity = nullptr;
 };
 
 struct EditAction : ReplacedEntityRecord {
@@ -71,7 +71,7 @@ struct WorldEditor {
   void setCurrentMeshName(GmContext* context, GameState& state, const std::string& meshName);
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
-  void showTileEntityPlacementPreview(GmContext* context, GameState& state);
+  void showGridEntityPlacementPreview(GmContext* context, GameState& state);
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void showMeshPlacementPreview(GmContext* context, GameState& state);

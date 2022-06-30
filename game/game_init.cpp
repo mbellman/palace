@@ -175,22 +175,22 @@ static void addOrientationTestLayout(Globals) {
   };
 
   // Bottom area
-  setTileEntityOverRange<Ground>(globals, { -4, -1, -4 }, { 4, -1, 4 });
+  setGridEntityOverRange<Ground>(globals, { -4, -1, -4 }, { 4, -1, 4 });
 
   // Left area
-  setTileEntityOverRange<Ground>(globals, { -5, -1, -4 }, { -5, 8, 4 });
+  setGridEntityOverRange<Ground>(globals, { -5, -1, -4 }, { -5, 8, 4 });
 
   // Right area
-  setTileEntityOverRange<Ground>(globals, { 5, -1, -4 }, { 5, 8, 4 });
+  setGridEntityOverRange<Ground>(globals, { 5, -1, -4 }, { 5, 8, 4 });
   
   // Top area
-  setTileEntityOverRange<Ground>(globals, { -5, 9, -4 }, { 5, 9, 4 });
+  setGridEntityOverRange<Ground>(globals, { -5, 9, -4 }, { 5, 9, 4 });
 
   // Back area
-  setTileEntityOverRange<Ground>(globals, { -5, -1, -5 }, { 5, 9, -5 });
+  setGridEntityOverRange<Ground>(globals, { -5, -1, -5 }, { 5, 9, -5 });
 
   // Front area
-  setTileEntityOverRange<Ground>(globals, { -5, -1, 5 }, { 5, 9, 5 });
+  setGridEntityOverRange<Ground>(globals, { -5, -1, 5 }, { 5, 9, 5 });
 
   // Pathway outdoors
   grid.clear({ 3, 1, -5 });

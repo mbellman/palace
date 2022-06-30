@@ -19,7 +19,7 @@ using namespace Gamma;
     }
   }
 
-  static void removeTileEntityObjectAtGridCoordinates(Globals, const GridCoordinates& coordinates) {
+  static void removeGridEntityObjectAtGridCoordinates(Globals, const GridCoordinates& coordinates) {
     auto& grid = state.world.grid;
     auto* entity = grid.get(coordinates);
 
@@ -41,7 +41,7 @@ using namespace Gamma;
     removeObjectAtPosition(globals, mesh->objects, objectPosition);
   }
 
-  static bool findTileEntityPlacementCoordinates(Globals, GridCoordinates& coordinates) {
+  static bool findGridEntityPlacementCoordinates(Globals, GridCoordinates& coordinates) {
     auto& camera = getCamera();
     auto& editor = state.editor;
     auto& grid = state.world.grid;
@@ -64,7 +64,7 @@ using namespace Gamma;
     return canPlaceEntity;
   }
 
-  static bool findTileEntityDeletionCoordinates(Globals, GridCoordinates& coordinates) {
+  static bool findGridEntityDeletionCoordinates(Globals, GridCoordinates& coordinates) {
     auto& camera = getCamera();
     auto& editor = state.editor;
     auto& grid = state.world.grid;
@@ -116,12 +116,12 @@ using namespace Gamma;
     editor.editActions[editor.totalEditActions++] = action;
   }
 
-  static TileEntity* copyTileEntity(const TileEntity* source) {
+  static GridEntity* copyGridEntity(const GridEntity* source) {
     if (source == nullptr) {
       return nullptr;
     }
 
-    TileEntity* copy = nullptr;
+    GridEntity* copy = nullptr;
 
     switch (source->type) {
       case GROUND:
@@ -192,7 +192,7 @@ using namespace Gamma;
   void selectRangeFrom(Globals) {
     GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
 
-    findTileEntityPlacementCoordinates(globals, rangeFrom);
+    findGridEntityPlacementCoordinates(globals, rangeFrom);
 
     state.editor.rangeFrom = rangeFrom;
     state.editor.rangeFromSelected = true;
@@ -205,14 +205,14 @@ using namespace Gamma;
     commit(object("placement-preview"));
   }
 
-  void showTileEntityPlacementPreview(Globals) {
+  void showGridEntityPlacementPreview(Globals) {
     auto& preview = object("placement-preview");
     GridCoordinates previewCoordinates;
 
     preview.scale = 0.f;
 
     if (state.editor.deleting) {
-      if (findTileEntityDeletionCoordinates(globals, previewCoordinates)) {
+      if (findGridEntityDeletionCoordinates(globals, previewCoordinates)) {
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
         auto alpha = sinf(getRunningTime() * 3.f) * 0.5f + 0.5f;
 
@@ -221,7 +221,7 @@ using namespace Gamma;
         preview.color = Vec3f::lerp(Vec3f(1.f, 0, 0), Vec3f(0.7f, 0, 0), alpha);
       }
     } else {
-      if (findTileEntityPlacementCoordinates(globals, previewCoordinates)) {
+      if (findGridEntityPlacementCoordinates(globals, previewCoordinates)) {
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
         auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
 
@@ -239,7 +239,7 @@ using namespace Gamma;
     auto& preview = object("placement-preview");
     GridCoordinates previewCoordinates;
 
-    if (findTileEntityPlacementCoordinates(globals, previewCoordinates)) {
+    if (findGridEntityPlacementCoordinates(globals, previewCoordinates)) {
       auto fadeColor = state.editor.deleting ? Vec3f(1.f, 0, 0) : Vec3f(0, 1.f, 0);
       auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
       auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
@@ -264,7 +264,7 @@ using namespace Gamma;
     auto start = state.editor.rangeFrom;
     GridCoordinates end = worldPositionToGridCoordinates(getCamera().position);
 
-    findTileEntityPlacementCoordinates(globals, end);
+    findGridEntityPlacementCoordinates(globals, end);
 
     if (end != state.editor.rangeTo) {
       state.editor.rangeTo = end;
@@ -306,17 +306,17 @@ using namespace Gamma;
     auto& grid = state.world.grid;
     GridCoordinates targetCoordinates;
     EditAction editAction;
-    TileEntity* newEntity = nullptr;
+    GridEntity* newEntity = nullptr;
 
     if (state.editor.deleting) {
-      if (!findTileEntityDeletionCoordinates(globals, targetCoordinates)) {
+      if (!findGridEntityDeletionCoordinates(globals, targetCoordinates)) {
         return;
       }
 
       // Offset the placement preview object so it isn't deleted
       object("placement-preview").position += Vec3f(1.f);
     } else {
-      if (!findTileEntityPlacementCoordinates(globals, targetCoordinates)) {
+      if (!findGridEntityPlacementCoordinates(globals, targetCoordinates)) {
         return;
       }
 
@@ -339,10 +339,10 @@ using namespace Gamma;
       }
     }
 
-    editAction.oldEntity = copyTileEntity(grid.get(targetCoordinates));
+    editAction.oldEntity = copyGridEntity(grid.get(targetCoordinates));
     editAction.coordinates = targetCoordinates;
 
-    removeTileEntityObjectAtGridCoordinates(globals, targetCoordinates);
+    removeGridEntityObjectAtGridCoordinates(globals, targetCoordinates);
     grid.clear(targetCoordinates);
 
     if (newEntity != nullptr) {
@@ -375,11 +375,11 @@ using namespace Gamma;
       if (grid.has(coordinates)) {
         action.replacedEntityRecords.push_back({
           coordinates,
-          copyTileEntity(grid.get(coordinates))
+          copyGridEntity(grid.get(coordinates))
         });
       }
 
-      removeTileEntityObjectAtGridCoordinates(globals, coordinates);
+      removeGridEntityObjectAtGridCoordinates(globals, coordinates);
 
       if (state.editor.deleting) {
         grid.clear(coordinates);
@@ -418,7 +418,7 @@ using namespace Gamma;
       overRange(lastEditAction.rangeFrom, lastEditAction.rangeTo, {
         GridCoordinates coordinates = { x, y, z };
 
-        removeTileEntityObjectAtGridCoordinates(globals, coordinates);
+        removeGridEntityObjectAtGridCoordinates(globals, coordinates);
         grid.clear(coordinates);
       });
 
@@ -434,7 +434,7 @@ using namespace Gamma;
       auto* oldEntity = lastEditAction.oldEntity;
 
       // Undo the last entity/object placement
-      removeTileEntityObjectAtGridCoordinates(globals, coordinates);
+      removeGridEntityObjectAtGridCoordinates(globals, coordinates);
       grid.clear(coordinates);
 
       if (oldEntity != nullptr) {

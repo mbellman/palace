@@ -11,22 +11,22 @@ enum EntityType {
 };
 
 /**
- * Tile entities
+ * Grid entities
  * -------------
  */
-struct TileEntity {
+struct GridEntity {
   EntityType type;
 
-  TileEntity(EntityType type): type(type) {};
-  virtual ~TileEntity() = default;
+  GridEntity(EntityType type): type(type) {};
+  virtual ~GridEntity() = default;
 };
 
-struct Ground : TileEntity {
-  Ground(): TileEntity(GROUND) {};
+struct Ground : GridEntity {
+  Ground(): GridEntity(GROUND) {};
 };
 
-struct Staircase : TileEntity {
-  Staircase(): TileEntity(STAIRCASE) {};
+struct Staircase : GridEntity {
+  Staircase(): GridEntity(STAIRCASE) {};
 
   Staircase(const Staircase* entity): Staircase() {
     orientation = entity->orientation;
@@ -35,12 +35,12 @@ struct Staircase : TileEntity {
   Gamma::Orientation orientation;
 };
 
-struct Switch : TileEntity {
-  Switch(): TileEntity(SWITCH) {};
+struct Switch : GridEntity {
+  Switch(): GridEntity(SWITCH) {};
 };
 
-struct WorldOrientationChange : TileEntity {
-  WorldOrientationChange(): TileEntity(WORLD_ORIENTATION_CHANGE) {};
+struct WorldOrientationChange : GridEntity {
+  WorldOrientationChange(): GridEntity(WORLD_ORIENTATION_CHANGE) {};
 
   WorldOrientationChange(const WorldOrientationChange* entity): WorldOrientationChange() {
     targetWorldOrientation = entity->targetWorldOrientation;

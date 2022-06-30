@@ -97,13 +97,13 @@ struct Area {
 };
 
 struct World {
-  GridMap<TileEntity> grid;
+  GridMap<GridEntity> grid;
   DynamicEntityManager entities;
 };
 
 // @todo we probably won't need this once level loading is in place
 template<typename E>
-void setTileEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
+void setGridEntityOverRange(GmContext* context, GameState& state, const GridCoordinates& start, const GridCoordinates& end) {
   auto& grid = state.world.grid;
 
   overRange(start, end, {
