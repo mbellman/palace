@@ -576,6 +576,10 @@ void initializeGame(Globals) {
         if (!state.editor.enabled) {
           object("placement-preview").scale = 0.f;
           commit(object("placement-preview"));
+
+          if (state.editor.isPlacingMesh) {
+            remove(object("mesh-preview"));
+          }
         }
       }
 

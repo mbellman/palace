@@ -299,7 +299,7 @@ using namespace Gamma;
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
 
-    preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 2.f;
+    preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
 
     commit(preview);
   }
