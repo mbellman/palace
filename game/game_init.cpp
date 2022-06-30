@@ -71,6 +71,14 @@ static void addKeyHandlers(Globals) {
       }
     }
 
+    serialized += "switch\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == SWITCH) {
+        serialized += serialize3Vector(coordinates) + "\n";
+      }
+    }
+
     serialized += "woc\n";
 
     // @todo define in orientation_system
@@ -121,6 +129,8 @@ static void addKeyHandlers(Globals) {
         currentEntityType = GROUND;
       } else if (line == "staircase") {
         currentEntityType = STAIRCASE;
+      } else if (line == "switch") {
+        currentEntityType = SWITCH;
       } else if (line == "woc") {
         currentEntityType = WORLD_ORIENTATION_CHANGE;
       } else {
@@ -144,6 +154,9 @@ static void addKeyHandlers(Globals) {
             grid.set({ x, y, z }, staircase);
             break;
           }
+          case SWITCH:
+            grid.set({ x, y, z }, new Switch);
+            break;
           case WORLD_ORIENTATION_CHANGE: {
             auto worldOrientation = stringToWorldOrientation[coords[3]];
             auto* worldOrientationChange = new WorldOrientationChange;
@@ -455,7 +468,7 @@ static void addParticles(Globals) {
 }
 
 static void addMeshes(Globals) {
-  // Static entity objects
+  // Grid entity objects
   addMesh("ground", 0xffff, Mesh::Cube());
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));

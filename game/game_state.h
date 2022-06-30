@@ -9,11 +9,17 @@
 #include "build_flags.h"
 
 struct GameState {
+  // Tracking variables
   float lastMoveInputTime = 0.f;
+
+  // World/orientation/move management
   World world;
   WorldOrientationState worldOrientationState;
   MoveQueue moves;
   CurrentMove currentMove;
+
+  // State flags
+  bool isSteppingOnSwitch = false;
 
   #if DEVELOPMENT == 1
     WorldEditor editor;
