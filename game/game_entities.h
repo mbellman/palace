@@ -6,6 +6,7 @@
 enum EntityType {
   GROUND,
   STAIRCASE,
+  SWITCH,
   WORLD_ORIENTATION_CHANGE
 };
 
@@ -32,6 +33,10 @@ struct Staircase : TileEntity {
   }
 
   Gamma::Orientation orientation;
+};
+
+struct Switch : TileEntity {
+  Switch(): TileEntity(SWITCH) {};
 };
 
 struct WorldOrientationChange : TileEntity {

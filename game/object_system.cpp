@@ -21,6 +21,10 @@ const static std::map<EntityType, ObjectParameters> entityToObjectParametersMap 
     scale(HALF_TILE_SIZE),
     color(0.5f)
   }},
+  {SWITCH, {
+    scale(HALF_TILE_SIZE),
+    color(1.f, 0, 0)
+  }},
   {WORLD_ORIENTATION_CHANGE, {
     scale(TILE_SIZE * 0.075f),
     color(1.f, 0, 0)
@@ -52,6 +56,17 @@ static void createStaircaseObject(Globals, const GridCoordinates& coordinates, c
   commit(object);
 }
 
+static void createSwitchObject(Globals, const GridCoordinates& coordinates) {
+  auto& object = createObjectFrom("switch");
+  auto& params = getObjectParameters(SWITCH);
+
+  object.position = gridCoordinatesToWorldPosition(coordinates);
+  object.color = params.color;
+  object.scale = params.scale;
+
+  commit(object);
+}
+
 static void createWorldOrientationChangeObject(Globals, const GridCoordinates& coordinates, WorldOrientation worldOrientation) {
   auto& object = createObjectFrom("trigger-indicator");
   auto& params = getObjectParameters(WORLD_ORIENTATION_CHANGE);
@@ -67,6 +82,7 @@ const ObjectParameters& getObjectParameters(EntityType entityType) {
   return entityToObjectParametersMap.at(entityType);
 }
 
+// @todo queryObjectByGridCoordinates, use a distance allowance term
 Object* queryObjectByPosition(Globals, ObjectPool& objects, const Vec3f& position) {
   for (auto& object : objects) {
     if (object.position == position) {
@@ -90,6 +106,9 @@ void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
       break;
     case STAIRCASE:
       createStaircaseObject(globals, coordinates, ((Staircase*)entity)->orientation);        
+      break;
+    case SWITCH:
+      createSwitchObject(globals, coordinates);
       break;
     case WORLD_ORIENTATION_CHANGE:
       #if DEVELOPMENT == 1

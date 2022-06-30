@@ -17,6 +17,7 @@ struct GameState;
 const static std::vector<u8> editorEntityCycle = {
   GROUND,
   STAIRCASE,
+  SWITCH,
   WORLD_ORIENTATION_CHANGE
 };
 

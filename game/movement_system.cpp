@@ -89,12 +89,16 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
 
   if (
     // Walking up a staircase
-    (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTile) == STAIRCASE) ||
+    (
+      typeOfEntity(currentTileBelow) == STAIRCASE &&
+      typeOfEntity(targetTile) == STAIRCASE
+    ) ||
     // Exiting off of an upward staircase
-    (typeOfEntity(currentTileBelow) == STAIRCASE &&
-    typeOfEntity(targetTileBelow) == GROUND &&
-    targetTile == nullptr)
+    (
+      typeOfEntity(currentTileBelow) == STAIRCASE &&
+      typeOfEntity(targetTileBelow) == GROUND &&
+      targetTile == nullptr
+    )
   ) {
     targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE;
 
@@ -127,10 +131,14 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     // Walking on a regular ground tile
     typeOfEntity(targetTileTwoBelow) == GROUND &&
     // Ground tiles are only walkable if the tile
-    // immediately below is empty or a staircase,
-    // and the target tile is empty
+    // immediately below the camera is empty or
+    // passable, and the target tile is empty
     (
-      (targetTileBelow == nullptr || targetTileBelow->type == STAIRCASE) &&
+      (
+        targetTileBelow == nullptr ||
+        targetTileBelow->type == STAIRCASE ||
+        targetTileBelow->type == SWITCH
+      ) &&
       targetTile == nullptr
     )
   ) {

@@ -28,21 +28,15 @@ using namespace Gamma;
     }
 
     auto objectPosition = gridCoordinatesToWorldPosition(coordinates);
-    Mesh* mesh;
+    std::string meshName;
 
-    // @todo use a map
-    switch (entity->type) {
-      default:
-      case GROUND:
-        mesh = mesh("ground");
-        break;
-      case STAIRCASE:
-        mesh = mesh("staircase");
-        break;
-      case WORLD_ORIENTATION_CHANGE:
-        mesh = mesh("trigger-indicator");
-        break;
-    }
+    // @todo define a map for this
+    if (entity->type == GROUND) meshName = "ground";
+    if (entity->type == STAIRCASE) meshName = "staircase";
+    if (entity->type == SWITCH) meshName = "switch";
+    if (entity->type == WORLD_ORIENTATION_CHANGE) meshName = "trigger-indicator";
+
+    auto* mesh = mesh(meshName);
 
     removeObjectAtPosition(globals, mesh->objects, objectPosition);
   }
@@ -136,6 +130,9 @@ using namespace Gamma;
       case STAIRCASE:
         copy = new Staircase((Staircase*)source);
         break;
+      case SWITCH:
+        copy = new Switch;
+        break;
       case WORLD_ORIENTATION_CHANGE:
         copy = new WorldOrientationChange((WorldOrientationChange*)source);
         break;
@@ -160,6 +157,7 @@ using namespace Gamma;
     // @todo define a map for this
     if (type == GROUND) previewMeshName = "ground";
     if (type == STAIRCASE) previewMeshName = "staircase";
+    if (type == SWITCH) previewMeshName = "switch";
     if (type == WORLD_ORIENTATION_CHANGE) previewMeshName = "trigger-indicator";
 
     auto& preview = createObjectFrom(previewMeshName);
@@ -330,6 +328,9 @@ using namespace Gamma;
         case STAIRCASE:
           newEntity = new Staircase;
           ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
+          break;
+        case SWITCH:
+          newEntity = new Switch;
           break;
         case WORLD_ORIENTATION_CHANGE:
           newEntity = new WorldOrientationChange;

@@ -457,10 +457,11 @@ static void addParticles(Globals) {
 static void addMeshes(Globals) {
   // Static entity objects
   addMesh("ground", 0xffff, Mesh::Cube());
-  addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase/model.obj"));
+  addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
+  addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
   // Decorative mesh objects
-  addMesh("rock", 1000, Mesh::Model("./game/models/rock/model.obj"));
+  addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators
