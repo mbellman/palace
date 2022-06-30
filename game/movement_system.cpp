@@ -142,6 +142,10 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
       targetTile == nullptr
     )
   ) {
+    if (typeOfEntity(targetTileBelow) == SWITCH) {
+      targetCameraPosition += Vec3f(upGridCoordinates.x, upGridCoordinates.y, upGridCoordinates.z) * TILE_SIZE * 0.25f;
+    }
+
     return true;
   }
 
