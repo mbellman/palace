@@ -8,39 +8,71 @@
 
 using namespace Gamma;
 
-static void stepOnSwitch(Globals) {
-  state.isSteppingOnSwitch = true;
+#define clamp(value) value = value > 1.f ? 1.f : value < 0.f ? 0.f : value
 
-  light("switch-light").power = 1.f;
-  light("switch-light").position = getCamera().position;
-}
-
-static void handleGridEntityBehavior(Globals) {
-  if (isMoving(globals)) {
-    return;
+static void handleSwitchWhenActive(Globals, Switch* entity, float dt) {
+  if (
+    state.lastPressedSwitch != nullptr &&
+    state.lastPressedSwitch != entity
+  ) {
+    // If stepping on a new switch while the last pressed switch
+    // is still defined, reset the last pressed switch's duration
+    state.lastPressedSwitch->pressedDuration = 0.f;
   }
 
+  entity->pressedDuration += dt * 5.f;
+
+  state.lastPressedSwitch = entity;
+}
+
+static void handleLastPressedSwitchWhenInactive(Globals, float dt) {
+  state.lastPressedSwitch->pressedDuration -= dt * 5.f;
+}
+
+static void handleLastPressedSwitch(Globals, Switch* entity) {
+  clamp(state.lastPressedSwitch->pressedDuration);
+
+  auto currentGridCoordinates = worldPositionToGridCoordinates(getCamera().position);
+  auto& switchLight = light("switch-light");
+  auto& switchParticles = mesh("switch-particles")->particleSystem;
+  auto gridPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
+  auto alpha = state.lastPressedSwitch->pressedDuration / 1.f;
+
+  switchLight.position = gridPosition;
+  switchLight.power = alpha;
+
+  switchParticles.medianSize = alpha * 2.f;
+  switchParticles.sizeVariation = alpha;
+  switchParticles.path[0] = gridPosition - Vec3f(0, HALF_TILE_SIZE, 0);
+  switchParticles.path[1] = gridPosition + Vec3f(0, HALF_TILE_SIZE, 0);
+
+  if (state.lastPressedSwitch->pressedDuration == 0.f) {
+    state.lastPressedSwitch = nullptr;
+  }
+}
+
+static void handleGridEntityBehavior(Globals, float dt) {
   auto currentGridCoordinates = worldPositionToGridCoordinates(getCamera().position);
   auto downGridCoordinates = getDownGridCoordinates(state.worldOrientationState.worldOrientation);
   auto* entityBelow = state.world.grid.get(currentGridCoordinates + downGridCoordinates);
 
-  // @todo clean up/generalize
+  // Handle switches
   if (entityBelow != nullptr && entityBelow->type == SWITCH) {
-    if (!state.isSteppingOnSwitch) {
-      stepOnSwitch(globals);
-    }
-  } else if (state.isSteppingOnSwitch) {
-    state.isSteppingOnSwitch = false;
+    handleSwitchWhenActive(globals, (Switch*)entityBelow, dt);
+  } else if (state.lastPressedSwitch != nullptr) {
+    handleLastPressedSwitchWhenInactive(globals, dt);
+  }
 
-    light("switch-light").power = 0.f;
+  if (state.lastPressedSwitch != nullptr) {
+    handleLastPressedSwitch(globals, state.lastPressedSwitch);
   }
 }
 
-static void handleDynamicEntityBehavior(Globals) {
+static void handleDynamicEntityBehavior(Globals, float dt) {
   // @todo
 }
 
 void handleEntityBehavior(Globals, float dt) {
-  handleGridEntityBehavior(globals);
-  handleDynamicEntityBehavior(globals);
+  handleGridEntityBehavior(globals, dt);
+  handleDynamicEntityBehavior(globals, dt);
 }

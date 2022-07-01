@@ -35,8 +35,11 @@ struct Staircase : GridEntity {
   Gamma::Orientation orientation;
 };
 
+// @todo support switches being permanently pressed down
 struct Switch : GridEntity {
   Switch(): GridEntity(SWITCH) {};
+
+  float pressedDuration = 0.f;
 };
 
 struct WorldOrientationChange : GridEntity {

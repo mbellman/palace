@@ -96,7 +96,7 @@ vec3 getPathPoint(int index) {
  * Returns the initial particle position, pseudo-randomly
  * determined by its ID.
  */
-vec3 getInitialPosition() {
+vec3 getInitialParticlePosition() {
   float radius = particles.minimum_radius + particles.spread * sqrt(0.001 + random(particle_id * 1.255673));
 
   float x = random(-1, 1, particle_id * 1.1);
@@ -109,7 +109,7 @@ vec3 getInitialPosition() {
 /**
  * @todo description
  */
-vec3 getPathPosition() {
+vec3 getPathParticlePosition() {
   if (path.total == 0) {
     return vec3(0);
   }
@@ -136,7 +136,7 @@ vec3 getPathPosition() {
 /**
  * @todo description
  */
-vec3 getDeviation() {
+vec3 getParticleDeviation() {
   float deviation_factor = particles.deviation * sin(particle_id + time);
 
   return vec3(
@@ -150,7 +150,7 @@ vec3 getDeviation() {
  * Returns the particle's current position as a function of time.
  */
 vec3 getParticlePosition() {
-  return particles.spawn + getInitialPosition() + getPathPosition() + getDeviation();
+  return particles.spawn + getInitialParticlePosition() + getPathParticlePosition() + getParticleDeviation();
 }
 
 void main() {

@@ -503,6 +503,25 @@ static void addEntityObjects(Globals) {
   #endif
 }
 
+static void addSwitchEntityEffects(Globals) {
+  addMesh("switch-particles", 500, Mesh::Particles());
+
+  auto& switchParticles = mesh("switch-particles")->particleSystem;
+  auto& switchLight = createLight(POINT);
+
+  switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
+  switchLight.power = 0.f;
+
+  switchParticles.spread = TILE_SIZE;
+  switchParticles.medianSpeed = 0.5f;
+  switchParticles.deviation = 2.f;
+  switchParticles.path.push_back(Vec3f(0));
+  switchParticles.path.push_back(Vec3f(0));
+  switchParticles.isCircuit = false;
+
+  saveLight("switch-light", &switchLight);
+}
+
 void initializeGame(Globals) {
   auto& input = getInput();
   auto& camera = getCamera();
@@ -692,18 +711,12 @@ void initializeGame(Globals) {
 
   addMeshes(globals);
   addEntityObjects(globals);
+  addSwitchEntityEffects(globals);
 
   auto& sunlight = createLight(DIRECTIONAL_SHADOWCASTER);
 
   sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
   sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
-
-  auto& switchLight = createLight(POINT);
-
-  switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
-  switchLight.power = 0.f;
-
-  saveLight("switch-light", &switchLight);
 
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -2 });
 

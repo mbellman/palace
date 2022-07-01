@@ -18,8 +18,8 @@ struct GameState {
   MoveQueue moves;
   CurrentMove currentMove;
 
-  // State flags
-  bool isSteppingOnSwitch = false;
+  // Entity behavior
+  Switch* lastPressedSwitch = nullptr;
 
   #if DEVELOPMENT == 1
     WorldEditor editor;

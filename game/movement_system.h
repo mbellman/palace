@@ -13,5 +13,4 @@ struct CurrentMove {
 
 struct GameState;
 
-bool isMoving(GmContext* context, GameState& state);
 void handlePlayerMovement(GmContext* context, GameState& state, float dt);
