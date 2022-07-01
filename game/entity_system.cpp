@@ -33,18 +33,19 @@ static void handleLastPressedSwitch(Globals, Switch* entity) {
   clamp(state.lastPressedSwitch->pressedDuration);
 
   auto currentGridCoordinates = worldPositionToGridCoordinates(getCamera().position);
+  auto entityWorldPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto& switchLight = light("switch-light");
   auto& switchParticles = mesh("switch-particles")->particleSystem;
-  auto gridPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto alpha = state.lastPressedSwitch->pressedDuration / 1.f;
 
-  switchLight.position = gridPosition;
+  switchLight.position = entityWorldPosition;
   switchLight.power = alpha;
 
   switchParticles.medianSize = alpha * 2.f;
   switchParticles.sizeVariation = alpha;
-  switchParticles.path[0] = gridPosition - Vec3f(0, HALF_TILE_SIZE, 0);
-  switchParticles.path[1] = gridPosition + Vec3f(0, HALF_TILE_SIZE, 0);
+  // @todo use world orientation for path displacement
+  switchParticles.path[0] = entityWorldPosition - Vec3f(0, HALF_TILE_SIZE, 0);
+  switchParticles.path[1] = entityWorldPosition + Vec3f(0, HALF_TILE_SIZE, 0);
 
   if (state.lastPressedSwitch->pressedDuration == 0.f) {
     state.lastPressedSwitch = nullptr;

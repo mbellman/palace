@@ -475,6 +475,7 @@ static void addMeshes(Globals) {
 
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
+  addMesh("archway", 1000, Mesh::Model("./game/models/archway.obj"));
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators
@@ -612,6 +613,8 @@ void initializeGame(Globals) {
 
           if (state.editor.isPlacingMesh) {
             remove(object("mesh-preview"));
+
+            state.editor.isPlacingMesh = false;
           }
         }
       }
@@ -718,7 +721,7 @@ void initializeGame(Globals) {
   sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
   sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
 
-  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -2 });
+  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -13 });
 
   state.cameraStartPosition = camera.position;
   state.cameraTargetPosition = camera.position;
