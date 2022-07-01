@@ -58,10 +58,9 @@ Gamma::Light& Gm_CreateLight(GmContext* context, Gamma::LightType type) {
   auto& lights = context->scene.lights;
 
   // @todo recycle removed/deactivated Lights
-  // @todo new Light()
-  lights.push_back(Light());
+  lights.push_back(new Light());
 
-  auto& light = lights.back();
+  auto& light = *lights.back();
 
   light.type = type;
 
@@ -190,6 +189,10 @@ void Gm_SaveObject(GmContext* context, const std::string& objectName, const Gamm
   context->scene.objectStore[objectName] = object._record;
 }
 
+void Gm_SaveLight(GmContext* context, const std::string& lightName, Gamma::Light* light) {
+  context->scene.lightStore[lightName] = light;
+}
+
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName) {
   auto& scene = context->scene;
   // @todo assert that the object exists
@@ -197,6 +200,13 @@ Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName) {
   auto& mesh = scene.meshes[record.meshIndex];
 
   return *mesh->objects.getByRecord(record);
+}
+
+Gamma::Light& Gm_GetLight(GmContext* context, const std::string& lightName) {
+  auto& lightStore = context->scene.lightStore;
+  // @todo assert that the light exists
+
+  return *lightStore.at(lightName);
 }
 
 void Gm_RemoveObject(GmContext* context, const Gamma::Object& object) {

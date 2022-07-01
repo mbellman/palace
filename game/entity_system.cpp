@@ -11,7 +11,8 @@ using namespace Gamma;
 static void stepOnSwitch(Globals) {
   state.isSteppingOnSwitch = true;
 
-  Console::log("Switch!");
+  light("switch-light").power = 1.f;
+  light("switch-light").position = getCamera().position;
 }
 
 static void handleGridEntityBehavior(Globals) {
@@ -28,8 +29,10 @@ static void handleGridEntityBehavior(Globals) {
     if (!state.isSteppingOnSwitch) {
       stepOnSwitch(globals);
     }
-  } else {
+  } else if (state.isSteppingOnSwitch) {
     state.isSteppingOnSwitch = false;
+
+    light("switch-light").power = 0.f;
   }
 }
 

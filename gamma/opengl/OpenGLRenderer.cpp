@@ -291,8 +291,8 @@ namespace Gamma {
     ctx.spotLights.clear();
     ctx.spotShadowcasters.clear();
 
-    for (auto& light : gmContext->scene.lights) {
-      switch (light.type) {
+    for (auto* light : gmContext->scene.lights) {
+      switch (light->type) {
         case LightType::POINT:
           ctx.pointLights.push_back(light);
           break;
@@ -517,7 +517,7 @@ namespace Gamma {
 
     for (u32 mapIndex = 0; mapIndex < glDirectionalShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glDirectionalShadowMaps[mapIndex];
-      auto& light = ctx.directionalShadowcasters[mapIndex];
+      auto& light = *ctx.directionalShadowcasters[mapIndex];
 
       glShadowMap.buffer.write();
 
@@ -552,7 +552,7 @@ namespace Gamma {
 
     for (u32 mapIndex = 0; mapIndex < glPointShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glPointShadowMaps[mapIndex];
-      auto& light = ctx.pointShadowCasters[mapIndex];
+      auto& light = *ctx.pointShadowCasters[mapIndex];
 
       if (light.isStatic && glShadowMap.isRendered) {
         continue;
@@ -602,7 +602,7 @@ namespace Gamma {
 
     for (u32 mapIndex = 0; mapIndex < glSpotShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glSpotShadowMaps[mapIndex];
-      auto& light = ctx.spotShadowcasters[mapIndex];
+      auto& light = *glShadowMap.light;
 
       if (light.isStatic && glShadowMap.isRendered) {
         continue;
@@ -701,7 +701,7 @@ namespace Gamma {
 
     for (u32 i = 0; i < ctx.pointShadowCasters.size(); i++) {
       auto& glShadowMap = *glPointShadowMaps[i];
-      auto& light = ctx.pointShadowCasters[i];
+      auto& light = *glShadowMap.light;
 
       glShadowMap.buffer.read();
       lightDisc.draw(light, internalResolution, *ctx.activeCamera);
@@ -725,7 +725,7 @@ namespace Gamma {
 
     // @todo limit to MAX_DIRECTIONAL_LIGHTS
     for (u32 i = 0; i < ctx.directionalLights.size(); i++) {
-      auto& light = ctx.directionalLights[i];
+      auto& light = *ctx.directionalLights[i];
       std::string indexedLight = "lights[" + std::to_string(i) + "]";
 
       shader.setVec3f(indexedLight + ".color", light.color);
@@ -746,8 +746,8 @@ namespace Gamma {
     shader.use();
 
     for (u32 i = 0; i < ctx.directionalShadowcasters.size(); i++) {
-      auto& light = ctx.directionalShadowcasters[i];
       auto& glShadowMap = *glDirectionalShadowMaps[i];
+      auto& light = *glShadowMap.light;
 
       glShadowMap.buffer.read();
 
@@ -807,7 +807,7 @@ namespace Gamma {
 
     for (u32 i = 0; i < ctx.spotShadowcasters.size(); i++) {
       auto& glShadowMap = *glSpotShadowMaps[i];
-      auto& light = ctx.spotShadowcasters[i];
+      auto& light = *glShadowMap.light;
 
       Matrix4f lightProjection = Matrix4f::glPerspective({ 1024, 1024 }, 120.0f, 1.0f, light.radius);
       Matrix4f lightView = Matrix4f::lookAt(light.position.gl(), light.direction.invert().gl(), Vec3f(0.0f, 1.0f, 0.0f));

@@ -498,7 +498,7 @@ static void addEntityObjects(Globals) {
     
     preview.scale = 0.f;
 
-    save("placement-preview", preview);
+    saveObject("placement-preview", preview);
     commit(preview);
   #endif
 }
@@ -697,6 +697,13 @@ void initializeGame(Globals) {
 
   sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
   sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
+
+  auto& switchLight = createLight(POINT);
+
+  switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
+  switchLight.power = 0.f;
+
+  saveLight("switch-light", &switchLight);
 
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -2 });
 

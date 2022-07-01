@@ -19,8 +19,10 @@
 #define createLight(type) Gm_CreateLight(context, type)
 #define createObjectFrom(meshName) Gm_CreateObjectFrom(context, meshName)
 #define commit(object) Gm_Commit(context, object)
-#define save(objectName, object) Gm_SaveObject(context, objectName, object)
+#define saveObject(objectName, object) Gm_SaveObject(context, objectName, object)
+#define saveLight(lightName, light) Gm_SaveLight(context, lightName, light)
 #define object(objectName) Gm_GetObject(context, objectName)
+#define light(lightName) Gm_GetLight(context, lightName)
 #define remove(object) Gm_RemoveObject(context, object)
 #define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
@@ -45,10 +47,12 @@ struct GmScene {
   Gamma::Camera camera;
   Gamma::InputSystem input;
   std::vector<Gamma::Mesh*> meshes;
-  std::vector<Gamma::Light> lights;
+  std::vector<Gamma::Light*> lights;
   std::map<std::string, Gamma::Mesh*> meshMap;
   std::map<std::string, Gamma::Vec3f> probeMap;
   std::map<std::string, Gamma::ObjectRecord> objectStore;
+  // @todo when recycling a light, its lightStore entry should be removed
+  std::map<std::string, Gamma::Light*> lightStore;
   Gamma::Vec3f freeCameraVelocity = Gamma::Vec3f(0.0f);
   u16 runningMeshId = 0;
   u32 frame = 0;
@@ -64,7 +68,9 @@ Gamma::Object& Gm_CreateObjectFrom(GmContext* context, const std::string& meshNa
 void Gm_Commit(GmContext* context, const Gamma::Object& object);
 Gamma::ObjectPool& Gm_GetObjects(GmContext* context, const std::string& meshName);
 void Gm_SaveObject(GmContext* context, const std::string& objectName, const Gamma::Object& object);
+void Gm_SaveLight(GmContext* context, const std::string& lightName, Gamma::Light* light);
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName);
+Gamma::Light& Gm_GetLight(GmContext* context, const std::string& lightName);
 void Gm_RemoveObject(GmContext* context, const Gamma::Object& object);
 void Gm_PointCamera(GmContext* context, const Gamma::Object& object, bool upsideDown = false);
 void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsideDown = false);

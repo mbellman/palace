@@ -12,8 +12,6 @@
 #include "system/packed_data.h"
 #include "system/type_aliases.h"
 
-#define UNUSED_LIGHT_INDEX -1
-
 namespace Gamma {
   enum LightType {
     POINT,
@@ -40,7 +38,6 @@ namespace Gamma {
     float fov = 90.0f;
     u32 type = LightType::POINT;
     bool isStatic = false;
-    int id = UNUSED_LIGHT_INDEX;
     // @todo std::vector<u32> shadowMapMeshes (?)
   };
 

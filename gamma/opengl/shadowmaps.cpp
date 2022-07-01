@@ -20,7 +20,7 @@ namespace Gamma {
    * --------------------------
    */
   OpenGLDirectionalShadowMap::OpenGLDirectionalShadowMap(const Light* light) {
-    lightId = light->id;
+    this->light = light;
 
     buffer.init();
     buffer.setSize({ 2048, 2048 });
@@ -40,7 +40,7 @@ namespace Gamma {
    * --------------------
    */
   OpenGLPointShadowMap::OpenGLPointShadowMap(const Light* light) {
-    lightId = light->id;
+    this->light = light;
 
     buffer.init();
     buffer.setSize({ 1024, 1024 });
@@ -56,7 +56,7 @@ namespace Gamma {
    * -------------------
    */
   OpenGLSpotShadowMap::OpenGLSpotShadowMap(const Light* light) {
-    lightId = light->id;
+    this->light = light;
 
     buffer.init();
     buffer.setSize({ 1024, 1024 });

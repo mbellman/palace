@@ -165,7 +165,7 @@ using namespace Gamma;
     preview.position = existingPreviewPosition;
     preview.rotation = existingPreviewRotation;
 
-    save("placement-preview", preview);
+    saveObject("placement-preview", preview);
   }
 
   void setCurrentMeshName(Globals, const std::string& meshName) {
@@ -180,7 +180,7 @@ using namespace Gamma;
 
       object.scale = HALF_TILE_SIZE;
 
-      save("mesh-preview", object);
+      saveObject("mesh-preview", object);
     }
   }
 

@@ -62,12 +62,12 @@ namespace Gamma {
     bool hasReflectiveObjects;
     bool hasRefractiveObjects;
     GLenum primitiveMode;
-    std::vector<Light> pointLights;
-    std::vector<Light> pointShadowCasters;
-    std::vector<Light> directionalLights;
-    std::vector<Light> directionalShadowcasters;
-    std::vector<Light> spotLights;
-    std::vector<Light> spotShadowcasters;
+    std::vector<Light*> pointLights;
+    std::vector<Light*> pointShadowCasters;
+    std::vector<Light*> directionalLights;
+    std::vector<Light*> directionalShadowcasters;
+    std::vector<Light*> spotLights;
+    std::vector<Light*> spotShadowcasters;
     Camera* activeCamera = nullptr;
     Matrix4f matProjection;
     Matrix4f matInverseProjection;
