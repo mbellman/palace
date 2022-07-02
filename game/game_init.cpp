@@ -475,7 +475,7 @@ static void addMeshes(Globals) {
 
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
-  addMesh("archway", 1000, Mesh::Model("./game/models/archway.obj"));
+  addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators

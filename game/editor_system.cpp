@@ -181,6 +181,9 @@ using namespace Gamma;
       object.scale = HALF_TILE_SIZE;
 
       saveObject("mesh-preview", object);
+
+      object("placement-preview").scale = 0.f;
+      commit(object("placement-preview"));
     }
   }
 
