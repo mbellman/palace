@@ -85,6 +85,32 @@ using namespace Gamma;
     return false;
   }
 
+  static bool findFloorPlacementPosition(Globals, Vec3f& position) {
+    auto& camera = getCamera();
+    auto& editor = state.editor;
+    auto& grid = state.world.grid;
+    float offset = 0.f;
+
+    while (offset < 150.f) {
+      auto ray = camera.position + camera.orientation.getDirection() * offset;
+      auto testCoordinates = worldPositionToGridCoordinates(ray);
+      auto* entity = grid.get(testCoordinates);
+
+      if (entity != nullptr && entity->type == GROUND) {
+        auto tileCenter = gridCoordinatesToWorldPosition(testCoordinates);
+
+        // @todo offset according to the current world orientation
+        position = tileCenter + Vec3f(0, HALF_TILE_SIZE, 0);
+
+        return true;
+      }
+
+      offset += HALF_TILE_SIZE / 4.f;
+    }
+
+    return false;
+  }
+
   static void storeEditAction(Globals, EditAction& action) {
     auto& editor = state.editor;
 
@@ -177,8 +203,6 @@ using namespace Gamma;
       state.editor.isPlacingMesh = true;
 
       auto& object = createObjectFrom(meshName);
-
-      object.scale = HALF_TILE_SIZE;
 
       saveObject("mesh-preview", object);
 
@@ -300,7 +324,16 @@ using namespace Gamma;
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
 
-    preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
+    preview.scale = HALF_TILE_SIZE;
+
+    // @todo isPlacingFloorMesh()
+    if (state.editor.currentMeshName == "floor") {
+      if (!findFloorPlacementPosition(globals, preview.position)) {
+        preview.scale = 0.f;
+      }
+    } else {
+      preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
+    }
 
     commit(preview);
   }
@@ -402,8 +435,19 @@ using namespace Gamma;
   }
 
   void handleEditorMeshPlacementAction(Globals) {
-    state.editor.isPlacingMesh = false;
-    state.editor.enabled = false;
+    if (object("mesh-preview").scale == 0.f) {
+      return;
+    }
+
+    // @todo isPlacingFloorMesh()
+    if (state.editor.currentMeshName == "floor") {
+      // Create a new floor tile mesh so we can continue placing them
+      setCurrentMeshName(globals, "floor");
+    } else {
+      // Stop moving the current preview mesh, setting it in placee
+      state.editor.isPlacingMesh = false;
+      state.editor.enabled = false;
+    }
   }
 
   void undoPreviousEditAction(Globals) {

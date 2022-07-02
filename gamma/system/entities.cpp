@@ -318,6 +318,7 @@ namespace Gamma {
    * -------------
    *
    * @todo description
+   * @todo make back face optional
    */
   Mesh* Mesh::Plane(u32 size, bool useLoopingTexture) {
     auto* mesh = new Mesh();
@@ -335,7 +336,7 @@ namespace Gamma {
           float xr = (float)x / (float)(size - 1);
           float zr = (float)z / (float)(size - 1);
 
-          vertex.position = Vec3f(xr - 0.5f, 0.f, -zr + 0.5f);
+          vertex.position = Vec3f(xr - 0.5f, 0.f, -zr + 0.5f) * 2.f;
 
           if (useLoopingTexture) {
             vertex.uv = Vec2f((float)x, (float)z);

@@ -473,6 +473,11 @@ static void addMeshes(Globals) {
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
+  // Floor mesh
+  addMesh("floor", 0xffff, Mesh::Plane(2));
+  mesh("floor")->texture = "./game/textures/dirt-floor.png";
+  mesh("floor")->normalMap = "./game/textures/dirt-normals.png";
+
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
@@ -617,6 +622,10 @@ void initializeGame(Globals) {
             state.editor.isPlacingMesh = false;
           }
         }
+      }
+
+      if (key == Key::G) {
+        mesh("ground")->disabled = !mesh("ground")->disabled;
       }
 
       // Toggle entity/trigger indicators
