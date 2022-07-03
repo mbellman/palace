@@ -103,6 +103,19 @@ static void addKeyHandlers(Globals) {
     Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
   }
 
+  static void saveEditorFloorMeshData(Globals) {
+    std::string serialized;
+
+    serialized += "dirt_floor\n";
+
+    for (auto& object : objects("floor")) {
+      // @todo save floor grid coordinates + world orientation
+      serialized += serialize3Vector(object.position) + "\n";
+    }
+
+    Gm_WriteFileContents("./game/world/mesh_data.txt", serialized);
+  }
+
   static void loadEditorWorldData(Globals) {
     auto& grid = state.world.grid;
     EntityType currentEntityType;
@@ -706,7 +719,7 @@ void initializeGame(Globals) {
         if (parts.size() > 1) {
           auto meshName = parts[1];
 
-          setCurrentMeshName(globals, meshName);
+          createPlaceableMeshObjectFrom(globals, meshName);
         }
       }
     });

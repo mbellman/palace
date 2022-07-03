@@ -68,7 +68,7 @@ struct WorldEditor {
 
 #if DEVELOPMENT == 1
   void setCurrentSelectedEntityType(GmContext* context, GameState& state, EntityType type);
-  void setCurrentMeshName(GmContext* context, GameState& state, const std::string& meshName);
+  void createPlaceableMeshObjectFrom(GmContext* context, GameState& state, const std::string& meshName);
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
   void selectRangeFrom(GmContext* context, GameState& state);
   void showGridEntityPlacementPreview(GmContext* context, GameState& state);

@@ -142,6 +142,11 @@ using namespace Gamma;
     editor.editActions[editor.totalEditActions++] = action;
   }
 
+  static bool isPlacingFloorMesh(Globals) {
+    // @todo check for all floor mesh names
+    return state.editor.currentMeshName == "floor";
+  }
+
   static GridEntity* copyGridEntity(const GridEntity* source) {
     if (source == nullptr) {
       return nullptr;
@@ -194,7 +199,7 @@ using namespace Gamma;
     saveObject("placement-preview", preview);
   }
 
-  void setCurrentMeshName(Globals, const std::string& meshName) {
+  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
     auto& meshMap = context->scene.meshMap;
 
     if (meshMap.find(meshName) != meshMap.end()) {
@@ -326,8 +331,7 @@ using namespace Gamma;
 
     preview.scale = HALF_TILE_SIZE;
 
-    // @todo isPlacingFloorMesh()
-    if (state.editor.currentMeshName == "floor") {
+    if (isPlacingFloorMesh(globals)) {
       if (!findFloorPlacementPosition(globals, preview.position)) {
         preview.scale = 0.f;
       }
@@ -439,14 +443,15 @@ using namespace Gamma;
       return;
     }
 
-    // @todo isPlacingFloorMesh()
-    if (state.editor.currentMeshName == "floor") {
-      // Create a new floor tile mesh so we can continue placing them
-      setCurrentMeshName(globals, "floor");
+    if (isPlacingFloorMesh(globals)) {
+      // Create a new floor tile object, setting the current one
+      // in place and allowing us to place another
+      createPlaceableMeshObjectFrom(globals, "floor");
     } else {
-      // Stop moving the current preview mesh, setting it in placee
+      // Stop moving the current preview mesh, setting it in place
       state.editor.isPlacingMesh = false;
       state.editor.enabled = false;
+      state.editor.currentMeshName = "";
     }
   }
 
