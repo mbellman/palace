@@ -637,7 +637,7 @@ void initializeGame(Globals) {
         }
       }
 
-      if (key == Key::G) {
+      if (key == Key::M) {
         mesh("ground")->disabled = !mesh("ground")->disabled;
       }
 
@@ -676,6 +676,10 @@ void initializeGame(Globals) {
 
             objects("range-preview").reset();
           }
+        }
+
+        if (key == Key::G) {
+          state.editor.snapMeshesToGrid = !state.editor.snapMeshesToGrid;
         }
 
         if (key == Key::NUM_0) {

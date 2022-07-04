@@ -48,6 +48,7 @@ struct WorldEditor {
 
   // Placeable mesh selection
   bool isPlacingMesh = false;
+  bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
   // @todo handle light placement
 

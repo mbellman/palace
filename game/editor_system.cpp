@@ -1,3 +1,6 @@
+#include <map>
+#include <string>
+
 #include "Gamma.h"
 
 #include "grid_utilities.h"
@@ -11,6 +14,11 @@
 using namespace Gamma;
 
 #if DEVELOPMENT == 1
+  static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
+    { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) },
+    { "floor", Vec3f(0, -HALF_TILE_SIZE, 0) }
+  };
+
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
     auto* object = queryObjectByPosition(globals, objects, position);
 
@@ -76,32 +84,6 @@ using namespace Gamma;
 
       if (grid.has(testCoordinates)) {
         coordinates = testCoordinates;
-        return true;
-      }
-
-      offset += HALF_TILE_SIZE / 4.f;
-    }
-
-    return false;
-  }
-
-  static bool findFloorPlacementPosition(Globals, Vec3f& position) {
-    auto& camera = getCamera();
-    auto& editor = state.editor;
-    auto& grid = state.world.grid;
-    float offset = 0.f;
-
-    while (offset < 150.f) {
-      auto ray = camera.position + camera.orientation.getDirection() * offset;
-      auto testCoordinates = worldPositionToGridCoordinates(ray);
-      auto* entity = grid.get(testCoordinates);
-
-      if (entity != nullptr && entity->type == GROUND) {
-        auto tileCenter = gridCoordinatesToWorldPosition(testCoordinates);
-
-        // @todo offset according to the current world orientation
-        position = tileCenter + Vec3f(0, HALF_TILE_SIZE, 0);
-
         return true;
       }
 
@@ -208,6 +190,8 @@ using namespace Gamma;
       state.editor.isPlacingMesh = true;
 
       auto& object = createObjectFrom(meshName);
+
+      object.scale = HALF_TILE_SIZE;
 
       saveObject("mesh-preview", object);
 
@@ -328,15 +312,20 @@ using namespace Gamma;
   void showMeshPlacementPreview(Globals) {
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
+    auto& editor = state.editor;
+    auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
 
-    preview.scale = HALF_TILE_SIZE;
+    if (editor.snapMeshesToGrid || isPlacingFloorMesh(globals)) {
+      auto gridCoordinates = worldPositionToGridCoordinates(placementPosition);
+      auto targetMeshPosition = gridCoordinatesToWorldPosition(gridCoordinates);
 
-    if (isPlacingFloorMesh(globals)) {
-      if (!findFloorPlacementPosition(globals, preview.position)) {
-        preview.scale = 0.f;
+      if (meshPlacementOffsetMap.find(editor.currentMeshName) != meshPlacementOffsetMap.end()) {
+        targetMeshPosition += meshPlacementOffsetMap.at(editor.currentMeshName);
       }
+
+      preview.position = Vec3f::lerp(preview.position, targetMeshPosition, 0.5f);
     } else {
-      preview.position = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
+      preview.position = placementPosition;
     }
 
     commit(preview);
