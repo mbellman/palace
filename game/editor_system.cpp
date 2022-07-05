@@ -185,9 +185,18 @@ using namespace Gamma;
     auto& meshMap = context->scene.meshMap;
 
     if (meshMap.find(meshName) != meshMap.end()) {
+      // Remove the existing mesh preview when swapping it for a different mesh
+      if (
+        state.editor.isPlacingMesh &&
+        meshName != state.editor.currentMeshName
+      ) {
+        remove(object("mesh-preview"));
+      }
+
       state.editor.enabled = true;
       state.editor.currentMeshName = meshName;
       state.editor.isPlacingMesh = true;
+      state.editor.snapMeshesToGrid = true;
 
       auto& object = createObjectFrom(meshName);
 
@@ -313,9 +322,9 @@ using namespace Gamma;
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
     auto& editor = state.editor;
-    auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 3.f;
+    auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
 
-    if (editor.snapMeshesToGrid || isPlacingFloorMesh(globals)) {
+    if (editor.snapMeshesToGrid) {
       auto gridCoordinates = worldPositionToGridCoordinates(placementPosition);
       auto targetMeshPosition = gridCoordinatesToWorldPosition(gridCoordinates);
 
@@ -432,10 +441,13 @@ using namespace Gamma;
       return;
     }
 
-    if (isPlacingFloorMesh(globals)) {
-      // Create a new floor tile object, setting the current one
-      // in place and allowing us to place another
-      createPlaceableMeshObjectFrom(globals, "floor");
+    // @todo check to see if any mesh objects exist at the
+    // mesh preview position, and don't place it if so
+
+    if (state.editor.snapMeshesToGrid) {
+      // Create a new mesh object to allow continual placement
+      // until the editor is disabled
+      createPlaceableMeshObjectFrom(globals, state.editor.currentMeshName);
     } else {
       // Stop moving the current preview mesh, setting it in place
       state.editor.isPlacingMesh = false;

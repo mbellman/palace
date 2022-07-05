@@ -471,6 +471,8 @@ namespace Gamma {
       }
     }
 
+    // @todo render foliage
+
     // @todo use ctx.hasProbeReflectors
     // @todo render probe reflectors, sans reflections, within probe cubemaps
     if (areProbesRendered) {
