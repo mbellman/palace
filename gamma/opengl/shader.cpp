@@ -6,6 +6,7 @@
 #include "system/console.h"
 #include "system/file.h"
 #include "system/flags.h"
+#include "system/vector_helpers.h"
 
 #include "glew.h"
 #include "SDL.h"
@@ -15,15 +16,6 @@ namespace Gamma {
   const static std::string INCLUDE_END = "\";";
   const static std::string INCLUDE_ROOT_PATH = "./gamma/opengl/shaders/";
   const static std::map<std::string, std::string> emptyMap;
-
-  /**
-   * Gm_VectorContains
-   * -----------------
-   */
-  template<typename T>
-  static bool Gm_VectorContains(const std::vector<T>& vector, T element) {
-    return std::find(vector.begin(), vector.end(), element) != vector.end();
-  }
 
   /**
    * Gm_CompileShader

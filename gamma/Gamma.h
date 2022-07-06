@@ -15,3 +15,4 @@
 #include "system/scene.h"
 #include "system/string_helpers.h"
 #include "system/type_aliases.h"
+#include "system/vector_helpers.h"

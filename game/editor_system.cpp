@@ -1,6 +1,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "Gamma.h"
 
@@ -15,9 +16,16 @@
 using namespace Gamma;
 
 #if DEVELOPMENT == 1
+  static const std::vector<std::string> meshNames = {
+    "dirt-floor",
+    "rock",
+    "arch",
+    "hedge"
+  };
+
   static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
-    { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) },
-    { "floor", Vec3f(0, -HALF_TILE_SIZE, 0) }
+    { "dirt-floor", Vec3f(0, -HALF_TILE_SIZE, 0) },
+    { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) }
   };
 
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
@@ -96,7 +104,6 @@ using namespace Gamma;
 
   static Object* findMeshObjectByDirection(Globals, const Vec3f& direction) {
     auto& camera = getCamera();
-    static auto meshNames = { "floor", "rock", "arch", "hedge" };
     float closestDistance = FLT_MAX;
     Object* found = nullptr;
 
@@ -116,6 +123,7 @@ using namespace Gamma;
         ) {
           closestDistance = objectDistance;
           found = &object;
+          state.editor.currentMeshName = meshName;
         }
       }
     }
@@ -152,11 +160,6 @@ using namespace Gamma;
     }
 
     editor.editActions[editor.totalEditActions++] = action;
-  }
-
-  static bool isPlacingFloorMesh(Globals) {
-    // @todo check for all floor mesh names
-    return state.editor.currentMeshName == "floor";
   }
 
   static GridEntity* copyGridEntity(const GridEntity* source) {
@@ -516,8 +519,6 @@ using namespace Gamma;
 
       state.editor.isFindingMesh = false;
       state.editor.isPlacingMesh = true;
-      // @todo
-      // state.editor.currentMeshName = ...
     }
   }
 
@@ -653,14 +654,19 @@ using namespace Gamma;
     Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
   }
 
+  // @todo save rotation + scale
   void saveMeshData(Globals) {
     std::string serialized;
+    auto* previewMesh = findObject("mesh-preview");
 
-    serialized += "dirt_floor\n";
+    for (auto& meshName : meshNames) {
+      serialized += meshName + "\n";
 
-    for (auto& object : objects("floor")) {
-      // @todo save floor grid coordinates + world orientation
-      serialized += serialize3Vector(object.position) + "\n";
+      for (auto& object : objects(meshName)) {
+        if (&object != previewMesh) {
+          serialized += serialize3Vector(object.position) + "\n";
+        }
+      }
     }
 
     Gm_WriteFileContents("./game/world/mesh_data.txt", serialized);
@@ -737,6 +743,34 @@ using namespace Gamma;
   }
 
   void loadMeshData(Globals) {
+    std::ifstream file("./game/world/mesh_data.txt");
 
+    if (file.fail()) {
+      return;
+    }
+
+    std::string line;
+    std::string currentMeshName;
+
+    while (std::getline(file, line)) {
+      if (Gm_VectorContains(meshNames, line)) {
+        currentMeshName = line;
+      } else {
+        auto data = Gm_SplitString(line, ",");
+
+        Vec3f position = {
+          stof(data[0]),
+          stof(data[1]),
+          stof(data[2])
+        };
+
+        auto& object = createObjectFrom(currentMeshName);
+
+        object.position = position;
+        object.scale = HALF_TILE_SIZE;
+
+        commit(object);
+      }
+    }
   }
 #endif

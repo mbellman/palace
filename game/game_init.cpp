@@ -335,10 +335,10 @@ static void addMeshes(Globals) {
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
-  // Floor mesh
-  addMesh("floor", 0xffff, Mesh::Plane(2));
-  mesh("floor")->texture = "./game/textures/dirt-floor.png";
-  mesh("floor")->normalMap = "./game/textures/dirt-normals.png";
+  // Dirt floor mesh
+  addMesh("dirt-floor", 0xffff, Mesh::Plane(2));
+  mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
+  mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
 
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
@@ -596,6 +596,7 @@ void initializeGame(Globals) {
           handleEditorMeshSelectionAction(globals);
         } else if (state.editor.isPlacingMesh) {
           handleEditorMeshPlacementAction(globals);
+          saveMeshData(globals);
         } else if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
             handleEditorRangedClickAction(globals);
@@ -623,16 +624,16 @@ void initializeGame(Globals) {
     });
   #endif
 
+  addMeshes(globals);
+  addParticles(globals);  // @temporary
   addKeyHandlers(globals);
   // addOrientationTestLayout(globals);
 
   #if DEVELOPMENT == 1
     loadWorldData(globals);
+    loadMeshData(globals);
   #endif
 
-  addParticles(globals);
-
-  addMeshes(globals);
   addEntityObjects(globals);
   addSwitchEntityEffects(globals);
 

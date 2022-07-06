@@ -194,17 +194,21 @@ void Gm_SaveLight(GmContext* context, const std::string& lightName, Gamma::Light
 }
 
 bool Gm_HasObject(GmContext* context, const std::string& objectName) {
+  return Gm_FindObject(context, objectName) != nullptr;
+}
+
+Gamma::Object* Gm_FindObject(GmContext* context, const std::string& objectName) {
   auto& scene = context->scene;
   auto& store = scene.objectStore;
 
   if (store.find(objectName) == store.end()) {
-    return false;
+    return nullptr;
   }
 
   auto& record = store.at(objectName);
   auto& mesh = scene.meshes[record.meshIndex];
 
-  return mesh->objects.getByRecord(record) != nullptr;
+  return mesh->objects.getByRecord(record);
 }
 
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName) {
