@@ -1,3 +1,4 @@
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -587,5 +588,155 @@ using namespace Gamma;
 
       offset += HALF_TILE_SIZE;
     }
+  }
+
+  #define serialize3Vector(value) std::to_string(value.x) + "," + std::to_string(value.y) + "," + std::to_string(value.z)
+
+  // Wrap a value to within the [0, TAU] range
+  #define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
+
+  void saveWorldData(Globals) {
+    std::string serialized;
+
+    serialized += "ground\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == GROUND) {
+        serialized += serialize3Vector(coordinates) + "\n";
+      }
+    }
+
+    serialized += "staircase\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == STAIRCASE) {
+        auto orientationAsVec3f = ((Staircase*)entity)->orientation.toVec3f();
+
+        wrap(orientationAsVec3f.x);
+        wrap(orientationAsVec3f.y);
+        wrap(orientationAsVec3f.z);
+
+        serialized += serialize3Vector(coordinates) + ",";
+        serialized += serialize3Vector(orientationAsVec3f) + "\n";
+      }
+    }
+
+    serialized += "switch\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == SWITCH) {
+        serialized += serialize3Vector(coordinates) + "\n";
+      }
+    }
+
+    serialized += "woc\n";
+
+    // @todo define in orientation_system
+    static std::map<WorldOrientation, std::string> worldOrientationToString = {
+      { POSITIVE_Y_UP, "+Y" },
+      { NEGATIVE_Y_UP, "-Y" },
+      { POSITIVE_X_UP, "+X" },
+      { NEGATIVE_X_UP, "-X" },
+      { POSITIVE_Z_UP, "+Z" },
+      { NEGATIVE_Z_UP, "-Z" }
+    };
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == WORLD_ORIENTATION_CHANGE) {
+        auto worldOrientation = ((WorldOrientationChange*)entity)->targetWorldOrientation;
+
+        serialized += serialize3Vector(coordinates) + ",";
+        serialized += worldOrientationToString[worldOrientation] + "\n";
+      }
+    }
+
+    Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
+  }
+
+  void saveMeshData(Globals) {
+    std::string serialized;
+
+    serialized += "dirt_floor\n";
+
+    for (auto& object : objects("floor")) {
+      // @todo save floor grid coordinates + world orientation
+      serialized += serialize3Vector(object.position) + "\n";
+    }
+
+    Gm_WriteFileContents("./game/world/mesh_data.txt", serialized);
+  }
+
+  void loadWorldData(Globals) {
+    auto& grid = state.world.grid;
+    EntityType currentEntityType;
+    std::ifstream file("./game/world/raw_data.txt");
+
+    if (file.fail()) {
+      return;
+    }
+
+    std::string line;
+
+    // @todo define in orientation_system
+    static std::map<std::string, WorldOrientation> stringToWorldOrientation = {
+      { "+Y", POSITIVE_Y_UP },
+      { "-Y", NEGATIVE_Y_UP },
+      { "+X", POSITIVE_X_UP },
+      { "-X", NEGATIVE_X_UP },
+      { "+Z", POSITIVE_Z_UP },
+      { "-Z", NEGATIVE_Z_UP }
+    };
+
+    while (std::getline(file, line)) {
+      if (line == "ground") {
+        currentEntityType = GROUND;
+      } else if (line == "staircase") {
+        currentEntityType = STAIRCASE;
+      } else if (line == "switch") {
+        currentEntityType = SWITCH;
+      } else if (line == "woc") {
+        currentEntityType = WORLD_ORIENTATION_CHANGE;
+      } else {
+        auto data = Gm_SplitString(line, ",");
+        auto x = (s16)stoi(data[0]);
+        auto y = (s16)stoi(data[1]);
+        auto z = (s16)stoi(data[2]);
+
+        switch (currentEntityType) {
+          case GROUND:
+            grid.set({ x, y, z }, new Ground);
+            break;
+          case STAIRCASE: {
+            auto pitch = stof(data[3]);
+            auto yaw = stof(data[4]);
+            auto roll = stof(data[5]);
+            auto* staircase = new Staircase;
+
+            staircase->orientation = { roll, pitch, yaw };
+
+            grid.set({ x, y, z }, staircase);
+            break;
+          }
+          case SWITCH:
+            grid.set({ x, y, z }, new Switch);
+            break;
+          case WORLD_ORIENTATION_CHANGE: {
+            auto worldOrientation = stringToWorldOrientation[data[3]];
+            auto* worldOrientationChange = new WorldOrientationChange;
+
+            worldOrientationChange->targetWorldOrientation = worldOrientation;
+
+            grid.set({ x, y, z }, worldOrientationChange);
+            break;
+          }
+        }
+      }
+    }
+
+    file.close();
+  }
+
+  void loadMeshData(Globals) {
+
   }
 #endif

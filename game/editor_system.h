@@ -83,4 +83,8 @@ struct WorldEditor {
   void handleEditorMeshSelectionAction(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
   void placeCameraAtClosestWalkableTile(GmContext* context, GameState& state);
+  void saveWorldData(GmContext* context, GameState& state);
+  void saveMeshData(GmContext* context, GameState& state);
+  void loadWorldData(GmContext* context, GameState& state);
+  void loadMeshData(GmContext* context, GameState& state);
 #endif
