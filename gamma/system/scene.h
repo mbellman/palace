@@ -21,6 +21,7 @@
 #define commit(object) Gm_Commit(context, object)
 #define saveObject(objectName, object) Gm_SaveObject(context, objectName, object)
 #define saveLight(lightName, light) Gm_SaveLight(context, lightName, light)
+#define hasObject(objectName) Gm_HasObject(context, objectName)
 #define object(objectName) Gm_GetObject(context, objectName)
 #define light(lightName) Gm_GetLight(context, lightName)
 #define remove(object) Gm_RemoveObject(context, object)
@@ -69,6 +70,7 @@ void Gm_Commit(GmContext* context, const Gamma::Object& object);
 Gamma::ObjectPool& Gm_GetObjects(GmContext* context, const std::string& meshName);
 void Gm_SaveObject(GmContext* context, const std::string& objectName, const Gamma::Object& object);
 void Gm_SaveLight(GmContext* context, const std::string& lightName, Gamma::Light* light);
+bool Gm_HasObject(GmContext* context, const std::string& objectName);
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName);
 Gamma::Light& Gm_GetLight(GmContext* context, const std::string& lightName);
 void Gm_RemoveObject(GmContext* context, const Gamma::Object& object);

@@ -35,19 +35,19 @@ struct EditAction : ReplacedEntityRecord {
 };
 
 struct WorldEditor {
-  // Flags
   bool enabled = false;
+
+  // Placeable entity selection
   bool useRange = false;
   bool rangeFromSelected = false;
   bool deleting = false;
-
-  // Placeable entity selection
-  EntityType currentSelectedEntityType = GROUND;  // @todo deprecate
-  u8 currentSelectedEntityIndex = 0;              // @todo use as new value
+  EntityType currentSelectedEntityType = GROUND;
+  u8 currentSelectedEntityIndex = 0;
   float lastEntityChangeTime = 0;
 
   // Placeable mesh selection
   bool isPlacingMesh = false;
+  bool isFindingMesh = false;
   bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
   // @todo handle light placement
@@ -76,9 +76,11 @@ struct WorldEditor {
   void showRangeFromSelectionPreview(GmContext* context, GameState& state);
   void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
   void showMeshPlacementPreview(GmContext* context, GameState& state);
+  void showMeshFinderPreview(GmContext* context, GameState& state);
   void handleEditorSingleTileClickAction(GmContext* context, GameState& state);
   void handleEditorRangedClickAction(GmContext* context, GameState& state);
   void handleEditorMeshPlacementAction(GmContext* context, GameState& state);
+  void handleEditorMeshSelectionAction(GmContext* context, GameState& state);
   void undoPreviousEditAction(GmContext* context, GameState& state);
   void placeCameraAtClosestWalkableTile(GmContext* context, GameState& state);
 #endif

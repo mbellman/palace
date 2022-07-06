@@ -93,6 +93,35 @@ using namespace Gamma;
     return false;
   }
 
+  static Object* findMeshObjectByDirection(Globals, const Vec3f& direction) {
+    auto& camera = getCamera();
+    static auto meshNames = { "floor", "rock", "arch", "hedge" };
+    float closestDistance = FLT_MAX;
+    Object* found = nullptr;
+
+    // @todo see if we need to optimize this once the number
+    // of objects per mesh extends into the hundreds/thousands
+    for (auto& meshName : meshNames) {
+      for (auto& object : objects(meshName)) {
+        auto cameraToObject = object.position - camera.position;
+        auto objectDistance = cameraToObject.magnitude();
+        auto unitCameraToObject = cameraToObject / objectDistance;
+        auto dot = Vec3f::dot(unitCameraToObject, direction);
+        auto angleRange = 1.f / (objectDistance + 1.f);
+
+        if (
+          dot > 1.f - angleRange &&
+          objectDistance < closestDistance
+        ) {
+          closestDistance = objectDistance;
+          found = &object;
+        }
+      }
+    }
+
+    return found;
+  }
+
   static void storeEditAction(Globals, EditAction& action) {
     auto& editor = state.editor;
 
@@ -340,6 +369,25 @@ using namespace Gamma;
     commit(preview);
   }
 
+  void showMeshFinderPreview(Globals) {
+    auto& camera = getCamera();
+    auto* object = findMeshObjectByDirection(globals, camera.orientation.getDirection());
+
+    // Reset the mesh preview highlight color
+    if (hasObject("mesh-preview")) {
+      object("mesh-preview").color = Vec3f(1.f);
+
+      commit(object("mesh-preview"));
+    }
+
+    if (object != nullptr) {
+      object->color = Vec3f(1.f, 0, 0);
+
+      commit(*object);
+      saveObject("mesh-preview", *object);
+    }
+  }
+
   void handleEditorSingleTileClickAction(Globals) {
     auto& grid = state.world.grid;
     GridCoordinates targetCoordinates;
@@ -453,6 +501,22 @@ using namespace Gamma;
       state.editor.isPlacingMesh = false;
       state.editor.enabled = false;
       state.editor.currentMeshName = "";
+    }
+  }
+
+  void handleEditorMeshSelectionAction(Globals) {
+    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
+
+    if (object != nullptr) {
+      saveObject("mesh-preview", *object);
+
+      object("mesh-preview").color = Vec3f(1.f);
+      commit(object("mesh-preview"));
+
+      state.editor.isFindingMesh = false;
+      state.editor.isPlacingMesh = true;
+      // @todo
+      // state.editor.currentMeshName = ...
     }
   }
 

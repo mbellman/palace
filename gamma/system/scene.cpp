@@ -193,6 +193,20 @@ void Gm_SaveLight(GmContext* context, const std::string& lightName, Gamma::Light
   context->scene.lightStore[lightName] = light;
 }
 
+bool Gm_HasObject(GmContext* context, const std::string& objectName) {
+  auto& scene = context->scene;
+  auto& store = scene.objectStore;
+
+  if (store.find(objectName) == store.end()) {
+    return false;
+  }
+
+  auto& record = store.at(objectName);
+  auto& mesh = scene.meshes[record.meshIndex];
+
+  return mesh->objects.getByRecord(record) != nullptr;
+}
+
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName) {
   auto& scene = context->scene;
   // @todo assert that the object exists
