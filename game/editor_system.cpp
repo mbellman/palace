@@ -596,7 +596,7 @@ using namespace Gamma;
   // Wrap a value to within the [0, TAU] range
   #define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
 
-  void saveWorldData(Globals) {
+  void saveWorldGridData(Globals) {
     std::string serialized;
 
     serialized += "ground\n";
@@ -651,7 +651,7 @@ using namespace Gamma;
       }
     }
 
-    Gm_WriteFileContents("./game/world/raw_data.txt", serialized);
+    Gm_WriteFileContents("./game/world/grid_data.txt", serialized);
   }
 
   // @todo save rotation + scale
@@ -672,10 +672,10 @@ using namespace Gamma;
     Gm_WriteFileContents("./game/world/mesh_data.txt", serialized);
   }
 
-  void loadWorldData(Globals) {
+  void loadWorldGridData(Globals) {
     auto& grid = state.world.grid;
     EntityType currentEntityType;
-    std::ifstream file("./game/world/raw_data.txt");
+    std::ifstream file("./game/world/grid_data.txt");
 
     if (file.fail()) {
       return;

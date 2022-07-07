@@ -414,7 +414,7 @@ void initializeGame(Globals) {
       // Undo editor actions
       if (state.editor.enabled && input.isKeyHeld(Key::CONTROL) && key == Key::Z) {
         undoPreviousEditAction(globals);
-        saveWorldData(globals);
+        saveWorldGridData(globals);
       }
 
       // Toggle free camera mode
@@ -600,13 +600,13 @@ void initializeGame(Globals) {
         } else if (state.editor.useRange) {
           if (state.editor.rangeFromSelected) {
             handleEditorRangedClickAction(globals);
-            saveWorldData(globals);
+            saveWorldGridData(globals);
           } else {
             selectRangeFrom(globals);
           }
         } else {
           handleEditorSingleTileClickAction(globals);
-          saveWorldData(globals);
+          saveWorldGridData(globals);
         }
       }
     });
@@ -630,7 +630,7 @@ void initializeGame(Globals) {
   // addOrientationTestLayout(globals);
 
   #if DEVELOPMENT == 1
-    loadWorldData(globals);
+    loadWorldGridData(globals);
     loadMeshData(globals);
   #endif
 
