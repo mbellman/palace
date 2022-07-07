@@ -637,10 +637,10 @@ void initializeGame(Globals) {
   addEntityObjects(globals);
   addSwitchEntityEffects(globals);
 
-  auto& sunlight = createLight(DIRECTIONAL_SHADOWCASTER);
+  auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
 
-  sunlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
-  sunlight.color = Vec3f(1.f, 0.7f, 0.2f);
+  moonlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
+  moonlight.color = Vec3f(0.8f, 0.8f, 1.f);
 
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -13 });
 

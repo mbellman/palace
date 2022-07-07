@@ -666,6 +666,8 @@ namespace Gamma {
     shader.setInt("texColorAndDepth", 0);
     shader.setInt("texNormalAndEmissivity", 1);
 
+    // @todo allow for custom configuration
+
     OpenGLScreenQuad::render();
   }
 
@@ -933,6 +935,8 @@ namespace Gamma {
     shaders.skybox.setVec3f("cameraPosition", ctx.activeCamera->position);
     shaders.skybox.setMatrix4f("matInverseProjection", ctx.matInverseProjection);
     shaders.skybox.setMatrix4f("matInverseView", ctx.matInverseView);
+
+    // @todo allow for custom configuration
 
     OpenGLScreenQuad::render();
   }

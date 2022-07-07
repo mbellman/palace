@@ -1,9 +1,10 @@
 // @todo track shader dependencies as part of hot reloading
+// @todo allow for custom configuration
 vec3 getSkyColor(vec3 direction) {
   vec3 sunDirection = normalize(vec3(0.3, 0.5, -1.0));
-  vec3 sunColor = vec3(1.0, 0.3, 0.1);
+  vec3 sunColor = vec3(0.8, 0.8, 1.0);
   float sunBrightness = 10;
-  float altitude = 0.2;
+  float altitude = 0.7;
 
   float y = direction.y + altitude;
   float z = direction.z;
@@ -18,7 +19,7 @@ vec3 getSkyColor(vec3 direction) {
 
   return vec3(
     max(base_r + atmosphere.r, 0),
-    max(base_g + 0.7 * atmosphere.g, 0),
-    max(base_b + 0.4 * atmosphere.b, 0)
+    max(base_g + atmosphere.g, 0),
+    max(base_b + atmosphere.b, 0)
   );
 }

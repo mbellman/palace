@@ -12,7 +12,6 @@ noperspective in vec2 fragUv;
 layout (location = 0) out vec4 out_color_and_depth;
 
 #include "utils/random.glsl";
-#include "utils/skybox.glsl";
 #include "utils/helpers.glsl";
 #include "utils/conversion.glsl";
 
