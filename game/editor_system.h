@@ -87,4 +87,5 @@ struct WorldEditor {
   void saveMeshData(GmContext* context, GameState& state);
   void loadWorldGridData(GmContext* context, GameState& state);
   void loadMeshData(GmContext* context, GameState& state);
+  void loadLightData(GmContext* context, GameState& state);
 #endif

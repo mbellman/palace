@@ -632,6 +632,7 @@ void initializeGame(Globals) {
   #if DEVELOPMENT == 1
     loadWorldGridData(globals);
     loadMeshData(globals);
+    loadLightData(globals);
   #endif
 
   addEntityObjects(globals);

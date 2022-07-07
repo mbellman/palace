@@ -681,6 +681,8 @@ using namespace Gamma;
       return;
     }
 
+    defer(file.close());
+
     std::string line;
 
     // @todo define in orientation_system
@@ -738,8 +740,6 @@ using namespace Gamma;
         }
       }
     }
-
-    file.close();
   }
 
   void loadMeshData(Globals) {
@@ -748,6 +748,8 @@ using namespace Gamma;
     if (file.fail()) {
       return;
     }
+
+    defer(file.close());
 
     std::string line;
     std::string currentMeshName;
@@ -770,6 +772,42 @@ using namespace Gamma;
         object.scale = HALF_TILE_SIZE;
 
         commit(object);
+      }
+    }
+  }
+
+  void loadLightData(Globals) {
+    std::ifstream file("./game/world/light_data.txt");
+
+    if (file.fail()) {
+      return;
+    }
+
+    defer(file.close());
+
+    std::string line;
+    LightType currentLightType;
+
+    while (std::getline(file, line)) {
+      if (line == "point") {
+        currentLightType = LightType::POINT;
+      } else {
+        auto data = Gm_SplitString(line, ",");
+        auto& light = createLight(currentLightType);
+
+        light.position = {
+          stof(data[0]),
+          stof(data[1]),
+          stof(data[2])
+        };
+
+        light.color = {
+          stof(data[3]),
+          stof(data[4]),
+          stof(data[5])
+        };
+
+        light.radius = stof(data[6]);
       }
     }
   }
