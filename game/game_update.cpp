@@ -11,42 +11,50 @@
 
 using namespace Gamma;
 
-std::string worldOrientationToString(WorldOrientation worldOrientation) {
-  switch (worldOrientation) {
-    default:
-    case POSITIVE_Y_UP: return "+Y up";
-    case NEGATIVE_Y_UP: return "-Y up";
-    case POSITIVE_X_UP: return "+X up";
-    case NEGATIVE_X_UP: return "-X up";
-    case POSITIVE_Z_UP: return "+Z up";
-    case NEGATIVE_Z_UP: return "-Z up";
+#if DEVELOPMENT == 1
+  static std::string worldOrientationToString(WorldOrientation worldOrientation) {
+    switch (worldOrientation) {
+      default:
+      case POSITIVE_Y_UP: return "+Y up";
+      case NEGATIVE_Y_UP: return "-Y up";
+      case POSITIVE_X_UP: return "+X up";
+      case NEGATIVE_X_UP: return "-X up";
+      case POSITIVE_Z_UP: return "+Z up";
+      case NEGATIVE_Z_UP: return "-Z up";
+    }
   }
-}
 
-static void addDebugMessages(Globals) {
-  auto& camera = getCamera();
-  auto& coordinates = worldPositionToGridCoordinates(camera.position);
+  static void addDebugMessages(Globals) {
+    auto& camera = getCamera();
+    auto& coordinates = worldPositionToGridCoordinates(camera.position);
 
-  std::string positionLabel = "Grid position: "
-    + std::to_string(coordinates.x) + ","
-    + std::to_string(coordinates.y) + ","
-    + std::to_string(coordinates.z);
+    std::string worldPositionLabel = "World position: "
+      + std::to_string(camera.position.x) + ","
+      + std::to_string(camera.position.y) + ","
+      + std::to_string(camera.position.z);
 
-  std::string orientationLabel = std::string("Camera orientation: ")
-    + std::to_string(camera.orientation.pitch) + " (pitch), "
-    + std::to_string(camera.orientation.yaw) + " (yaw), "
-    + std::to_string(camera.orientation.roll) + " (roll)";
+    std::string gridPositionLabel = "Grid position: "
+      + std::to_string(coordinates.x) + ","
+      + std::to_string(coordinates.y) + ","
+      + std::to_string(coordinates.z);
 
-  std::string worldOrientationLabel = "World orientation: " + worldOrientationToString(state.worldOrientationState.worldOrientation);
-  std::string entitiesLabel = "Total static entities: " + std::to_string(state.world.grid.size());
-  std::string editorWorldOrientationLabel = "Editor world orientation: " + worldOrientationToString(state.editor.currentSelectedWorldOrientation);
+    std::string orientationLabel = std::string("Camera orientation: ")
+      + std::to_string(camera.orientation.pitch) + " (pitch), "
+      + std::to_string(camera.orientation.yaw) + " (yaw), "
+      + std::to_string(camera.orientation.roll) + " (roll)";
 
-  addDebugMessage(positionLabel);
-  addDebugMessage(orientationLabel);
-  addDebugMessage(worldOrientationLabel);
-  addDebugMessage(entitiesLabel);
-  addDebugMessage(editorWorldOrientationLabel);
-}
+    std::string worldOrientationLabel = "World orientation: " + worldOrientationToString(state.worldOrientationState.worldOrientation);
+    std::string entitiesLabel = "Total static entities: " + std::to_string(state.world.grid.size());
+    std::string editorWorldOrientationLabel = "Editor world orientation: " + worldOrientationToString(state.editor.currentSelectedWorldOrientation);
+
+    addDebugMessage(worldPositionLabel);
+    addDebugMessage(gridPositionLabel);
+    addDebugMessage(orientationLabel);
+    addDebugMessage(worldOrientationLabel);
+    addDebugMessage(entitiesLabel);
+    addDebugMessage(editorWorldOrientationLabel);
+  }
+#endif
 
 void updateGame(Globals, float dt) {
   #if DEVELOPMENT == 1

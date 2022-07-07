@@ -13,6 +13,10 @@ const GmSceneStats Gm_GetSceneStats(GmContext* context) {
   GmSceneStats stats;
 
   for (auto* mesh : context->scene.meshes) {
+    if (mesh->disabled) {
+      continue;
+    }
+
     if (mesh->lods.size() > 0) {
       for (auto& lod : mesh->lods) {
         stats.verts += lod.vertexCount * lod.instanceCount;
