@@ -356,7 +356,7 @@ static void addMeshes(Globals) {
   #endif
 }
 
-static void addEntityObjects(Globals) {
+static void createEntityObjects(Globals) {
   auto& grid = state.world.grid;
 
   for (auto& [ coordinates, entity ] : grid) {
@@ -561,6 +561,7 @@ void initializeGame(Globals) {
   #endif
 
   addMeshes(globals);
+  addSwitchEntityEffects(globals);
   addParticles(globals);  // @temporary
   addKeyHandlers(globals);
   // addOrientationTestLayout(globals);
@@ -569,10 +570,11 @@ void initializeGame(Globals) {
     loadWorldGridData(globals);
     loadMeshData(globals);
     loadLightData(globals);
+  #else
+    // @todo
   #endif
 
-  addEntityObjects(globals);
-  addSwitchEntityEffects(globals);
+  createEntityObjects(globals);
 
   auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
 
