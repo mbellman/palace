@@ -72,7 +72,12 @@ void updateGame(Globals, float dt) {
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {
-      if (state.editor.isFindingMesh) {
+      // @todo move to editor_system
+      if (state.editor.isFindingLight) {
+        showLightFinderPreview(globals);
+      } else if (state.editor.isPlacingLight) {
+        showLightPlacementPreview(globals);
+      } else if (state.editor.isFindingMesh) {
         showMeshFinderPreview(globals);
       } else if (state.editor.isPlacingMesh) {
         showMeshPlacementPreview(globals);
@@ -84,6 +89,9 @@ void updateGame(Globals, float dt) {
         showGridEntityPlacementPreview(globals);
       }
     }
+
+    mesh("trigger-indicator")->disabled = !state.editor.enabled;
+    mesh("light-indicator")->disabled = !state.editor.enabled;
 
     // @todo we may actually have use for camera warp-to behavior
     // during gameplay, so it may be useful to extract this into

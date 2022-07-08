@@ -38,7 +38,7 @@ struct EditAction : ReplacedEntityRecord {
 struct WorldEditor {
   bool enabled = false;
 
-  // Placeable entity selection
+  // Grid entity placement
   bool useRange = false;
   bool rangeFromSelected = false;
   bool deleting = false;
@@ -46,12 +46,17 @@ struct WorldEditor {
   u8 currentSelectedEntityIndex = 0;
   float lastEntityChangeTime = 0;
 
-  // Placeable mesh selection
+  // Mesh placement
   bool isPlacingMesh = false;
   bool isFindingMesh = false;
   bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
-  // @todo handle light placement
+
+  // Light placement
+  bool isPlacingLight = false;
+  bool isFindingLight = false;
+  Gamma::Light* selectedLight = nullptr;
+  Gamma::LightType currentLightType = Gamma::LightType::POINT;
 
   // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
@@ -71,6 +76,7 @@ struct WorldEditor {
 #if DEVELOPMENT == 1
   void toggleEditor(Globals);
   void toggleMeshFinder(Globals);
+  void toggleLightFinder(Globals);
   void setCurrentSelectedEntityType(Globals, EntityType type);
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName);
   void adjustCurrentEntityOrientation(Globals, const Gamma::Orientation& adjustment);
@@ -79,6 +85,8 @@ struct WorldEditor {
   void showRangedEntityPlacementPreview(Globals);
   void showMeshPlacementPreview(Globals);
   void showMeshFinderPreview(Globals);
+  void showLightPlacementPreview(Globals);
+  void showLightFinderPreview(Globals);
   void handleEditorClickAction(Globals);
   void undoPreviousEditAction(Globals);
   void placeCameraAtClosestWalkableTile(Globals);

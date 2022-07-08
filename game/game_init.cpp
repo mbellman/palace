@@ -519,6 +519,10 @@ void initializeGame(Globals) {
         toggleMeshFinder(globals);
       }
 
+      if (key == Key::L) {
+        toggleLightFinder(globals);
+      }
+
       // Editor controls while enabled
       if (state.editor.enabled) {
         // Toggle ranged tile placement

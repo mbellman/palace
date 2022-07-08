@@ -29,7 +29,7 @@ using namespace Gamma;
   };
 
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
-    auto* object = queryObjectByPosition(globals, objects, position);
+    auto* object = findObjectByPosition(globals, objects, position);
 
     if (object != nullptr) {
       remove(*object);
@@ -358,37 +358,66 @@ using namespace Gamma;
   }
 
   void toggleEditor(Globals) {
-    state.editor.enabled = !state.editor.enabled;
+    auto& editor = state.editor;
 
-    mesh("trigger-indicator")->disabled = !state.editor.enabled;
-    mesh("light-indicator")->disabled = !state.editor.enabled;
+    editor.enabled = !editor.enabled;
 
-    if (!state.editor.enabled) {
+    if (!editor.enabled) {
       hideEntityPlacementPreview(globals);
 
-      if (state.editor.isPlacingMesh) {
+      if (editor.isPlacingMesh) {
         stopPlacingMesh(globals);
       }
 
-      if (state.editor.isFindingMesh) {
+      if (editor.isFindingMesh) {
         disableMeshFinder(globals);
       }
+
+      // @todo disableLightPlacement()
+      editor.isPlacingLight = false;
+      editor.isFindingLight = false;
 
       context->renderer->resetShadowMaps();
     }
   }
 
   void toggleMeshFinder(Globals) {
-    state.editor.isFindingMesh = !state.editor.isFindingMesh;
-    state.editor.enabled = state.editor.isFindingMesh;
+    auto& editor = state.editor;
 
-    hideEntityPlacementPreview(globals);
+    editor.isFindingMesh = !editor.isFindingMesh;
+    editor.enabled = editor.isFindingMesh;
 
-    if (state.editor.isPlacingMesh) {
+    if (editor.isPlacingMesh) {
       stopPlacingMesh(globals);
     }
 
-    if (!state.editor.isFindingMesh) {
+    if (!editor.isFindingMesh) {
+      disableMeshFinder(globals);
+    }
+
+    // @todo disableGridEntityPlacement()
+    hideEntityPlacementPreview(globals);
+
+    // @todo disableLightPlacement()
+    editor.isPlacingLight = false;
+    editor.isFindingLight = false;
+  }
+  
+  void toggleLightFinder(Globals) {
+    auto& editor = state.editor;
+
+    editor.isFindingLight = !editor.isFindingLight;
+    editor.enabled = editor.isFindingLight;
+
+    // @todo disableGridEntityPlacement()
+    hideEntityPlacementPreview(globals);
+
+    // @todo disableMeshPlacement()
+    if (editor.isPlacingMesh) {
+      stopPlacingMesh(globals);
+    }
+
+    if (editor.isFindingMesh) {
       disableMeshFinder(globals);
     }
   }
@@ -419,21 +448,25 @@ using namespace Gamma;
   }
 
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
+    auto& editor = state.editor;
     auto& meshMap = context->scene.meshMap;
 
     if (meshMap.find(meshName) != meshMap.end()) {
       // Remove the existing mesh preview when swapping it for a different mesh
       if (
-        state.editor.isPlacingMesh &&
-        meshName != state.editor.currentMeshName
+        editor.isPlacingMesh &&
+        meshName != editor.currentMeshName
       ) {
         remove(object("mesh-preview"));
       }
 
-      state.editor.enabled = true;
-      state.editor.currentMeshName = meshName;
-      state.editor.isPlacingMesh = true;
-      state.editor.snapMeshesToGrid = true;
+      editor.enabled = true;
+      editor.currentMeshName = meshName;
+      editor.isPlacingMesh = true;
+      editor.snapMeshesToGrid = true;
+
+      editor.isPlacingLight = false;
+      editor.isFindingLight = false;
 
       auto& object = createObjectFrom(meshName);
 
@@ -579,14 +612,73 @@ using namespace Gamma;
     }
   }
 
+  void showLightPlacementPreview(Globals) {
+    auto& editor = state.editor;
+
+    if (editor.selectedLight != nullptr) {
+      // @todo
+    }
+  }
+
+  void showLightFinderPreview(Globals) {
+    auto& editor = state.editor;
+    auto& scene = context->scene;
+    auto& camera = getCamera();
+    auto& cameraDirection = camera.orientation.getDirection();
+    auto closestDistance = FLT_MAX;
+    auto& lightIndicators = objects("light-indicator");
+
+    editor.selectedLight = nullptr;
+
+    for (auto& indicator : lightIndicators) {
+      indicator.color = Vec3f(1.f);
+
+      commit(indicator);
+    }
+
+    for (auto* light : scene.lights) {
+      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+        auto cameraToLight = light->position - camera.position;
+        auto lightDistance = cameraToLight.magnitude();
+        auto unitCameraToObject = cameraToLight / lightDistance;
+        auto dot = Vec3f::dot(unitCameraToObject, cameraDirection);
+        auto angleRange = 1.f / (lightDistance + 1.f);
+
+        if (
+          dot > 1.f - angleRange &&
+          lightDistance < closestDistance
+        ) {
+          closestDistance = lightDistance;
+          editor.selectedLight = light;
+        }
+      }
+    }
+
+    if (editor.selectedLight != nullptr) {
+      auto* indicator = findObjectByPosition(globals, lightIndicators, state.editor.selectedLight->position);
+
+      if (indicator != nullptr) {
+        indicator->color = Vec3f(1.f, 0, 0);
+
+        commit(*indicator);
+      }
+    }
+  }
+
   void handleEditorClickAction(Globals) {
-    if (state.editor.isFindingMesh) {
+    auto& editor = state.editor;
+
+    if (editor.isFindingLight) {
+      // @todo
+    } else if (editor.isPlacingLight) {
+      // @todo
+    } else if (editor.isFindingMesh) {
       handleMeshSelectionAction(globals);
-    } else if (state.editor.isPlacingMesh) {
+    } else if (editor.isPlacingMesh) {
       handleMeshPlacementAction(globals);
       saveMeshData(globals);
-    } else if (state.editor.useRange) {
-      if (state.editor.rangeFromSelected) {
+    } else if (editor.useRange) {
+      if (editor.rangeFromSelected) {
         handleRangedClickAction(globals);
         saveWorldGridData(globals);
       } else {
