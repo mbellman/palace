@@ -369,7 +369,7 @@ static void addEntityObjects(Globals) {
     
     preview.scale = 0.f;
 
-    saveObject("placement-preview", preview);
+    saveObject("entity-preview", preview);
     commit(preview);
   #endif
 }
@@ -473,44 +473,19 @@ void initializeGame(Globals) {
 
       auto key = event.key;
 
-      // Toggle world editor
       if (key == Key::E) {
-        // @todo toggleEditor()
-        state.editor.enabled = !state.editor.enabled;
-
-        if (!state.editor.enabled) {
-          // @todo hideEntityPlacementPreview()
-          object("placement-preview").scale = 0.f;
-          commit(object("placement-preview"));
-
-          if (state.editor.isPlacingMesh) {
-            // @todo stopPlacingMesh()
-            remove(object("mesh-preview"));
-          }
-
-          if (state.editor.isFindingMesh) {
-            // @todo resetMeshPreviewColor()
-            if (hasObject("mesh-preview")) {
-              object("mesh-preview").color = Vec3f(1.f);
-
-              commit(object("mesh-preview"));
-            }
-          }
-
-          state.editor.isPlacingMesh = false;
-          state.editor.isFindingMesh = false;
-        }
+        toggleEditor(globals);
       }
 
       if (key == Key::M) {
         mesh("ground")->disabled = !mesh("ground")->disabled;
+
+        context->renderer->resetShadowMaps();
       }
 
       // Toggle entity/trigger indicators
       if (key == Key::I) {
-        auto& triggerIndicators = *mesh("trigger-indicator");
-
-        triggerIndicators.disabled = !triggerIndicators.disabled;
+        mesh("trigger-indicator")->disabled = !mesh("trigger-indicator")->disabled;
 
         context->renderer->resetShadowMaps();
       }
@@ -530,31 +505,8 @@ void initializeGame(Globals) {
       bindEditorWorldOrientationKey(Key::NUM_5, POSITIVE_Z_UP);
       bindEditorWorldOrientationKey(Key::NUM_6, NEGATIVE_Z_UP);
 
-
-      // @todo toggleMeshFinder()
       if (key == Key::F) {
-        state.editor.isFindingMesh = !state.editor.isFindingMesh;
-        state.editor.enabled = state.editor.isFindingMesh;
-
-        // @todo hideEntityPlacementPreview()
-        object("placement-preview").scale = 0.f;
-        commit(object("placement-preview"));
-
-        if (state.editor.isPlacingMesh) {
-          // @todo stopPlacingMesh()
-          remove(object("mesh-preview"));
-
-          state.editor.isPlacingMesh = false;
-        }
-
-        if (!state.editor.isFindingMesh) {
-          // @todo resetMeshPreviewColor()
-          if (hasObject("mesh-preview")) {
-            object("mesh-preview").color = Vec3f(1.f);
-
-            commit(object("mesh-preview"));
-          }
-        }
+        toggleMeshFinder(globals);
       }
 
       // Editor controls while enabled
@@ -591,23 +543,7 @@ void initializeGame(Globals) {
 
     input.on<MouseButtonEvent>("mousedown", [context, &state](const MouseButtonEvent& event) {
       if (state.editor.enabled && SDL_GetRelativeMouseMode()) {
-        // @todo create a mousedown handler in editor_system
-        if (state.editor.isFindingMesh) {
-          handleEditorMeshSelectionAction(globals);
-        } else if (state.editor.isPlacingMesh) {
-          handleEditorMeshPlacementAction(globals);
-          saveMeshData(globals);
-        } else if (state.editor.useRange) {
-          if (state.editor.rangeFromSelected) {
-            handleEditorRangedClickAction(globals);
-            saveWorldGridData(globals);
-          } else {
-            selectRangeFrom(globals);
-          }
-        } else {
-          handleEditorSingleTileClickAction(globals);
-          saveWorldGridData(globals);
-        }
+        handleEditorClickAction(globals);
       }
     });
 

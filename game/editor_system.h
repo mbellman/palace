@@ -7,6 +7,7 @@
 
 #include "game_entities.h"
 #include "grid_utilities.h"
+#include "game_macros.h"
 #include "build_flags.h"
 
 #define MAX_EDIT_ACTIONS 5
@@ -68,24 +69,22 @@ struct WorldEditor {
 };
 
 #if DEVELOPMENT == 1
-  void setCurrentSelectedEntityType(GmContext* context, GameState& state, EntityType type);
-  void createPlaceableMeshObjectFrom(GmContext* context, GameState& state, const std::string& meshName);
-  void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Gamma::Orientation& adjustment);
-  void selectRangeFrom(GmContext* context, GameState& state);
-  void showGridEntityPlacementPreview(GmContext* context, GameState& state);
-  void showRangeFromSelectionPreview(GmContext* context, GameState& state);
-  void showRangedEntityPlacementPreview(GmContext* context, GameState& state);
-  void showMeshPlacementPreview(GmContext* context, GameState& state);
-  void showMeshFinderPreview(GmContext* context, GameState& state);
-  void handleEditorSingleTileClickAction(GmContext* context, GameState& state);
-  void handleEditorRangedClickAction(GmContext* context, GameState& state);
-  void handleEditorMeshPlacementAction(GmContext* context, GameState& state);
-  void handleEditorMeshSelectionAction(GmContext* context, GameState& state);
-  void undoPreviousEditAction(GmContext* context, GameState& state);
-  void placeCameraAtClosestWalkableTile(GmContext* context, GameState& state);
-  void saveWorldGridData(GmContext* context, GameState& state);
-  void saveMeshData(GmContext* context, GameState& state);
-  void loadWorldGridData(GmContext* context, GameState& state);
-  void loadMeshData(GmContext* context, GameState& state);
-  void loadLightData(GmContext* context, GameState& state);
+  void toggleEditor(Globals);
+  void toggleMeshFinder(Globals);
+  void setCurrentSelectedEntityType(Globals, EntityType type);
+  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName);
+  void adjustCurrentEntityOrientation(Globals, const Gamma::Orientation& adjustment);
+  void showGridEntityPlacementPreview(Globals);
+  void showRangeFromSelectionPreview(Globals);
+  void showRangedEntityPlacementPreview(Globals);
+  void showMeshPlacementPreview(Globals);
+  void showMeshFinderPreview(Globals);
+  void handleEditorClickAction(Globals);
+  void undoPreviousEditAction(Globals);
+  void placeCameraAtClosestWalkableTile(Globals);
+  void saveWorldGridData(Globals);
+  void saveMeshData(Globals);
+  void loadWorldGridData(Globals);
+  void loadMeshData(Globals);
+  void loadLightData(Globals);
 #endif

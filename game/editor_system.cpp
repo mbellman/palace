@@ -189,11 +189,212 @@ using namespace Gamma;
     return copy;
   }
 
+  static void hideEntityPlacementPreview(Globals) {
+    object("entity-preview").scale = 0.f;
+    commit(object("entity-preview"));
+  }
+
+  static void stopPlacingMesh(Globals) {
+    remove(object("mesh-preview"));
+
+    state.editor.isPlacingMesh = false;
+  }
+
+  static void disableMeshFinder(Globals) {
+    auto* preview = findObject("mesh-preview");
+
+    if (preview != nullptr) {
+      preview->color = Vec3f(1.f);
+
+      commit(*preview);
+    }
+
+    state.editor.isFindingMesh = false;
+  }
+
+  static void handleGridCellClickAction(Globals) {
+    auto& grid = state.world.grid;
+    GridCoordinates targetCoordinates;
+    EditAction editAction;
+    GridEntity* newEntity = nullptr;
+
+    if (state.editor.deleting) {
+      if (!findGridEntityDeletionCoordinates(globals, targetCoordinates)) {
+        return;
+      }
+
+      // Offset the placement preview object so it isn't deleted
+      object("entity-preview").position += Vec3f(1.f);
+    } else {
+      if (!findGridEntityPlacementCoordinates(globals, targetCoordinates)) {
+        return;
+      }
+
+      switch (state.editor.currentSelectedEntityType) {
+        default:
+        case GROUND:
+          newEntity = new Ground;
+          break;
+        case STAIRCASE:
+          newEntity = new Staircase;
+          ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
+          break;
+        case SWITCH:
+          newEntity = new Switch;
+          break;
+        case WORLD_ORIENTATION_CHANGE:
+          newEntity = new WorldOrientationChange;
+          ((WorldOrientationChange*)newEntity)->targetWorldOrientation = state.editor.currentSelectedWorldOrientation;
+          break;
+      }
+    }
+
+    editAction.oldEntity = copyGridEntity(grid.get(targetCoordinates));
+    editAction.coordinates = targetCoordinates;
+
+    removeGridEntityObjectAtGridCoordinates(globals, targetCoordinates);
+    grid.clear(targetCoordinates);
+
+    if (newEntity != nullptr) {
+      grid.set(targetCoordinates, newEntity);
+      createObjectFromCoordinates(globals, targetCoordinates);
+    }
+
+    storeEditAction(globals, editAction);
+
+    context->renderer->resetShadowMaps();
+  }
+
+  static void selectRangeFrom(Globals) {
+    GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
+
+    findGridEntityPlacementCoordinates(globals, rangeFrom);
+
+    state.editor.rangeFrom = rangeFrom;
+    state.editor.rangeFromSelected = true;
+
+    // Offset the placement preview object so it isn't
+    // caught in ranged object replacement actions
+    object("entity-preview").position += Vec3f(1.f);
+    
+    hideEntityPlacementPreview(globals);
+  }
+
+  static void handleRangedClickAction(Globals) {
+    auto& grid = state.world.grid;
+    auto start = state.editor.rangeFrom;
+    auto end = state.editor.rangeTo;
+
+    checkRange(start, end);
+
+    EditAction action;
+
+    action.isRangedPlacementAction = true;
+    action.rangeFrom = start;
+    action.rangeTo = end;
+
+    overRange(start, end, {
+      GridCoordinates coordinates = { x, y, z };
+
+      // Keep track of any replaced entities so we can potentially restore them
+      if (grid.has(coordinates)) {
+        action.replacedEntityRecords.push_back({
+          coordinates,
+          copyGridEntity(grid.get(coordinates))
+        });
+      }
+
+      removeGridEntityObjectAtGridCoordinates(globals, coordinates);
+
+      if (state.editor.deleting) {
+        grid.clear(coordinates);
+      } else {
+        // @todo use entity corresponding to the current selected entity type
+        grid.set(coordinates, new Ground);
+        createObjectFromCoordinates(globals, coordinates);
+      }
+    });
+
+    storeEditAction(globals, action);
+    objects("range-preview").reset();
+
+    state.editor.rangeFromSelected = false;
+
+    context->renderer->resetShadowMaps();
+  }
+
+  static void handleMeshPlacementAction(Globals) {
+    if (object("mesh-preview").scale == 0.f) {
+      return;
+    }
+
+    // @todo check to see if any mesh objects exist at the
+    // mesh preview position, and don't place it if so
+
+    if (state.editor.snapMeshesToGrid) {
+      // Create a new mesh object to allow continual placement
+      // until the editor is disabled
+      createPlaceableMeshObjectFrom(globals, state.editor.currentMeshName);
+    } else {
+      // Stop moving the current preview mesh, setting it in place
+      state.editor.isPlacingMesh = false;
+      state.editor.enabled = false;
+      state.editor.currentMeshName = "";
+    }
+  }
+
+  static void handleMeshSelectionAction(Globals) {
+    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
+
+    if (object != nullptr) {
+      saveObject("mesh-preview", *object);
+
+      object("mesh-preview").color = Vec3f(1.f);
+      commit(object("mesh-preview"));
+
+      state.editor.isFindingMesh = false;
+      state.editor.isPlacingMesh = true;
+    }
+  }
+
+  void toggleEditor(Globals) {
+    state.editor.enabled = !state.editor.enabled;
+
+    if (!state.editor.enabled) {
+      hideEntityPlacementPreview(globals);
+
+      if (state.editor.isPlacingMesh) {
+        stopPlacingMesh(globals);
+      }
+
+      if (state.editor.isFindingMesh) {
+        disableMeshFinder(globals);
+      }
+
+      context->renderer->resetShadowMaps();
+    }
+  }
+
+  void toggleMeshFinder(Globals) {
+    state.editor.isFindingMesh = !state.editor.isFindingMesh;
+    state.editor.enabled = state.editor.isFindingMesh;
+
+    hideEntityPlacementPreview(globals);
+
+    if (state.editor.isPlacingMesh) {
+      stopPlacingMesh(globals);
+    }
+
+    if (!state.editor.isFindingMesh) {
+      disableMeshFinder(globals);
+    }
+  }
+
   void setCurrentSelectedEntityType(Globals, EntityType type) {
     state.editor.currentSelectedEntityType = type;
     state.editor.deleting = false;
     
-    auto& existingPreview = object("placement-preview");
+    auto& existingPreview = object("entity-preview");
     auto existingPreviewPosition = existingPreview.position;
     auto existingPreviewRotation = existingPreview.rotation;
     std::string previewMeshName;
@@ -211,7 +412,7 @@ using namespace Gamma;
     preview.position = existingPreviewPosition;
     preview.rotation = existingPreviewRotation;
 
-    saveObject("placement-preview", preview);
+    saveObject("entity-preview", preview);
   }
 
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
@@ -237,8 +438,7 @@ using namespace Gamma;
 
       saveObject("mesh-preview", object);
 
-      object("placement-preview").scale = 0.f;
-      commit(object("placement-preview"));
+      hideEntityPlacementPreview(globals);
     }
   }
 
@@ -247,24 +447,8 @@ using namespace Gamma;
     state.editor.currentEntityOrientation += adjustment;
   }
 
-  void selectRangeFrom(Globals) {
-    GridCoordinates rangeFrom = worldPositionToGridCoordinates(getCamera().position);
-
-    findGridEntityPlacementCoordinates(globals, rangeFrom);
-
-    state.editor.rangeFrom = rangeFrom;
-    state.editor.rangeFromSelected = true;
-
-    // Hide the single tile placement preview
-    object("placement-preview").scale = 0.f;
-    // Offset the placement preview object so it isn't
-    // caught in ranged object replacement actions
-    object("placement-preview").position += Vec3f(1.f);
-    commit(object("placement-preview"));
-  }
-
   void showGridEntityPlacementPreview(Globals) {
-    auto& preview = object("placement-preview");
+    auto& preview = object("entity-preview");
     GridCoordinates previewCoordinates;
 
     preview.scale = 0.f;
@@ -294,7 +478,7 @@ using namespace Gamma;
   }
 
   void showRangeFromSelectionPreview(GmContext* context, GameState& state) {
-    auto& preview = object("placement-preview");
+    auto& preview = object("entity-preview");
     GridCoordinates previewCoordinates;
 
     if (findGridEntityPlacementCoordinates(globals, previewCoordinates)) {
@@ -392,133 +576,22 @@ using namespace Gamma;
     }
   }
 
-  void handleEditorSingleTileClickAction(Globals) {
-    auto& grid = state.world.grid;
-    GridCoordinates targetCoordinates;
-    EditAction editAction;
-    GridEntity* newEntity = nullptr;
-
-    if (state.editor.deleting) {
-      if (!findGridEntityDeletionCoordinates(globals, targetCoordinates)) {
-        return;
-      }
-
-      // Offset the placement preview object so it isn't deleted
-      object("placement-preview").position += Vec3f(1.f);
-    } else {
-      if (!findGridEntityPlacementCoordinates(globals, targetCoordinates)) {
-        return;
-      }
-
-      switch (state.editor.currentSelectedEntityType) {
-        default:
-        case GROUND:
-          newEntity = new Ground;
-          break;
-        case STAIRCASE:
-          newEntity = new Staircase;
-          ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
-          break;
-        case SWITCH:
-          newEntity = new Switch;
-          break;
-        case WORLD_ORIENTATION_CHANGE:
-          newEntity = new WorldOrientationChange;
-          ((WorldOrientationChange*)newEntity)->targetWorldOrientation = state.editor.currentSelectedWorldOrientation;
-          break;
-      }
-    }
-
-    editAction.oldEntity = copyGridEntity(grid.get(targetCoordinates));
-    editAction.coordinates = targetCoordinates;
-
-    removeGridEntityObjectAtGridCoordinates(globals, targetCoordinates);
-    grid.clear(targetCoordinates);
-
-    if (newEntity != nullptr) {
-      grid.set(targetCoordinates, newEntity);
-      createObjectFromCoordinates(globals, targetCoordinates);
-    }
-
-    storeEditAction(globals, editAction);
-
-    context->renderer->resetShadowMaps();
-  }
-
-  void handleEditorRangedClickAction(Globals) {
-    auto& grid = state.world.grid;
-    auto start = state.editor.rangeFrom;
-    auto end = state.editor.rangeTo;
-
-    checkRange(start, end);
-
-    EditAction action;
-
-    action.isRangedPlacementAction = true;
-    action.rangeFrom = start;
-    action.rangeTo = end;
-
-    overRange(start, end, {
-      GridCoordinates coordinates = { x, y, z };
-
-      // Keep track of any replaced entities so we can potentially restore them
-      if (grid.has(coordinates)) {
-        action.replacedEntityRecords.push_back({
-          coordinates,
-          copyGridEntity(grid.get(coordinates))
-        });
-      }
-
-      removeGridEntityObjectAtGridCoordinates(globals, coordinates);
-
-      if (state.editor.deleting) {
-        grid.clear(coordinates);
+  void handleEditorClickAction(Globals) {
+    if (state.editor.isFindingMesh) {
+      handleMeshSelectionAction(globals);
+    } else if (state.editor.isPlacingMesh) {
+      handleMeshPlacementAction(globals);
+      saveMeshData(globals);
+    } else if (state.editor.useRange) {
+      if (state.editor.rangeFromSelected) {
+        handleRangedClickAction(globals);
+        saveWorldGridData(globals);
       } else {
-        // @todo use entity corresponding to the current selected entity type
-        grid.set(coordinates, new Ground);
-        createObjectFromCoordinates(globals, coordinates);
+        selectRangeFrom(globals);
       }
-    });
-
-    storeEditAction(globals, action);
-    objects("range-preview").reset();
-
-    state.editor.rangeFromSelected = false;
-
-    context->renderer->resetShadowMaps();
-  }
-
-  void handleEditorMeshPlacementAction(Globals) {
-    if (object("mesh-preview").scale == 0.f) {
-      return;
-    }
-
-    // @todo check to see if any mesh objects exist at the
-    // mesh preview position, and don't place it if so
-
-    if (state.editor.snapMeshesToGrid) {
-      // Create a new mesh object to allow continual placement
-      // until the editor is disabled
-      createPlaceableMeshObjectFrom(globals, state.editor.currentMeshName);
     } else {
-      // Stop moving the current preview mesh, setting it in place
-      state.editor.isPlacingMesh = false;
-      state.editor.enabled = false;
-      state.editor.currentMeshName = "";
-    }
-  }
-
-  void handleEditorMeshSelectionAction(Globals) {
-    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
-
-    if (object != nullptr) {
-      saveObject("mesh-preview", *object);
-
-      object("mesh-preview").color = Vec3f(1.f);
-      commit(object("mesh-preview"));
-
-      state.editor.isFindingMesh = false;
-      state.editor.isPlacingMesh = true;
+      handleGridCellClickAction(globals);
+      saveWorldGridData(globals);
     }
   }
 
