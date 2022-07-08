@@ -13,5 +13,5 @@ struct ObjectParameters {
 };
 
 const ObjectParameters& getObjectParameters(EntityType entityType);
-Gamma::Object* findObjectByPosition(GmContext* context, GameState& state, Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
+Gamma::Object* findObjectByPosition(Gamma::ObjectPool& objects, const Gamma::Vec3f& position);
 void createObjectFromCoordinates(GmContext* context, GameState& state, const GridCoordinates& coordinates);

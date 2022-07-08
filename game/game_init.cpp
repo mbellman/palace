@@ -382,12 +382,14 @@ static void createGridEntityObjects(Globals) {
 
 static void createLightIndicatorObjects(Globals) {
   for (auto* light : context->scene.lights) {
-    auto& indicator = createObjectFrom("light-indicator");
+    if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+      auto& indicator = createObjectFrom("light-indicator");
 
-    indicator.scale = 1.5f;
-    indicator.position = light->position;
+      indicator.scale = 1.5f;
+      indicator.position = light->position;
 
-    commit(indicator);
+      commit(indicator);
+    }
   }
 }
 

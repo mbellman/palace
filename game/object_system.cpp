@@ -82,7 +82,7 @@ const ObjectParameters& getObjectParameters(EntityType entityType) {
   return entityToObjectParametersMap.at(entityType);
 }
 
-Object* findObjectByPosition(Globals, ObjectPool& objects, const Vec3f& position) {
+Object* findObjectByPosition(ObjectPool& objects, const Vec3f& position) {
   for (auto& object : objects) {
     if (object.position == position) {
       return &object;

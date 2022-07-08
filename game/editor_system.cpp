@@ -29,7 +29,7 @@ using namespace Gamma;
   };
 
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
-    auto* object = findObjectByPosition(globals, objects, position);
+    auto* object = findObjectByPosition(objects, position);
 
     if (object != nullptr) {
       remove(*object);
@@ -323,6 +323,20 @@ using namespace Gamma;
     context->renderer->resetShadowMaps();
   }
 
+  static void handleMeshSelectionAction(Globals) {
+    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
+
+    if (object != nullptr) {
+      saveObject("mesh-preview", *object);
+
+      object("mesh-preview").color = Vec3f(1.f);
+      commit(object("mesh-preview"));
+
+      state.editor.isFindingMesh = false;
+      state.editor.isPlacingMesh = true;
+    }
+  }
+
   static void handleMeshPlacementAction(Globals) {
     if (object("mesh-preview").scale == 0.f) {
       return;
@@ -343,18 +357,16 @@ using namespace Gamma;
     }
   }
 
-  static void handleMeshSelectionAction(Globals) {
-    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
+  static void handleLightSelectionAction(Globals) {
+    pointCamera(state.editor.selectedLight->position);
 
-    if (object != nullptr) {
-      saveObject("mesh-preview", *object);
+    state.editor.isFindingLight = false;
+    state.editor.isPlacingLight = true;
+  }
 
-      object("mesh-preview").color = Vec3f(1.f);
-      commit(object("mesh-preview"));
-
-      state.editor.isFindingMesh = false;
-      state.editor.isPlacingMesh = true;
-    }
+  static void handleLightPlacementAction(Globals) {
+    state.editor.isFindingLight = true;
+    state.editor.isPlacingLight = false;
   }
 
   void toggleEditor(Globals) {
@@ -614,28 +626,44 @@ using namespace Gamma;
 
   void showLightPlacementPreview(Globals) {
     auto& editor = state.editor;
+    auto& camera = getCamera();
+    auto& lightIndicators = objects("light-indicator");
 
     if (editor.selectedLight != nullptr) {
-      // @todo
+      auto* indicator = findObjectByPosition(lightIndicators, editor.selectedLight->position);
+
+      editor.selectedLight->position = camera.position + camera.orientation.getDirection() * editor.selectedLightDistance;
+
+      if (indicator != nullptr) {
+        indicator->position = editor.selectedLight->position;
+
+        commit(*indicator);
+      }
     }
   }
 
   void showLightFinderPreview(Globals) {
+    #define MAX_FINDER_DISTANCE 100.f
+
     auto& editor = state.editor;
     auto& scene = context->scene;
     auto& camera = getCamera();
     auto& cameraDirection = camera.orientation.getDirection();
-    auto closestDistance = FLT_MAX;
+    auto closestDistance = MAX_FINDER_DISTANCE;
     auto& lightIndicators = objects("light-indicator");
 
+    // Reset selected light values
     editor.selectedLight = nullptr;
+    editor.selectedLightDistance = 0.f;
 
+    // Reset light indicator highlight colors
     for (auto& indicator : lightIndicators) {
       indicator.color = Vec3f(1.f);
 
       commit(indicator);
     }
 
+    // Find a point/spot light by camera direction
     for (auto* light : scene.lights) {
       if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
         auto cameraToLight = light->position - camera.position;
@@ -649,13 +677,16 @@ using namespace Gamma;
           lightDistance < closestDistance
         ) {
           closestDistance = lightDistance;
+
           editor.selectedLight = light;
+          editor.selectedLightDistance = lightDistance;
         }
       }
     }
 
+    // Highlight the selected light's corresponding indicator
     if (editor.selectedLight != nullptr) {
-      auto* indicator = findObjectByPosition(globals, lightIndicators, state.editor.selectedLight->position);
+      auto* indicator = findObjectByPosition(lightIndicators, state.editor.selectedLight->position);
 
       if (indicator != nullptr) {
         indicator->color = Vec3f(1.f, 0, 0);
@@ -669,9 +700,9 @@ using namespace Gamma;
     auto& editor = state.editor;
 
     if (editor.isFindingLight) {
-      // @todo
+      handleLightSelectionAction(globals);
     } else if (editor.isPlacingLight) {
-      // @todo
+      handleLightPlacementAction(globals);
     } else if (editor.isFindingMesh) {
       handleMeshSelectionAction(globals);
     } else if (editor.isPlacingMesh) {

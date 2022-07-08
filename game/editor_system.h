@@ -56,6 +56,7 @@ struct WorldEditor {
   bool isPlacingLight = false;
   bool isFindingLight = false;
   Gamma::Light* selectedLight = nullptr;
+  float selectedLightDistance = 0.f;
   Gamma::LightType currentLightType = Gamma::LightType::POINT;
 
   // Default orientation for placed entities
