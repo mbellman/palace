@@ -350,13 +350,19 @@ static void addMeshes(Globals) {
   #if DEVELOPMENT == 1
     // Trigger entity indicators
     addMesh("trigger-indicator", 0xffff, Mesh::Cube());
+    mesh("trigger-indicator")->disabled = true;
+
+    // Light indicators
+    addMesh("light-indicator", 1000, Mesh::Cube());  // @todo Mesh::Sphere()
+    mesh("light-indicator")->type = MeshType::EMISSIVE;
+    mesh("light-indicator")->disabled = true;
 
     // Ranged placement preview
     addMesh("range-preview", 0xffff, Mesh::Cube());
   #endif
 }
 
-static void createEntityObjects(Globals) {
+static void createGridEntityObjects(Globals) {
   auto& grid = state.world.grid;
 
   for (auto& [ coordinates, entity ] : grid) {
@@ -372,6 +378,17 @@ static void createEntityObjects(Globals) {
     saveObject("entity-preview", preview);
     commit(preview);
   #endif
+}
+
+static void createLightIndicatorObjects(Globals) {
+  for (auto* light : context->scene.lights) {
+    auto& indicator = createObjectFrom("light-indicator");
+
+    indicator.scale = 1.5f;
+    indicator.position = light->position;
+
+    commit(indicator);
+  }
 }
 
 static void addSwitchEntityEffects(Globals) {
@@ -483,13 +500,6 @@ void initializeGame(Globals) {
         context->renderer->resetShadowMaps();
       }
 
-      // Toggle entity/trigger indicators
-      if (key == Key::I) {
-        mesh("trigger-indicator")->disabled = !mesh("trigger-indicator")->disabled;
-
-        context->renderer->resetShadowMaps();
-      }
-
       // Reset world orientation to +Y
       if (key == Key::O) {
         setWorldOrientation(globals, POSITIVE_Y_UP);
@@ -570,11 +580,13 @@ void initializeGame(Globals) {
     loadWorldGridData(globals);
     loadMeshData(globals);
     loadLightData(globals);
+
+    createLightIndicatorObjects(globals);
   #else
     // @todo
   #endif
 
-  createEntityObjects(globals);
+  createGridEntityObjects(globals);
 
   auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
 

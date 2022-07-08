@@ -360,6 +360,9 @@ using namespace Gamma;
   void toggleEditor(Globals) {
     state.editor.enabled = !state.editor.enabled;
 
+    mesh("trigger-indicator")->disabled = !state.editor.enabled;
+    mesh("light-indicator")->disabled = !state.editor.enabled;
+
     if (!state.editor.enabled) {
       hideEntityPlacementPreview(globals);
 
