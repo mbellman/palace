@@ -636,6 +636,7 @@ using namespace Gamma;
 
       if (indicator != nullptr) {
         indicator->position = editor.selectedLight->position;
+        indicator->color = editor.selectedLight->color;
 
         commit(*indicator);
       }

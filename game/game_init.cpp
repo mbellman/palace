@@ -565,12 +565,32 @@ void initializeGame(Globals) {
 
     context->commander.on<std::string>("command", [context, &state](const std::string& command) {
       if (Gm_StringStartsWith(command, "mesh")) {
+        // @todo handleMeshCommand()
         auto parts = Gm_SplitString(command, " ");
 
         if (parts.size() > 1) {
           auto meshName = parts[1];
 
           createPlaceableMeshObjectFrom(globals, meshName);
+        }
+      } else if (Gm_StringStartsWith(command, "color")) {
+        // @todo handleColorCommand()
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          auto& colorParts = Gm_SplitString(parts[1], ",");
+
+          auto color = Vec3f(
+            stof(colorParts[0]),
+            stof(colorParts[1]),
+            stof(colorParts[2])
+          );
+
+          if (state.editor.isPlacingLight) {
+            state.editor.selectedLight->color = color;
+          } else if (state.editor.isPlacingMesh) {
+            // @todo
+          }
         }
       }
     });
