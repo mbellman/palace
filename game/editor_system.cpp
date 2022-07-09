@@ -459,37 +459,6 @@ using namespace Gamma;
     saveObject("entity-preview", preview);
   }
 
-  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
-    auto& editor = state.editor;
-    auto& meshMap = context->scene.meshMap;
-
-    if (meshMap.find(meshName) != meshMap.end()) {
-      // Remove the existing mesh preview when swapping it for a different mesh
-      if (
-        editor.isPlacingMesh &&
-        meshName != editor.currentMeshName
-      ) {
-        remove(object("mesh-preview"));
-      }
-
-      editor.enabled = true;
-      editor.currentMeshName = meshName;
-      editor.isPlacingMesh = true;
-      editor.snapMeshesToGrid = true;
-
-      editor.isPlacingLight = false;
-      editor.isFindingLight = false;
-
-      auto& object = createObjectFrom(meshName);
-
-      object.scale = HALF_TILE_SIZE;
-
-      saveObject("mesh-preview", object);
-
-      hideEntityPlacementPreview(globals);
-    }
-  }
-
   // @todo switch roll/pitch depending on camera facing direction
   void adjustCurrentEntityOrientation(GmContext* context, GameState& state, const Orientation& adjustment) {
     state.editor.currentEntityOrientation += adjustment;
@@ -624,6 +593,37 @@ using namespace Gamma;
     }
   }
 
+  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
+    auto& editor = state.editor;
+    auto& meshMap = context->scene.meshMap;
+
+    if (meshMap.find(meshName) != meshMap.end()) {
+      // Remove the existing mesh preview when swapping it for a different mesh
+      if (
+        editor.isPlacingMesh &&
+        meshName != editor.currentMeshName
+      ) {
+        remove(object("mesh-preview"));
+      }
+
+      editor.enabled = true;
+      editor.currentMeshName = meshName;
+      editor.isPlacingMesh = true;
+      editor.snapMeshesToGrid = true;
+
+      editor.isPlacingLight = false;
+      editor.isFindingLight = false;
+
+      auto& object = createObjectFrom(meshName);
+
+      object.scale = HALF_TILE_SIZE;
+
+      saveObject("mesh-preview", object);
+
+      hideEntityPlacementPreview(globals);
+    }
+  }
+
   void showLightPlacementPreview(Globals) {
     auto& editor = state.editor;
     auto& camera = getCamera();
@@ -695,6 +695,28 @@ using namespace Gamma;
         commit(*indicator);
       }
     }
+  }
+
+  void createPlaceableLight(Globals, Gamma::LightType lightType) {
+    auto& editor = state.editor;
+    auto& camera = getCamera();
+    auto& light = createLight(lightType);
+
+    light.position = camera.position + camera.orientation.getDirection() * 40.f;
+
+    auto& indicator = createObjectFrom("light-indicator");
+
+    indicator.scale = 1.5f;
+    indicator.position = light.position;
+
+    commit(indicator);
+
+    editor.selectedLight = &light;
+    editor.selectedLightDistance = 40.f;
+
+    editor.enabled = true;
+    editor.isPlacingLight = true;
+    editor.isFindingLight = false;
   }
 
   void handleEditorClickAction(Globals) {

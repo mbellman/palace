@@ -573,6 +573,24 @@ void initializeGame(Globals) {
 
           createPlaceableMeshObjectFrom(globals, meshName);
         }
+      } else if (Gm_StringStartsWith(command, "light")) {
+        // @todo handleLightCommand()
+        auto parts = Gm_SplitString(command, " ");
+        auto lightTypeString = parts[1];
+        LightType lightType = POINT;
+
+        // @todo create a map for this
+        if (lightTypeString == "point") {
+          lightType = POINT;
+        } else if (lightTypeString == "point_shadow") {
+          // @todo
+        } else if (lightTypeString == "spot") {
+          // @todo
+        } else if (lightTypeString == "spot_shadow") {
+          // @todo
+        }
+
+        createPlaceableLight(globals, lightType);
       } else if (Gm_StringStartsWith(command, "color")) {
         // @todo handleColorCommand()
         auto parts = Gm_SplitString(command, " ");

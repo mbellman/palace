@@ -57,7 +57,6 @@ struct WorldEditor {
   bool isFindingLight = false;
   Gamma::Light* selectedLight = nullptr;
   float selectedLightDistance = 0.f;
-  Gamma::LightType currentLightType = Gamma::LightType::POINT;
 
   // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
@@ -79,15 +78,16 @@ struct WorldEditor {
   void toggleMeshFinder(Globals);
   void toggleLightFinder(Globals);
   void setCurrentSelectedEntityType(Globals, EntityType type);
-  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName);
   void adjustCurrentEntityOrientation(Globals, const Gamma::Orientation& adjustment);
   void showGridEntityPlacementPreview(Globals);
   void showRangeFromSelectionPreview(Globals);
   void showRangedEntityPlacementPreview(Globals);
   void showMeshPlacementPreview(Globals);
   void showMeshFinderPreview(Globals);
+  void createPlaceableMeshObjectFrom(Globals, const std::string& meshName);
   void showLightPlacementPreview(Globals);
   void showLightFinderPreview(Globals);
+  void createPlaceableLight(Globals, Gamma::LightType lightType);
   void handleEditorClickAction(Globals);
   void undoPreviousEditAction(Globals);
   void placeCameraAtClosestWalkableTile(Globals);
