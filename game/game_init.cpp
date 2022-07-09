@@ -350,6 +350,7 @@ static void addMeshes(Globals) {
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
   mesh("hedge")->texture = "./game/textures/hedge.png";
+  mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators
