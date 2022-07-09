@@ -21,6 +21,7 @@ using namespace Gamma;
     "dirt-wall",
     "rock",
     "arch",
+    "flowers",
     "hedge"
   };
 
@@ -199,6 +200,7 @@ using namespace Gamma;
     remove(object("mesh-preview"));
 
     state.editor.isPlacingMesh = false;
+    state.editor.selectedMeshColor = pVec4(255,255,255);
   }
 
   static void disableMeshFinder(Globals) {
@@ -211,6 +213,7 @@ using namespace Gamma;
     }
 
     state.editor.isFindingMesh = false;
+    state.editor.selectedMeshColor = pVec4(255,255,255);
   }
 
   static void handleGridCellClickAction(Globals) {
@@ -325,16 +328,18 @@ using namespace Gamma;
   }
 
   static void handleMeshSelectionAction(Globals) {
+    auto& editor = state.editor;
     auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
 
     if (object != nullptr) {
       saveObject("mesh-preview", *object);
 
-      object("mesh-preview").color = Vec3f(1.f);
+      // @todo resetMeshPreviewColor()
+      object("mesh-preview").color = editor.selectedMeshColor;
       commit(object("mesh-preview"));
 
-      state.editor.isFindingMesh = false;
-      state.editor.isPlacingMesh = true;
+      editor.isFindingMesh = false;
+      editor.isPlacingMesh = true;
     }
   }
 
@@ -554,12 +559,15 @@ using namespace Gamma;
   }
 
   void showMeshPlacementPreview(Globals) {
+    auto& editor = state.editor;
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
-    auto& editor = state.editor;
-    auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
+
+    editor.selectedMeshColor = preview.color;
 
     if (editor.snapMeshesToGrid) {
+      auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
+      // @todo alignWorldPositionToGrid()
       auto gridCoordinates = worldPositionToGridCoordinates(placementPosition);
       auto targetMeshPosition = gridCoordinatesToWorldPosition(gridCoordinates);
 
@@ -569,25 +577,31 @@ using namespace Gamma;
 
       preview.position = Vec3f::lerp(preview.position, targetMeshPosition, 0.5f);
     } else {
-      preview.position = placementPosition;
+      // @todo use editor.selectedMeshDistance
+      preview.position = camera.position + camera.orientation.getDirection() * 30.f;
     }
 
     commit(preview);
   }
 
   void showMeshFinderPreview(Globals) {
+    #define FOCUS_COLOR Vec3f(1.f, 0, 0)
+
+    auto& editor = state.editor;
     auto& camera = getCamera();
     auto* object = findMeshObjectByDirection(globals, camera.orientation.getDirection());
 
-    // Reset the mesh preview highlight color
     if (hasObject("mesh-preview")) {
-      object("mesh-preview").color = Vec3f(1.f);
+      // @todo resetMeshPreviewColor()
+      object("mesh-preview").color = editor.selectedMeshColor;
 
       commit(object("mesh-preview"));
     }
 
     if (object != nullptr) {
-      object->color = Vec3f(1.f, 0, 0);
+      editor.selectedMeshColor = object->color;
+
+      object->color = FOCUS_COLOR;
 
       commit(*object);
       saveObject("mesh-preview", *object);
@@ -886,7 +900,7 @@ using namespace Gamma;
       serialized += meshName + "\n";
 
       for (auto& object : objects(meshName)) {
-        if (&object != previewMesh) {
+        if (&object != previewMesh || !state.editor.isPlacingMesh) {
           serialized += serialize3Vector(object.position) + "\n";
         }
       }

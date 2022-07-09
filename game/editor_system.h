@@ -44,6 +44,8 @@ struct WorldEditor {
   bool deleting = false;
   EntityType currentSelectedEntityType = GROUND;
   u8 currentSelectedEntityIndex = 0;
+  GridCoordinates rangeFrom;
+  GridCoordinates rangeTo;
   float lastEntityChangeTime = 0;
 
   // Mesh placement
@@ -51,6 +53,8 @@ struct WorldEditor {
   bool isFindingMesh = false;
   bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
+  float selectedMeshDistance = 0.f;  // @todo
+  Gamma::pVec4 selectedMeshColor = Gamma::pVec4(255,255,255);
 
   // Light placement
   bool isPlacingLight = false;
@@ -63,10 +67,6 @@ struct WorldEditor {
 
   // Default world orientation target for World Orientation Change triggers
   WorldOrientation currentSelectedWorldOrientation = POSITIVE_Y_UP;
-
-  // Ranged actions
-  GridCoordinates rangeFrom;
-  GridCoordinates rangeTo;
 
   // Edit action history/undo management
   EditAction editActions[MAX_EDIT_ACTIONS];

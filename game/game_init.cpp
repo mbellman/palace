@@ -348,6 +348,7 @@ static void addMeshes(Globals) {
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
+  addMesh("flowers", 1000, Mesh::Model("./game/models/flowers.obj"));
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
   mesh("hedge")->texture = "./game/textures/hedge.png";
   mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
@@ -569,6 +570,15 @@ void initializeGame(Globals) {
     });
 
     context->commander.on<std::string>("command", [context, &state](const std::string& command) {
+      // @todo move elsewhere
+      #define parseVec3f(name, input) \
+        auto components = Gm_SplitString(input, ",");\
+        auto name = Vec3f(\
+          stof(components[0]),\
+          stof(components[1]),\
+          stof(components[2])\
+        )\
+
       if (Gm_StringStartsWith(command, "mesh")) {
         // @todo handleMeshCommand()
         auto parts = Gm_SplitString(command, " ");
@@ -601,18 +611,27 @@ void initializeGame(Globals) {
         auto parts = Gm_SplitString(command, " ");
 
         if (parts.size() > 1) {
-          auto& colorParts = Gm_SplitString(parts[1], ",");
-
-          auto color = Vec3f(
-            stof(colorParts[0]),
-            stof(colorParts[1]),
-            stof(colorParts[2])
-          );
+          parseVec3f(color, parts[1]);
 
           if (state.editor.isPlacingLight) {
             state.editor.selectedLight->color = color;
           } else if (state.editor.isPlacingMesh) {
-            // @todo
+            object("mesh-preview").color = color;
+
+            commit(object("mesh-preview"));
+          }
+        }
+      } else if (Gm_StringStartsWith(command, "rotate")) {
+        // @todo handleRotateCommand()
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          parseVec3f(rotation, parts[1]);
+
+          if (state.editor.isPlacingMesh) {
+            object("mesh-preview").rotation = rotation;
+
+            commit(object("mesh-preview"));
           }
         }
       }
