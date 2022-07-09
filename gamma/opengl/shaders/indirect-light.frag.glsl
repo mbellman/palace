@@ -100,8 +100,7 @@ float getScreenSpaceAmbientOcclusionContribution(float fragment_depth, vec3 frag
 }
 
 vec3 getScreenSpaceGlobalIlluminationContribution(float fragment_depth, vec3 fragment_position, vec3 fragment_normal) {
-  // @todo see about reducing this to 16 samples
-  const int TOTAL_SAMPLES = 30;
+  const int TOTAL_SAMPLES = 8;
   const float max_sample_radius = 750.0;
   const float max_brightness = 100.0;
   vec3 global_illumination = vec3(0.0);
