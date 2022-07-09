@@ -340,11 +340,15 @@ static void addMeshes(Globals) {
   mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
   mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
 
+  // Dirt wall mesh
+  addMesh("dirt-wall", 0xffff, Mesh::Model("./game/models/wall.obj"));
+  mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
+  mesh("dirt-wall")->normalMap = "./game/textures/dirt-normals.png";
+
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
-
   mesh("hedge")->texture = "./game/textures/hedge.png";
 
   #if DEVELOPMENT == 1

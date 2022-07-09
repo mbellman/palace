@@ -18,6 +18,7 @@ using namespace Gamma;
 #if DEVELOPMENT == 1
   static const std::vector<std::string> meshNames = {
     "dirt-floor",
+    "dirt-wall",
     "rock",
     "arch",
     "hedge"
