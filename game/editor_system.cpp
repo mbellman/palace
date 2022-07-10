@@ -21,7 +21,8 @@ using namespace Gamma;
     "dirt-wall",
     "rock",
     "arch",
-    "flowers",
+    "flower",
+    "grass",
     "hedge"
   };
 
@@ -200,20 +201,19 @@ using namespace Gamma;
     remove(object("mesh-preview"));
 
     state.editor.isPlacingMesh = false;
-    state.editor.selectedMeshColor = pVec4(255,255,255);
   }
 
   static void disableMeshFinder(Globals) {
+    auto& editor = state.editor;
     auto* preview = findObject("mesh-preview");
 
     if (preview != nullptr) {
-      preview->color = Vec3f(1.f);
-
+      // Commit the existing preview object, restoring its
+      // color as set in showMeshFinderPreview()
       commit(*preview);
     }
 
-    state.editor.isFindingMesh = false;
-    state.editor.selectedMeshColor = pVec4(255,255,255);
+    editor.isFindingMesh = false;
   }
 
   static void handleGridCellClickAction(Globals) {
@@ -333,10 +333,9 @@ using namespace Gamma;
 
     if (object != nullptr) {
       saveObject("mesh-preview", *object);
-
-      // @todo resetMeshPreviewColor()
-      object("mesh-preview").color = editor.selectedMeshColor;
-      commit(object("mesh-preview"));
+      // Commit the selected object, restoring its
+      // color as set in showMeshFinderPreview()
+      commit(*object);
 
       editor.isFindingMesh = false;
       editor.isPlacingMesh = true;
@@ -563,8 +562,6 @@ using namespace Gamma;
     auto& camera = getCamera();
     auto& preview = object("mesh-preview");
 
-    editor.selectedMeshColor = preview.color;
-
     if (editor.snapMeshesToGrid) {
       auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
       // @todo alignWorldPositionToGrid()
@@ -589,22 +586,29 @@ using namespace Gamma;
 
     auto& editor = state.editor;
     auto& camera = getCamera();
-    auto* object = findMeshObjectByDirection(globals, camera.orientation.getDirection());
+    auto* previousPreview = findObject("mesh-preview");
+    auto* targetPreview = findMeshObjectByDirection(globals, camera.orientation.getDirection());
 
-    if (hasObject("mesh-preview")) {
-      // @todo resetMeshPreviewColor()
-      object("mesh-preview").color = editor.selectedMeshColor;
-
-      commit(object("mesh-preview"));
+    if (previousPreview != nullptr) {
+      // Commit the restored color state (see below)
+      commit(*previousPreview);
     }
 
-    if (object != nullptr) {
-      editor.selectedMeshColor = object->color;
+    if (targetPreview != nullptr) {
+      auto originalColor = targetPreview->color;
 
-      object->color = FOCUS_COLOR;
+      // Temporarily set and commit the preview object color to
+      // a given focus color
+      targetPreview->color = FOCUS_COLOR;
 
-      commit(*object);
-      saveObject("mesh-preview", *object);
+      commit(*targetPreview);
+      saveObject("mesh-preview", *targetPreview);
+
+      // Set the preview object color back to its original value,
+      // but don't commit the change. We want its rendered color
+      // to be the focus color, but we want to be able to commit
+      // it again on a subsequent frame and restore its state.
+      targetPreview->color = originalColor;
     }
   }
 

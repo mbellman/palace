@@ -54,7 +54,6 @@ struct WorldEditor {
   bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
   float selectedMeshDistance = 0.f;  // @todo
-  Gamma::pVec4 selectedMeshColor = Gamma::pVec4(255,255,255);
 
   // Light placement
   bool isPlacingLight = false;

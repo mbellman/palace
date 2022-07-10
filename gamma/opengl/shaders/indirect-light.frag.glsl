@@ -162,6 +162,7 @@ void main() {
   #endif
 
   #if USE_SCREEN_SPACE_AMBIENT_OCCLUSION == 1
+    // @todo limit AO intensity
     ambient_occlusion = getScreenSpaceAmbientOcclusionContribution(frag_color_and_depth.w, fragment_position, fragment_normal);
   #endif
 
