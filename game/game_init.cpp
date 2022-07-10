@@ -349,9 +349,10 @@ static void addMeshes(Globals) {
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
-  addMesh("flower", 1000, Mesh::Model("./game/models/flower.obj"));
   addMesh("flowerbed", 1000, Mesh::Model("./game/models/flowerbed.obj"));
   mesh("flowerbed")->type = MeshType::FOLIAGE;
+  addMesh("flowerbed-petals", 1000, Mesh::Model("./game/models/flowerbed-petals.obj"));
+  mesh("flowerbed-petals")->type = MeshType::FOLIAGE;
   addMesh("grass", 1000, Mesh::Model("./game/models/grass.obj"));
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
   mesh("hedge")->texture = "./game/textures/hedge.png";

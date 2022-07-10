@@ -21,7 +21,6 @@ using namespace Gamma;
     "dirt-wall",
     "rock",
     "arch",
-    "flower",
     "flowerbed",
     "grass",
     "hedge"
@@ -1012,6 +1011,7 @@ using namespace Gamma;
           stof(data[2])
         };
 
+        // @todo createMeshObject(meshName, position, etc.)
         auto& object = createObjectFrom(currentMeshName);
 
         object.position = position;
@@ -1020,6 +1020,15 @@ using namespace Gamma;
         if (currentMeshName == "flowerbed") {
           // @temporary
           object.color = Vec3f(0.1f, 0.6f, 0.2f);
+
+          // @todo properly handle compound meshes
+          auto& petals = createObjectFrom("flowerbed-petals");
+
+          petals.position = object.position;
+          petals.scale = object.scale;
+          petals.color = Vec3f(1.f, 0.4f, 0.2f);
+
+          commit(petals);
         }
 
         commit(object);
