@@ -898,20 +898,24 @@ using namespace Gamma;
 
   // @todo save rotation + scale
   void saveMeshData(Globals) {
-    std::string serialized;
+    std::stringstream serialized;
     auto* previewMesh = findObject("mesh-preview");
 
     for (auto& meshName : meshNames) {
-      serialized += meshName + "\n";
+      serialized << meshName + "\n";
 
       for (auto& object : objects(meshName)) {
         if (&object != previewMesh || !state.editor.isPlacingMesh) {
-          serialized += serialize3Vector(object.position) + "\n";
+          auto& p = object.position;
+          auto& r = object.rotation;  // @todo serialize
+          auto& s = object.scale;     // @todo serialize
+
+          serialized << p.x << "," << p.y << "," << p.z << "\n";
         }
       }
     }
 
-    Gm_WriteFileContents("./game/world/mesh_data.txt", serialized);
+    Gm_WriteFileContents("./game/world/mesh_data.txt", serialized.str());
   }
 
   void loadWorldGridData(Globals) {
