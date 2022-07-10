@@ -22,6 +22,7 @@ using namespace Gamma;
     "rock",
     "arch",
     "flower",
+    "flowerbed",
     "grass",
     "hedge"
   };
@@ -1011,6 +1012,11 @@ using namespace Gamma;
 
         object.position = position;
         object.scale = HALF_TILE_SIZE;
+
+        if (currentMeshName == "flowerbed") {
+          // @temporary
+          object.color = Vec3f(0.1f, 0.6f, 0.2f);
+        }
 
         commit(object);
       }

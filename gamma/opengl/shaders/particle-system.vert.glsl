@@ -93,6 +93,13 @@ vec3 getPathPoint(int index) {
 }
 
 /**
+ * @todo description
+ */
+float getParticleSpeed() {
+  return particles.median_speed + random(-particles.speed_variation, particles.speed_variation, particle_id);
+}
+
+/**
  * Returns the initial particle position, pseudo-randomly
  * determined by its ID.
  */
@@ -114,7 +121,7 @@ vec3 getPathParticlePosition() {
     return vec3(0);
   }
 
-  float particle_speed = particles.median_speed + random(-particles.speed_variation, particles.speed_variation, particle_id);
+  float particle_speed = getParticleSpeed();
   float path_progress = fract(random(0, 1, particle_id * 1.1) + time * (particle_speed / path.total));
 
   float path_position = path.is_circuit
@@ -137,7 +144,8 @@ vec3 getPathParticlePosition() {
  * @todo description
  */
 vec3 getParticleDeviation() {
-  float deviation_factor = particles.deviation * sin(particle_id + time);
+  float particle_speed = getParticleSpeed();
+  float deviation_factor = particles.deviation * sin(particle_id + time * particle_speed);
 
   return vec3(
     deviation_factor * random(-1, 1, particle_id * 1.4),

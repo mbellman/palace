@@ -114,6 +114,10 @@ namespace Gamma {
      */
     PROBE_REFLECTOR = 0xFB,
     /**
+     * @todo description
+     */
+    FOLIAGE = 0xFC,
+    /**
      * Defines standard Meshes without any unique rendering properties.
      */
     NON_EMISSIVE = 0xFF

@@ -61,6 +61,11 @@ namespace Gamma {
     shaders.geometry.fragment("./gamma/opengl/shaders/geometry.frag.glsl");
     shaders.geometry.link();
 
+    shaders.foliage.init();
+    shaders.foliage.vertex("./gamma/opengl/shaders/foliage.vert.glsl");
+    shaders.foliage.fragment("./gamma/opengl/shaders/geometry.frag.glsl");
+    shaders.foliage.link();
+
     shaders.probeReflector.init();
     shaders.probeReflector.vertex("./gamma/opengl/shaders/geometry.vert.glsl");
     shaders.probeReflector.fragment("./gamma/opengl/shaders/probe-reflector.frag.glsl");

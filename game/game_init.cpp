@@ -322,11 +322,12 @@ static void addParticles(Globals) {
   auto& particles = mesh("particles")->particleSystem;
 
   particles.spread = 100.f;
-  particles.speedVariation = 5.f;
+  particles.medianSpeed = 0.5f;
+  particles.speedVariation = 0.25f;
   particles.deviation = 10.f;
   particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
-  particles.spawn = gridCoordinatesToWorldPosition({ 0, 4, 0 });
+  particles.spawn = gridCoordinatesToWorldPosition({ 2, -2, -7 });
 }
 
 static void addMeshes(Globals) {
@@ -349,6 +350,8 @@ static void addMeshes(Globals) {
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
   addMesh("flower", 1000, Mesh::Model("./game/models/flower.obj"));
+  addMesh("flowerbed", 1000, Mesh::Model("./game/models/flowerbed.obj"));
+  mesh("flowerbed")->type = MeshType::FOLIAGE;
   addMesh("grass", 1000, Mesh::Model("./game/models/grass.obj"));
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
   mesh("hedge")->texture = "./game/textures/hedge.png";

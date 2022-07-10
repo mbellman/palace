@@ -471,7 +471,22 @@ namespace Gamma {
       }
     }
 
-    // @todo render foliage
+    // Render foliage
+    shaders.foliage.use();
+    shaders.foliage.setMatrix4f("matProjection", ctx.matProjection);
+    shaders.foliage.setMatrix4f("matView", ctx.matView);
+    shaders.foliage.setInt("meshTexture", 0);
+    shaders.foliage.setInt("meshNormalMap", 1);
+    shaders.foliage.setFloat("time", gmContext->scene.runningTime);
+
+    for (auto* glMesh : glMeshes) {
+      if (glMesh->isMeshType(MeshType::FOLIAGE)) {
+        shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
+        shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
+
+        glMesh->render(ctx.primitiveMode);
+      }
+    }
 
     // @todo use ctx.hasProbeReflectors
     // @todo render probe reflectors, sans reflections, within probe cubemaps
