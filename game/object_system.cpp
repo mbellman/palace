@@ -33,14 +33,18 @@ const static std::map<EntityType, ObjectParameters> gridObjectParametersMap = {
 };
 
 const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
-  {"flowerbed", {
+  {"tulips", {
     scale(HALF_TILE_SIZE),
     color(0.1f, 0.6f, 0.2f)
   }},
-  {"flowerbed-petals", {
+  {"tulip-petals", {
     scale(HALF_TILE_SIZE),
     color(1.f, 0.4f, 0.2f)
   }}
+};
+
+const static std::map<std::string, std::vector<std::string>> compoundMeshMap = {
+  {"tulips", { "tulip-petals"} }
 };
 
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
@@ -144,42 +148,43 @@ Object& createMeshObject(Globals, const std::string& meshName, const Vec3f& posi
 
   commit(object);
 
-  if (meshName == "flowerbed") {
-    // @todo generalize this
-    auto& petals = createObjectFrom("flowerbed-petals");
-    auto& params = getMeshObjectParameters("flowerbed-petals");
+  if (compoundMeshMap.find(meshName) != compoundMeshMap.end()) {
+    auto& extensionMeshNames = compoundMeshMap.at(meshName);
 
-    petals.position = object.position;
-    petals.scale = object.scale;
-    petals.color = params.color;
-
-    commit(petals);
+    for (auto& extensionMeshName : extensionMeshNames) {
+      createMeshObject(globals, extensionMeshName, position);
+    }
   }
 
   return object;
 }
 
 void synchronizeCompoundMeshes(Globals) {
-  if (state.editor.currentMeshName == "flowerbed") {
-    // @todo generalize this
-    auto& objects = objects("flowerbed");
-    auto& extensions = objects("flowerbed-petals");
+  auto& currentMeshName = state.editor.currentMeshName;
 
-    // Remove any residual extension mesh objects
-    // if their base mesh objects were removed
-    while (extensions.totalActive() > objects.totalActive()) {
-      remove(extensions[extensions.totalActive() - 1]);
-    }
+  if (compoundMeshMap.find(currentMeshName) != compoundMeshMap.end()) {
+    auto& baseObjects = objects(currentMeshName);
+    auto& extensionMeshNames = compoundMeshMap.at(currentMeshName);
 
-    for (u8 i = 0; i < objects.totalActive(); i++) {
-      auto& object = objects[i];
-      auto& extension = extensions[i];
+    for (auto& extensionMeshName : extensionMeshNames) {
+      auto& extensions = objects(extensionMeshName);
 
-      extension.position = object.position;
-      extension.rotation = object.rotation;
-      extension.scale = object.scale;
+      // Remove any residual extension mesh objects
+      // if their base mesh objects were removed
+      while (extensions.totalActive() > baseObjects.totalActive()) {
+        remove(extensions[extensions.totalActive() - 1]);
+      }
 
-      commit(extension);
+      for (u8 i = 0; i < baseObjects.totalActive(); i++) {
+        auto& object = baseObjects[i];
+        auto& extension = extensions[i];
+
+        extension.position = object.position;
+        extension.rotation = object.rotation;
+        extension.scale = object.scale;
+
+        commit(extension);
+      }
     }
   }
 }

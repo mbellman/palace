@@ -21,7 +21,7 @@ using namespace Gamma;
     "dirt-wall",
     "rock",
     "arch",
-    "flowerbed",
+    "tulips",
     "grass",
     "hedge"
   };
