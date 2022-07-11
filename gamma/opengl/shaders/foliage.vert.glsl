@@ -54,9 +54,9 @@ void main() {
   float distance_from_ground = abs(vertexPosition.y);
 
   vec3 offset = vec3(
-    sin(time + vertexPosition.x * 2.0) + sin(time * 5.21) * 0.05,
+    sin(time + world_position.x / 3.0 + world_position.z / 3.0) + cos(time * 3.1) * 0.05,
     0,
-    sin(time + vertexPosition.z * 2.3) + cos(time * 1.2) * 0.05
+    sin(time + world_position.z / 3.0) + sin(time * 1.3) * 0.4
   ) * pow(distance_from_ground / 1.5, 2);
 
   world_position.xyz += offset;
