@@ -261,7 +261,7 @@ using namespace Gamma;
 
     if (newEntity != nullptr) {
       grid.set(targetCoordinates, newEntity);
-      createObjectFromCoordinates(globals, targetCoordinates);
+      createGridObjectFromCoordinates(globals, targetCoordinates);
     }
 
     storeEditAction(globals, editAction);
@@ -315,7 +315,7 @@ using namespace Gamma;
       } else {
         // @todo use entity corresponding to the current selected entity type
         grid.set(coordinates, new Ground);
-        createObjectFromCoordinates(globals, coordinates);
+        createGridObjectFromCoordinates(globals, coordinates);
       }
     });
 
@@ -487,7 +487,7 @@ using namespace Gamma;
     } else {
       if (findGridEntityPlacementCoordinates(globals, previewCoordinates)) {
         auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
-        auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
+        auto& params = getGridObjectParameters(state.editor.currentSelectedEntityType);
 
         preview.position = Vec3f::lerp(preview.position, targetPosition, 0.5f);
         preview.rotation = Vec3f::lerp(preview.rotation, state.editor.currentEntityOrientation.toVec3f(), 0.5f);
@@ -506,7 +506,7 @@ using namespace Gamma;
     if (findGridEntityPlacementCoordinates(globals, previewCoordinates)) {
       auto fadeColor = state.editor.deleting ? Vec3f(1.f, 0, 0) : Vec3f(0, 1.f, 0);
       auto targetPosition = gridCoordinatesToWorldPosition(previewCoordinates);
-      auto& params = getObjectParameters(state.editor.currentSelectedEntityType);
+      auto& params = getGridObjectParameters(state.editor.currentSelectedEntityType);
 
       #define sinewave(speed) sinf(getRunningTime() * speed)
 
@@ -634,8 +634,10 @@ using namespace Gamma;
       editor.isFindingLight = false;
 
       auto& object = createObjectFrom(meshName);
+      auto& params = getMeshObjectParameters(meshName);
 
-      object.scale = HALF_TILE_SIZE;
+      object.scale = params.scale;
+      object.color = params.color;
 
       saveObject("mesh-preview", object);
 
@@ -785,7 +787,7 @@ using namespace Gamma;
       // Restore the entities/objects replaced by the edit action
       for (auto& record : lastEditAction.replacedEntityRecords) {
         grid.set(record.coordinates, record.oldEntity);
-        createObjectFromCoordinates(globals, record.coordinates);
+        createGridObjectFromCoordinates(globals, record.coordinates);
       }
 
       lastEditAction.replacedEntityRecords.clear();
@@ -800,7 +802,7 @@ using namespace Gamma;
       if (oldEntity != nullptr) {
         // Restore the entity/object which existed before
         grid.set(coordinates, oldEntity);
-        createObjectFromCoordinates(globals, coordinates);
+        createGridObjectFromCoordinates(globals, coordinates);
       }
     }
 
@@ -1011,16 +1013,16 @@ using namespace Gamma;
           stof(data[2])
         };
 
-        // @todo createMeshObject(meshName, position, etc.)
         auto& object = createObjectFrom(currentMeshName);
+        auto& params = getMeshObjectParameters(currentMeshName);
 
         object.position = position;
-        object.scale = HALF_TILE_SIZE;
+        object.scale = params.scale;
+        object.color = params.color;
+
+        commit(object);
 
         if (currentMeshName == "flowerbed") {
-          // @temporary
-          object.color = Vec3f(0.1f, 0.6f, 0.2f);
-
           // @todo properly handle compound meshes
           auto& petals = createObjectFrom("flowerbed-petals");
 
@@ -1030,8 +1032,6 @@ using namespace Gamma;
 
           commit(petals);
         }
-
-        commit(object);
       }
     }
   }

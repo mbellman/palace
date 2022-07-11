@@ -1,5 +1,6 @@
-#include <vector>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "object_system.h"
 #include "game_entities.h"
@@ -12,7 +13,7 @@
 
 using namespace Gamma;
 
-const static std::map<EntityType, ObjectParameters> entityToObjectParametersMap = {
+const static std::map<EntityType, ObjectParameters> gridObjectParametersMap = {
   {GROUND, {
     scale(HALF_TILE_SIZE * 0.99f),
     color(1.f, 0.7f, 0.3f)
@@ -31,9 +32,16 @@ const static std::map<EntityType, ObjectParameters> entityToObjectParametersMap 
   }}
 };
 
+const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
+  {"flowerbed", {
+    scale(HALF_TILE_SIZE),
+    color(0.1f, 0.6f, 0.2f)
+  }}
+};
+
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
   auto& object = createObjectFrom("ground");
-  auto& params = getObjectParameters(GROUND);
+  auto& params = getGridObjectParameters(GROUND);
 
   object.position = gridCoordinatesToWorldPosition(coordinates);
   object.scale = params.scale;
@@ -44,7 +52,7 @@ static void createGroundObject(Globals, const GridCoordinates& coordinates) {
 
 static void createStaircaseObject(Globals, const GridCoordinates& coordinates, const Orientation& orientation) {
   auto& object = createObjectFrom("staircase");
-  auto& params = getObjectParameters(STAIRCASE);
+  auto& params = getGridObjectParameters(STAIRCASE);
 
   object.position = gridCoordinatesToWorldPosition(coordinates);
   object.color = params.color;
@@ -58,7 +66,7 @@ static void createStaircaseObject(Globals, const GridCoordinates& coordinates, c
 
 static void createSwitchObject(Globals, const GridCoordinates& coordinates) {
   auto& object = createObjectFrom("switch");
-  auto& params = getObjectParameters(SWITCH);
+  auto& params = getGridObjectParameters(SWITCH);
 
   object.position = gridCoordinatesToWorldPosition(coordinates);
   object.color = params.color;
@@ -69,7 +77,7 @@ static void createSwitchObject(Globals, const GridCoordinates& coordinates) {
 
 static void createWorldOrientationChangeObject(Globals, const GridCoordinates& coordinates, WorldOrientation worldOrientation) {
   auto& object = createObjectFrom("trigger-indicator");
-  auto& params = getObjectParameters(WORLD_ORIENTATION_CHANGE);
+  auto& params = getGridObjectParameters(WORLD_ORIENTATION_CHANGE);
 
   object.position = gridCoordinatesToWorldPosition(coordinates);
   object.color = params.color;
@@ -78,8 +86,21 @@ static void createWorldOrientationChangeObject(Globals, const GridCoordinates& c
   commit(object);
 }
 
-const ObjectParameters& getObjectParameters(EntityType entityType) {
-  return entityToObjectParametersMap.at(entityType);
+const ObjectParameters& getGridObjectParameters(EntityType entityType) {
+  return gridObjectParametersMap.at(entityType);
+}
+
+const ObjectParameters& getMeshObjectParameters(const std::string& meshName) {
+  const static ObjectParameters defaultParameters = {
+    scale(HALF_TILE_SIZE),
+    color(1.f)
+  };
+  
+  if (meshObjectParametersMap.find(meshName) != meshObjectParametersMap.end()) {
+    return meshObjectParametersMap.at(meshName);
+  }
+
+  return defaultParameters;
 }
 
 Object* findObjectByPosition(ObjectPool& objects, const Vec3f& position) {
@@ -92,7 +113,7 @@ Object* findObjectByPosition(ObjectPool& objects, const Vec3f& position) {
   return nullptr;
 }
 
-void createObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
+void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
   auto* entity = state.world.grid.get(coordinates);
 
   if (entity == nullptr) {

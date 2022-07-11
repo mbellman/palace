@@ -377,7 +377,7 @@ static void createGridEntityObjects(Globals) {
   auto& grid = state.world.grid;
 
   for (auto& [ coordinates, entity ] : grid) {
-    createObjectFromCoordinates(globals, coordinates);
+    createGridObjectFromCoordinates(globals, coordinates);
   }
 
   #if DEVELOPMENT == 1
