@@ -200,6 +200,8 @@ using namespace Gamma;
   static void stopPlacingMesh(Globals) {
     remove(object("mesh-preview"));
 
+    synchronizeCompoundMeshes(globals);
+
     state.editor.isPlacingMesh = false;
   }
 
@@ -579,6 +581,8 @@ using namespace Gamma;
     }
 
     commit(preview);
+
+    synchronizeCompoundMeshes(globals);
   }
 
   void showMeshFinderPreview(Globals) {
@@ -633,11 +637,7 @@ using namespace Gamma;
       editor.isPlacingLight = false;
       editor.isFindingLight = false;
 
-      auto& object = createObjectFrom(meshName);
-      auto& params = getMeshObjectParameters(meshName);
-
-      object.scale = params.scale;
-      object.color = params.color;
+      auto& object = createMeshObject(globals, meshName, Vec3f(0.f));
 
       saveObject("mesh-preview", object);
 
@@ -1013,25 +1013,7 @@ using namespace Gamma;
           stof(data[2])
         };
 
-        auto& object = createObjectFrom(currentMeshName);
-        auto& params = getMeshObjectParameters(currentMeshName);
-
-        object.position = position;
-        object.scale = params.scale;
-        object.color = params.color;
-
-        commit(object);
-
-        if (currentMeshName == "flowerbed") {
-          // @todo properly handle compound meshes
-          auto& petals = createObjectFrom("flowerbed-petals");
-
-          petals.position = object.position;
-          petals.scale = object.scale;
-          petals.color = Vec3f(1.f, 0.4f, 0.2f);
-
-          commit(petals);
-        }
+        createMeshObject(globals, currentMeshName, position);
       }
     }
   }

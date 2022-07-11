@@ -36,6 +36,10 @@ const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
   {"flowerbed", {
     scale(HALF_TILE_SIZE),
     color(0.1f, 0.6f, 0.2f)
+  }},
+  {"flowerbed-petals", {
+    scale(HALF_TILE_SIZE),
+    color(1.f, 0.4f, 0.2f)
   }}
 };
 
@@ -103,16 +107,6 @@ const ObjectParameters& getMeshObjectParameters(const std::string& meshName) {
   return defaultParameters;
 }
 
-Object* findObjectByPosition(ObjectPool& objects, const Vec3f& position) {
-  for (auto& object : objects) {
-    if (object.position == position) {
-      return &object;
-    }
-  }
-
-  return nullptr;
-}
-
 void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates) {
   auto* entity = state.world.grid.get(coordinates);
 
@@ -138,4 +132,64 @@ void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates
     default:
       break;
   }
+}
+
+Object& createMeshObject(Globals, const std::string& meshName, const Vec3f& position) {
+  auto& object = createObjectFrom(meshName);
+  auto& params = getMeshObjectParameters(meshName);
+
+  object.position = position;
+  object.scale = params.scale;
+  object.color = params.color;
+
+  commit(object);
+
+  if (meshName == "flowerbed") {
+    // @todo generalize this
+    auto& petals = createObjectFrom("flowerbed-petals");
+    auto& params = getMeshObjectParameters("flowerbed-petals");
+
+    petals.position = object.position;
+    petals.scale = object.scale;
+    petals.color = params.color;
+
+    commit(petals);
+  }
+
+  return object;
+}
+
+void synchronizeCompoundMeshes(Globals) {
+  if (state.editor.currentMeshName == "flowerbed") {
+    // @todo generalize this
+    auto& objects = objects("flowerbed");
+    auto& extensions = objects("flowerbed-petals");
+
+    // Remove any residual extension mesh objects
+    // if their base mesh objects were removed
+    while (extensions.totalActive() > objects.totalActive()) {
+      remove(extensions[extensions.totalActive() - 1]);
+    }
+
+    for (u8 i = 0; i < objects.totalActive(); i++) {
+      auto& object = objects[i];
+      auto& extension = extensions[i];
+
+      extension.position = object.position;
+      extension.rotation = object.rotation;
+      extension.scale = object.scale;
+
+      commit(extension);
+    }
+  }
+}
+
+Object* findObjectByPosition(ObjectPool& objects, const Vec3f& position) {
+  for (auto& object : objects) {
+    if (object.position == position) {
+      return &object;
+    }
+  }
+
+  return nullptr;
 }

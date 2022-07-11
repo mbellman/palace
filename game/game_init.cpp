@@ -666,7 +666,7 @@ void initializeGame(Globals) {
   moonlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
   moonlight.color = Vec3f(0.8f, 0.8f, 1.f);
 
-  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -13 });
+  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
 
   state.cameraStartPosition = camera.position;
   state.cameraTargetPosition = camera.position;
