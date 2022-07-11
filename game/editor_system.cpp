@@ -617,10 +617,9 @@ using namespace Gamma;
   }
 
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
-    auto& editor = state.editor;
-    auto& meshMap = context->scene.meshMap;
+    if (Gm_VectorContains(meshNames, meshName)) {
+      auto& editor = state.editor;
 
-    if (meshMap.find(meshName) != meshMap.end()) {
       // Remove the existing mesh preview when swapping it for a different mesh
       if (
         editor.isPlacingMesh &&
