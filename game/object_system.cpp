@@ -142,11 +142,10 @@ void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates
   }
 }
 
-Object& createMeshObject(Globals, const std::string& meshName, const Vec3f& position) {
+Object& createMeshObject(Globals, const std::string& meshName) {
   auto& object = createObjectFrom(meshName);
   auto& params = getMeshObjectParameters(meshName);
 
-  object.position = position;
   object.scale = params.scale;
   object.color = params.color;
 
@@ -156,7 +155,7 @@ Object& createMeshObject(Globals, const std::string& meshName, const Vec3f& posi
     auto& extensionMeshNames = compoundMeshMap.at(meshName);
 
     for (auto& extensionMeshName : extensionMeshNames) {
-      createMeshObject(globals, extensionMeshName, position);
+      createMeshObject(globals, extensionMeshName);
     }
   }
 
@@ -164,11 +163,15 @@ Object& createMeshObject(Globals, const std::string& meshName, const Vec3f& posi
 }
 
 void synchronizeCompoundMeshes(Globals) {
-  auto& currentMeshName = state.editor.currentMeshName;
+  for (auto& [ meshName, _ ] : compoundMeshMap) {
+    synchronizeCompoundMeshes(globals, meshName);
+  }
+}
 
-  if (compoundMeshMap.find(currentMeshName) != compoundMeshMap.end()) {
-    auto& baseObjects = objects(currentMeshName);
-    auto& extensionMeshNames = compoundMeshMap.at(currentMeshName);
+void synchronizeCompoundMeshes(Globals, const std::string& meshName) {
+  if (compoundMeshMap.find(meshName) != compoundMeshMap.end()) {
+    auto& baseObjects = objects(meshName);
+    auto& extensionMeshNames = compoundMeshMap.at(meshName);
 
     for (auto& extensionMeshName : extensionMeshNames) {
       auto& extensions = objects(extensionMeshName);

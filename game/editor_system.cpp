@@ -199,11 +199,13 @@ using namespace Gamma;
   }
 
   static void stopPlacingMesh(Globals) {
+    auto& editor = state.editor;
+
     remove(object("mesh-preview"));
 
-    synchronizeCompoundMeshes(globals);
+    synchronizeCompoundMeshes(globals, editor.currentMeshName);
 
-    state.editor.isPlacingMesh = false;
+    editor.isPlacingMesh = false;
   }
 
   static void disableMeshFinder(Globals) {
@@ -583,7 +585,7 @@ using namespace Gamma;
 
     commit(preview);
 
-    synchronizeCompoundMeshes(globals);
+    synchronizeCompoundMeshes(globals, editor.currentMeshName);
   }
 
   void showMeshFinderPreview(Globals) {
@@ -637,7 +639,7 @@ using namespace Gamma;
       editor.isPlacingLight = false;
       editor.isFindingLight = false;
 
-      auto& object = createMeshObject(globals, meshName, Vec3f(0.f));
+      auto& object = createMeshObject(globals, meshName);
 
       saveObject("mesh-preview", object);
 
@@ -897,7 +899,6 @@ using namespace Gamma;
     Gm_WriteFileContents("./game/world/grid_data.txt", serialized);
   }
 
-  // @todo save rotation + scale
   void saveMeshData(Globals) {
     std::stringstream serialized;
     auto* previewMesh = findObject("mesh-preview");
@@ -908,10 +909,14 @@ using namespace Gamma;
       for (auto& object : objects(meshName)) {
         if (&object != previewMesh || !state.editor.isPlacingMesh) {
           auto& p = object.position;
-          auto& r = object.rotation;  // @todo serialize
-          auto& s = object.scale;     // @todo serialize
+          auto& r = object.rotation;
+          auto& s = object.scale;
 
-          serialized << p.x << "," << p.y << "," << p.z << "\n";
+          // @todo serialize color
+          serialized << p.x << "," << p.y << "," << p.z << ",";
+          serialized << r.x << "," << r.y << "," << r.z << ",";
+          // Only serialize a single scale component, assuming uniform scaling
+          serialized << s.x << "\n";
         }
       }
     }
@@ -1013,9 +1018,26 @@ using namespace Gamma;
           stof(data[2])
         };
 
-        createMeshObject(globals, currentMeshName, position);
+        Vec3f rotation = {
+          stof(data[3]),
+          stof(data[4]),
+          stof(data[5])
+        };
+
+        Vec3f scale = stof(data[6]);
+
+        auto& object = createMeshObject(globals, currentMeshName);
+
+        object.position = position;
+        object.rotation = rotation;
+        object.scale = scale;
+        // @todo color
+
+        commit(object);
       }
     }
+
+    synchronizeCompoundMeshes(globals);
   }
 
   void loadLightData(Globals) {
