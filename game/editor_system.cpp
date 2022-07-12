@@ -753,6 +753,7 @@ using namespace Gamma;
       handleLightSelectionAction(globals);
     } else if (editor.isPlacingLight) {
       handleLightPlacementAction(globals);
+      saveLightData(globals);
     } else if (editor.isFindingMesh) {
       handleMeshSelectionAction(globals);
     } else if (editor.isPlacingMesh) {
@@ -927,6 +928,28 @@ using namespace Gamma;
     }
 
     Gm_WriteFileContents("./game/world/mesh_data.txt", serialized.str());
+  }
+
+  void saveLightData(Globals) {
+    std::stringstream serialized;
+    auto& scene = context->scene;
+
+    serialized << "point\n";
+
+    for (auto* light : scene.lights) {
+      // @todo light->serializable instead of lightStore check
+      if (light->type == LightType::POINT && light != scene.lightStore.at("switch-light")) {
+        auto& p = light->position;
+        auto& c = light->color;
+        auto radius = light->radius;
+
+        serialized << p.x << "," << p.y << "," << p.z << ",";
+        serialized << c.x << "," << c.y << "," << c.z << ",";
+        serialized << radius << "\n";
+      }
+    }
+
+    Gm_WriteFileContents("./game/world/light_data.txt", serialized.str());
   }
 
   void loadWorldGridData(Globals) {

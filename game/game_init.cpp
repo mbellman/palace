@@ -617,6 +617,19 @@ void initializeGame(Globals) {
         }
 
         createPlaceableLight(globals, lightType);
+      } else if (Gm_StringStartsWith(command, "radius")) {
+        // @todo handleRadiusCommand()
+        if (!state.editor.isPlacingLight) {
+          return;
+        }
+
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          auto radius = stof(parts[1]);
+
+          state.editor.selectedLight->radius = radius;
+        }
       } else if (Gm_StringStartsWith(command, "color")) {
         // @todo handleColorCommand()
         auto parts = Gm_SplitString(command, " ");
