@@ -343,7 +343,7 @@ using namespace Gamma;
       // color as set in showMeshFinderPreview()
       commit(*object);
 
-      pointCamera(*object);
+      pointCameraAt(*object);
 
       editor.isFindingMesh = false;
       editor.isPlacingMesh = true;
@@ -372,7 +372,7 @@ using namespace Gamma;
   }
 
   static void handleLightSelectionAction(Globals) {
-    pointCamera(state.editor.selectedLight->position);
+    pointCameraAt(state.editor.selectedLight->position);
 
     state.editor.isFindingLight = false;
     state.editor.isPlacingLight = true;
@@ -915,10 +915,11 @@ using namespace Gamma;
           auto& p = object.position;
           auto& r = object.rotation;
           auto& s = object.scale;
+          auto& c = object.color;
 
-          // @todo serialize color
           serialized << p.x << "," << p.y << "," << p.z << ",";
           serialized << r.x << "," << r.y << "," << r.z << ",";
+          serialized << (u32)c.r << "," << (u32)c.g << "," << (u32)c.b << ",";
           // Only serialize a single scale component, assuming uniform scaling
           serialized << s.x << "\n";
         }
@@ -1028,14 +1029,20 @@ using namespace Gamma;
           stof(data[5])
         };
 
-        Vec3f scale = stof(data[6]);
+        pVec4 color = {
+          (u8)stoi(data[6]),
+          (u8)stoi(data[7]),
+          (u8)stoi(data[8])
+        };
+
+        Vec3f scale = stof(data[9]);
 
         auto& object = createMeshObject(globals, currentMeshName);
 
         object.position = position;
         object.rotation = rotation;
+        object.color = color;
         object.scale = scale;
-        // @todo color
 
         commit(object);
       }

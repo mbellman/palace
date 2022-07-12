@@ -28,8 +28,7 @@
 #define remove(object) Gm_RemoveObject(context, object)
 #define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
-// @todo rename pointCameraAt()
-#define pointCamera(...) Gm_PointCamera(context, __VA_ARGS__)
+#define pointCameraAt(...) Gm_PointCameraAt(context, __VA_ARGS__)
 #define useFrustumCulling(...) Gm_UseFrustumCulling(context, __VA_ARGS__)
 #define useLodByDistance(distance, ...) Gm_UseLodByDistance(context, distance, __VA_ARGS__)
 
@@ -77,8 +76,8 @@ Gamma::Object* Gm_FindObject(GmContext* context, const std::string& objectName);
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName);
 Gamma::Light& Gm_GetLight(GmContext* context, const std::string& lightName);
 void Gm_RemoveObject(GmContext* context, const Gamma::Object& object);
-void Gm_PointCamera(GmContext* context, const Gamma::Object& object, bool upsideDown = false);
-void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsideDown = false);
+void Gm_PointCameraAt(GmContext* context, const Gamma::Object& object, bool upsideDown = false);
+void Gm_PointCameraAt(GmContext* context, const Gamma::Vec3f& position, bool upsideDown = false);
 void Gm_HandleFreeCameraMode(GmContext* context, float dt);
 void Gm_UseFrustumCulling(GmContext* context, const std::initializer_list<std::string>& meshNames);
 void Gm_UseLodByDistance(GmContext* context, float distance, const std::initializer_list<std::string>& meshNames);

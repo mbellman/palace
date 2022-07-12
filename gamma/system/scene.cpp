@@ -238,11 +238,11 @@ void Gm_RemoveObject(GmContext* context, const Gamma::Object& object) {
   mesh->objects.removeById(record.id);
 }
 
-void Gm_PointCamera(GmContext* context, const Gamma::Object& object, bool upsideDown) {
-  Gm_PointCamera(context, object.position, upsideDown);
+void Gm_PointCameraAt(GmContext* context, const Gamma::Object& object, bool upsideDown) {
+  Gm_PointCameraAt(context, object.position, upsideDown);
 }
 
-void Gm_PointCamera(GmContext* context, const Gamma::Vec3f& position, bool upsideDown) {
+void Gm_PointCameraAt(GmContext* context, const Gamma::Vec3f& position, bool upsideDown) {
   auto& camera = context->scene.camera;
   Vec3f forward = (position - camera.position).unit();
   Vec3f sideways = Vec3f::cross(forward, Vec3f(0, 1.0f, 0));
