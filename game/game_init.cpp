@@ -581,7 +581,6 @@ void initializeGame(Globals) {
     });
 
     context->commander.on<std::string>("command", [context, &state](const std::string& command) {
-      // @todo move elsewhere
       #define parseVec3f(name, input) \
         auto components = Gm_SplitString(input, ",");\
         auto name = Vec3f(\
@@ -590,6 +589,7 @@ void initializeGame(Globals) {
           stof(components[2])\
         )\
 
+      // @todo handleCommand()
       if (Gm_StringStartsWith(command, "mesh")) {
         // @todo handleMeshCommand()
         auto parts = Gm_SplitString(command, " ");
@@ -641,6 +641,19 @@ void initializeGame(Globals) {
 
           if (state.editor.isPlacingMesh) {
             object("mesh-preview").rotation = rotation;
+
+            commit(object("mesh-preview"));
+          }
+        }
+      } else if (Gm_StringStartsWith(command, "scale")) {
+        // @todo handleScaleCommand()
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          auto scale = stof(parts[1]);
+
+          if (state.editor.isPlacingMesh) {
+            object("mesh-preview").scale = scale;
 
             commit(object("mesh-preview"));
           }

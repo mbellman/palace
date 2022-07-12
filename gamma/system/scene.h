@@ -28,6 +28,7 @@
 #define remove(object) Gm_RemoveObject(context, object)
 #define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
+// @todo rename pointCameraAt()
 #define pointCamera(...) Gm_PointCamera(context, __VA_ARGS__)
 #define useFrustumCulling(...) Gm_UseFrustumCulling(context, __VA_ARGS__)
 #define useLodByDistance(distance, ...) Gm_UseLodByDistance(context, distance, __VA_ARGS__)

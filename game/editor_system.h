@@ -53,13 +53,13 @@ struct WorldEditor {
   bool isFindingMesh = false;
   bool snapMeshesToGrid = false;
   std::string currentMeshName = "";
-  float selectedMeshDistance = 0.f;  // @todo
+  float selectedMeshDistance = TILE_SIZE * 2.f;
 
   // Light placement
   bool isPlacingLight = false;
   bool isFindingLight = false;
   Gamma::Light* selectedLight = nullptr;
-  float selectedLightDistance = 0.f;
+  float selectedLightDistance = TILE_SIZE * 2.f;
 
   // Default orientation for placed entities
   Gamma::Orientation currentEntityOrientation;

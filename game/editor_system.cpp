@@ -333,8 +333,9 @@ using namespace Gamma;
   }
 
   static void handleMeshSelectionAction(Globals) {
+    auto& camera =getCamera();
     auto& editor = state.editor;
-    auto* object = findMeshObjectByDirection(globals, getCamera().orientation.getDirection());
+    auto* object = findMeshObjectByDirection(globals, camera.orientation.getDirection());
 
     if (object != nullptr) {
       saveObject("mesh-preview", *object);
@@ -342,8 +343,11 @@ using namespace Gamma;
       // color as set in showMeshFinderPreview()
       commit(*object);
 
+      pointCamera(*object);
+
       editor.isFindingMesh = false;
       editor.isPlacingMesh = true;
+      editor.selectedMeshDistance = (camera.position - object->position).magnitude();
     }
   }
 
@@ -352,10 +356,10 @@ using namespace Gamma;
       return;
     }
 
-    // @todo check to see if any mesh objects exist at the
-    // mesh preview position, and don't place it if so
-
     if (state.editor.snapMeshesToGrid) {
+      // @todo check to see if any mesh objects exist at the
+      // mesh preview position, and don't place it if so
+
       // Create a new mesh object to allow continual placement
       // until the editor is disabled
       createPlaceableMeshObjectFrom(globals, state.editor.currentMeshName);
@@ -579,8 +583,7 @@ using namespace Gamma;
 
       preview.position = Vec3f::lerp(preview.position, targetMeshPosition, 0.5f);
     } else {
-      // @todo use editor.selectedMeshDistance
-      preview.position = camera.position + camera.orientation.getDirection() * 30.f;
+      preview.position = camera.position + camera.orientation.getDirection() * editor.selectedMeshDistance;
     }
 
     commit(preview);
@@ -635,6 +638,7 @@ using namespace Gamma;
       editor.currentMeshName = meshName;
       editor.isPlacingMesh = true;
       editor.snapMeshesToGrid = true;
+      editor.selectedMeshDistance = TILE_SIZE * 2.f;
 
       editor.isPlacingLight = false;
       editor.isFindingLight = false;
@@ -735,7 +739,7 @@ using namespace Gamma;
     commit(indicator);
 
     editor.selectedLight = &light;
-    editor.selectedLightDistance = 40.f;
+    editor.selectedLightDistance = TILE_SIZE * 2.f;
 
     editor.enabled = true;
     editor.isPlacingLight = true;
