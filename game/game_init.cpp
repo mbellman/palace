@@ -349,14 +349,20 @@ static void addMeshes(Globals) {
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
+
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;
+
   addMesh("tulip-petals", 1000, Mesh::Model("./game/models/tulip-petals.obj"));
   mesh("tulip-petals")->type = MeshType::FOLIAGE;
+
   addMesh("grass", 1000, Mesh::Model("./game/models/grass.obj"));
+
   addMesh("hedge", 1000, Mesh::Model("./game/models/hedge.obj"));
   mesh("hedge")->texture = "./game/textures/hedge.png";
   mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
+
+  addMesh("stone-tile", 1000, Mesh::Model("./game/models/stone-tile.obj"));
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators

@@ -23,7 +23,8 @@ using namespace Gamma;
     "arch",
     "tulips",
     "grass",
-    "hedge"
+    "hedge",
+    "stone-tile"
   };
 
   static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
