@@ -76,8 +76,16 @@ vec3 getBranchFoliageOffset(vec3 world_position) {
 }
 
 vec3 getLeafFoliageOffset(vec3 world_position) {
-  // @todo
-  return vec3(0);
+  float x_3 = world_position.x / 3.0;
+  float y_3 = world_position.y / 3.0;
+  float z_3 = world_position.z / 3.0;
+  float rate = time * behavior.speed;
+
+  float offset_x = sin(rate + z_3) + sin(rate * 0.5 + z_3) * 0.5;
+  float offset_y = cos(rate + x_3) + cos(rate * 0.7 + x_3) * 0.5;
+  float offset_z = sin(rate + y_3) + sin(rate * 0.9 + y_3) * 0.5;
+
+  return vec3(offset_x, offset_y, offset_z) * 0.1;
 }
 
 void main() {

@@ -322,8 +322,8 @@ static void addParticles(Globals) {
   auto& particles = mesh("particles")->particleSystem;
 
   particles.spread = 100.f;
-  particles.medianSpeed = 0.5f;
-  particles.speedVariation = 0.25f;
+  particles.medianSpeed = 0.3f;
+  particles.speedVariation = 0.15f;
   particles.deviation = 10.f;
   particles.sizeVariation = 3.f;
   particles.medianSize = 5.f;
@@ -355,6 +355,7 @@ static void addMeshes(Globals) {
   addMesh("arch-vines", 1000, Mesh::Model("./game/models/arch-vines.obj"));
   mesh("arch-vines")->type = MeshType::FOLIAGE;
   mesh("arch-vines")->foliageBehavior.type = FoliageBehaviorType::LEAF;
+  mesh("arch-vines")->foliageBehavior.speed = 3.f;
 
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;
