@@ -31,9 +31,9 @@ namespace Gamma {
     OpenGLShader probeReflector;
     OpenGLShader particles;
     OpenGLShader lightingPrepass;
-    OpenGLShader pointLight;
     OpenGLShader directionalLight;
     OpenGLShader spotLight;
+    OpenGLShader pointLight;
     OpenGLShader indirectLight;
     OpenGLShader indirectLightComposite;
     OpenGLShader skybox;
@@ -44,11 +44,11 @@ namespace Gamma {
     OpenGLShader refractiveGeometry;
 
     // Shadowcaster shaders
-    OpenGLShader shadowLightView;
-    OpenGLShader pointShadowcasterView;
     OpenGLShader directionalShadowcaster;
-    OpenGLShader pointShadowcaster;
     OpenGLShader spotShadowcaster;
+    OpenGLShader pointShadowcasterView;
+    OpenGLShader shadowLightView;
+    OpenGLShader pointShadowcaster;
 
     // Dev shaders
     OpenGLShader gBufferDev;
@@ -122,12 +122,12 @@ namespace Gamma {
     void renderSpotShadowMaps();
     void prepareLightingPass();
     void renderLightingPrepass();
-    void renderPointLights();
-    void renderPointShadowcasters();
     void renderDirectionalLights();
     void renderDirectionalShadowcasters();
     void renderSpotLights();
     void renderSpotShadowcasters();
+    void renderPointLights();
+    void renderPointShadowcasters();
     void copyEmissiveObjects();
     void renderIndirectLight();
     void renderSkybox();
