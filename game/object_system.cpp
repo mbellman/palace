@@ -41,6 +41,10 @@ const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
     scale(HALF_TILE_SIZE),
     color(1.f, 0.4f, 0.2f)
   }},
+  {"arch-vines", {
+    scale(HALF_TILE_SIZE),
+    color(0.1f, 1.f, 0.4f)
+  }},
   {"stone-tile", {
     scale(HALF_TILE_SIZE),
     color(0.75f)
@@ -48,7 +52,8 @@ const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
 };
 
 const static std::map<std::string, std::vector<std::string>> compoundMeshMap = {
-  {"tulips", { "tulip-petals"} }
+  {"tulips", { "tulip-petals" }},
+  {"arch", { "arch-vines" }}
 };
 
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
