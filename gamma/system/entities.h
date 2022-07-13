@@ -177,6 +177,30 @@ namespace Gamma {
   };
 
   /**
+   * FoliageBehaviorType
+   * -------------------
+   *
+   * Different categories of foliage, describing different types
+   * of geometry displacement behavior.
+   */
+  enum FoliageBehaviorType {
+    FLOWER,
+    BRANCH,
+    LEAF
+  };
+
+  /**
+   * FoliageBehavior
+   * ---------------
+   *
+   * @todo description
+   */
+  struct FoliageBehavior {
+    FoliageBehaviorType type = FoliageBehaviorType::FLOWER;
+    float speed = 1.f;
+  };
+
+  /**
    * Mesh
    * ----
    *
@@ -266,9 +290,13 @@ namespace Gamma {
      */
     bool disabled = false;
     /**
-     * Configuration parameters for particle system meshes.
+     * Configuration for particle system meshes.
      */
     ParticleSystem particleSystem;
+    /**
+     * Configuration for foliage meshes.
+     */
+    FoliageBehavior foliageBehavior;
 
     static Mesh* Cube();
     static Mesh* Model(const char* path);

@@ -481,8 +481,12 @@ namespace Gamma {
 
     for (auto* glMesh : glMeshes) {
       if (glMesh->isMeshType(MeshType::FOLIAGE)) {
+        auto& behavior = glMesh->getSourceMesh()->foliageBehavior;
+
         shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
         shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
+        shaders.foliage.setInt("behavior.type", behavior.type);
+        shaders.foliage.setFloat("behavior.speed", behavior.speed);
 
         glMesh->render(ctx.primitiveMode);
       }

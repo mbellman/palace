@@ -353,7 +353,8 @@ static void addMeshes(Globals) {
   mesh("arch")->texture = "./game/textures/arch.png";
 
   addMesh("arch-vines", 1000, Mesh::Model("./game/models/arch-vines.obj"));
-  // mesh("arch-vines")->type = MeshType::FOLIAGE;
+  mesh("arch-vines")->type = MeshType::FOLIAGE;
+  mesh("arch-vines")->foliageBehavior.type = FoliageBehaviorType::LEAF;
 
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;
