@@ -3,9 +3,11 @@
 #include "Gamma.h"
 
 #include "easing_utilities.h"
+#include "game_macros.h"
 
 struct CurrentMove {
   float startTime = 0.f;
+  float duration = 0.f;
   EasingType easing;
   Gamma::Vec3f from;
   Gamma::Vec3f to;
@@ -13,4 +15,4 @@ struct CurrentMove {
 
 struct GameState;
 
-void handlePlayerMovement(GmContext* context, GameState& state, float dt);
+void handlePlayerMovement(Globals, float dt);

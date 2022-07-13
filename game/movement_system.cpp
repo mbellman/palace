@@ -164,10 +164,11 @@ static void handleNextMove(Globals) {
   auto& camera = getCamera();
   auto runningTime = getRunningTime();
   auto nextMove = takeNextMove(state.moves);
+  auto& currentMove = state.currentMove;
   auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
   auto targetCameraPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
-  auto timeSinceCurrentMoveBegan = runningTime - state.currentMove.startTime;
+  auto timeSinceCurrentMoveBegan = runningTime - currentMove.startTime;
   Vec3f moveDelta = Vec3f(0);
 
   // Only advance the target world position along the
@@ -216,26 +217,34 @@ static void handleNextMove(Globals) {
     // prior move sequence. An in-out easing works best
     // for single tile moves or the beginning of a move
     // sequence, so we apply it in these cases.
-    state.currentMove.easing = EasingType::EASE_IN_OUT;
+    currentMove.easing = EasingType::EASE_IN_OUT;
   } else if (state.moves.size == 0) {
     // Last move in a sequence, so slow down and stop
-    state.currentMove.easing = EasingType::EASE_OUT;
+    currentMove.easing = EasingType::EASE_OUT;
   } else if (state.moves.size >= 1) {
     // More moves ahead in the sequence, so move
     // at a constant rate
-    state.currentMove.easing = EasingType::LINEAR;
+    currentMove.easing = EasingType::LINEAR;
   }
 
-  state.currentMove.startTime = runningTime;
-  state.currentMove.from = camera.position;
-  state.currentMove.to = targetCameraPosition;
-  // @todo reduce tween time based on proximity to the target position
+  currentMove.startTime = runningTime;
+  currentMove.from = camera.position;
+  currentMove.to = targetCameraPosition;
+
+  // Determine the current move duration as a function of
+  // how far the move travels. Longer moves should take
+  // closer to a full second, and shorter moves should
+  // complete sooner.
+  float moveDistanceRatio = (currentMove.from - currentMove.to).magnitude() / TILE_SIZE;
+
+  currentMove.duration = powf(moveDistanceRatio, 1.f / 3.f);
 }
 
 static void movePlayer(Globals, float dt) {
   auto& camera = getCamera();
-  auto& from = state.currentMove.from;
-  auto& to = state.currentMove.to;
+  auto& move = state.currentMove;
+  auto& from = move.from;
+  auto& to = move.to;
 
   // Add dt to the easing alpha value to ensure that
   // the camera is always in motion while executing
@@ -245,26 +254,26 @@ static void movePlayer(Globals, float dt) {
   // the same frame as updating the current move,
   // we don't want to wait a frame to start moving
   // the camera, as this produces a jarring stutter.
-  auto alpha = (getRunningTime() - state.currentMove.startTime) + dt;
+  auto alpha = ((getRunningTime() - move.startTime) + dt) / move.duration;
 
-  if (state.currentMove.easing == EasingType::EASE_IN_OUT) {
+  if (move.easing == EasingType::EASE_IN_OUT) {
     alpha *= 3.f;
-  } else if (state.currentMove.easing == EasingType::LINEAR) {
+  } else if (move.easing == EasingType::LINEAR) {
     alpha *= 4.f;
-  } else if (state.currentMove.easing == EasingType::EASE_OUT) {
+  } else if (move.easing == EasingType::EASE_OUT) {
     alpha *= 2.f;
   }
 
   if (alpha >= 1.f) {
     camera.position = to;
-    state.currentMove.startTime = 0.f;
+    move.startTime = 0.f;
   } else {
     #define easeCamera(easingFn)\
       camera.position.x = easingFn(from.x, to.x, alpha);\
       camera.position.y = easingFn(from.y, to.y, alpha);\
       camera.position.z = easingFn(from.z, to.z, alpha);
 
-    switch (state.currentMove.easing) {
+    switch (move.easing) {
       case EasingType::EASE_IN_OUT:
         easeCamera(easeInOut);
         break;
