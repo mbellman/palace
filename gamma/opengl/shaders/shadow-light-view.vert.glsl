@@ -1,6 +1,6 @@
 #version 460 core
 
-uniform mat4 matLightView;
+uniform mat4 matLightViewProjection;
 
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
@@ -13,10 +13,11 @@ layout (location = 5) in mat4 modelMatrix;
 // out vec2 fragUv;
 
 #include "utils/gl.glsl";
+#include "utils/foliage.glsl";
 
 void main() {
   // @hack invert Z
-  gl_Position = matLightView * glVec4(modelMatrix * vec4(vertexPosition, 1.0));
+  gl_Position = matLightViewProjection * glVec4(modelMatrix * vec4(vertexPosition, 1.0));
 
   // @todo once mesh textures are checked for alpha
   // fragUv = vertexUv;

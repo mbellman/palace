@@ -31,5 +31,5 @@ namespace Gamma {
     OpenGLSpotShadowMap(const Light* light);
   };
 
-  Matrix4f Gm_CreateCascadedLightViewMatrixGL(u8 cascade, const Vec3f& lightDirection, const Camera& camera);
+  Matrix4f Gm_CreateCascadedLightViewProjectionMatrixGL(u8 cascade, const Vec3f& lightDirection, const Camera& camera);
 }

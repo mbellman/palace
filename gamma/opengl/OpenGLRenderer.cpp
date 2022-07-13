@@ -285,7 +285,7 @@ namespace Gamma {
    */
   void OpenGLRenderer::initializeLightArrays() {
     ctx.pointLights.clear();
-    ctx.pointShadowCasters.clear();
+    ctx.pointShadowcasters.clear();
     ctx.directionalLights.clear();
     ctx.directionalShadowcasters.clear();
     ctx.spotLights.clear();
@@ -298,7 +298,7 @@ namespace Gamma {
           break;
         case LightType::POINT_SHADOWCASTER:
           if (Gm_IsFlagEnabled(GammaFlags::RENDER_SHADOWS)) {
-            ctx.pointShadowCasters.push_back(light);
+            ctx.pointShadowcasters.push_back(light);
           } else {
             ctx.pointLights.push_back(light);
           }
@@ -357,7 +357,7 @@ namespace Gamma {
       renderPointLights();
     }
 
-    if (ctx.pointShadowCasters.size() > 0) {
+    if (ctx.pointShadowcasters.size() > 0) {
       renderPointShadowcasters();
     }
 
@@ -532,7 +532,7 @@ namespace Gamma {
    */
   void OpenGLRenderer::renderDirectionalShadowMaps() {
     auto& camera = *ctx.activeCamera;
-    auto& shader = shaders.directionalShadowcasterView;
+    auto& shader = shaders.shadowLightView;
 
     shader.use();
 
@@ -544,9 +544,9 @@ namespace Gamma {
 
       for (u32 cascade = 0; cascade < 3; cascade++) {
         glShadowMap.buffer.writeToAttachment(cascade);
-        Matrix4f matLightView = Gm_CreateCascadedLightViewMatrixGL(cascade, light.direction, camera);
+        Matrix4f matLightViewProjection = Gm_CreateCascadedLightViewProjectionMatrixGL(cascade, light.direction, camera);
 
-        shader.setMatrix4f("matLightView", matLightView);
+        shader.setMatrix4f("matLightViewProjection", matLightViewProjection);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -554,6 +554,8 @@ namespace Gamma {
         // (will require a handful of other changes to mesh organization/data buffering)
         for (auto* glMesh : glMeshes) {
           auto* sourceMesh = glMesh->getSourceMesh();
+
+          // @todo set foliage parameters if applicable
 
           if (sourceMesh->canCastShadows && sourceMesh->maxCascade >= cascade) {
             glMesh->render(ctx.primitiveMode, true);
@@ -573,7 +575,7 @@ namespace Gamma {
 
     for (u32 mapIndex = 0; mapIndex < glPointShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glPointShadowMaps[mapIndex];
-      auto& light = *ctx.pointShadowCasters[mapIndex];
+      auto& light = *ctx.pointShadowcasters[mapIndex];
 
       if (light.isStatic && glShadowMap.isRendered) {
         continue;
@@ -617,7 +619,7 @@ namespace Gamma {
    * @todo description
    */
   void OpenGLRenderer::renderSpotShadowMaps() {
-    auto& shader = shaders.spotShadowcasterView;
+    auto& shader = shaders.shadowLightView;
 
     shader.use();
 
@@ -629,16 +631,15 @@ namespace Gamma {
         continue;
       }
 
-      // @optimize matLightProjection can be precomputed
       Matrix4f matLightProjection = Matrix4f::glPerspective({ 1024, 1024 }, 120.0f, 1.0f, light.radius);
       Matrix4f matLightView = Matrix4f::lookAt(light.position.gl(), light.direction.invert().gl(), Vec3f(0.0f, 1.0f, 0.0f));
-      Matrix4f lightMatrix = (matLightProjection * matLightView).transpose();
+      Matrix4f matLightViewProjection = (matLightProjection * matLightView).transpose();
 
       glShadowMap.buffer.write();
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      shader.setMatrix4f("lightMatrix", lightMatrix);
+      shader.setMatrix4f("matLightViewProjection", matLightViewProjection);
 
       // @todo glMultiDrawElementsIndirect for static world geometry
       // (will require a handful of other changes to mesh organization/data buffering)
@@ -722,7 +723,7 @@ namespace Gamma {
     shader.setMatrix4f("matInverseProjection", ctx.matInverseProjection);
     shader.setMatrix4f("matInverseView", ctx.matInverseView);
 
-    for (u32 i = 0; i < ctx.pointShadowCasters.size(); i++) {
+    for (u32 i = 0; i < ctx.pointShadowcasters.size(); i++) {
       auto& glShadowMap = *glPointShadowMaps[i];
       auto& light = *glShadowMap.light;
 
@@ -781,9 +782,9 @@ namespace Gamma {
       shader.setInt("texShadowMaps[0]", 3);
       shader.setInt("texShadowMaps[1]", 4);
       shader.setInt("texShadowMaps[2]", 5);
-      shader.setMatrix4f("lightMatrices[0]", Gm_CreateCascadedLightViewMatrixGL(0, light.direction, camera));
-      shader.setMatrix4f("lightMatrices[1]", Gm_CreateCascadedLightViewMatrixGL(1, light.direction, camera));
-      shader.setMatrix4f("lightMatrices[2]", Gm_CreateCascadedLightViewMatrixGL(2, light.direction, camera));
+      shader.setMatrix4f("lightMatrices[0]", Gm_CreateCascadedLightViewProjectionMatrixGL(0, light.direction, camera));
+      shader.setMatrix4f("lightMatrices[1]", Gm_CreateCascadedLightViewProjectionMatrixGL(1, light.direction, camera));
+      shader.setMatrix4f("lightMatrices[2]", Gm_CreateCascadedLightViewProjectionMatrixGL(2, light.direction, camera));
       shader.setVec3f("cameraPosition", camera.position);
       shader.setMatrix4f("matInverseProjection", ctx.matInverseProjection);
       shader.setMatrix4f("matInverseView", ctx.matInverseView);

@@ -44,12 +44,11 @@ namespace Gamma {
     OpenGLShader refractiveGeometry;
 
     // Shadowcaster shaders
-    OpenGLShader directionalShadowcaster;
-    OpenGLShader directionalShadowcasterView;
-    OpenGLShader pointShadowcaster;
+    OpenGLShader shadowLightView;
     OpenGLShader pointShadowcasterView;
+    OpenGLShader directionalShadowcaster;
+    OpenGLShader pointShadowcaster;
     OpenGLShader spotShadowcaster;
-    OpenGLShader spotShadowcasterView;
 
     // Dev shaders
     OpenGLShader gBufferDev;
@@ -64,7 +63,7 @@ namespace Gamma {
     bool hasRefractiveObjects;
     GLenum primitiveMode;
     std::vector<Light*> pointLights;
-    std::vector<Light*> pointShadowCasters;
+    std::vector<Light*> pointShadowcasters;
     std::vector<Light*> directionalLights;
     std::vector<Light*> directionalShadowcasters;
     std::vector<Light*> spotLights;

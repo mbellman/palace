@@ -107,11 +107,6 @@ namespace Gamma {
     shaders.directionalShadowcaster.fragment("./gamma/opengl/shaders/directional-light-with-shadow.frag.glsl");
     shaders.directionalShadowcaster.link();
 
-    shaders.directionalShadowcasterView.init();
-    shaders.directionalShadowcasterView.vertex("./gamma/opengl/shaders/directional-light-view.vert.glsl");
-    shaders.directionalShadowcasterView.fragment("./gamma/opengl/shaders/directional-light-view.frag.glsl");
-    shaders.directionalShadowcasterView.link();
-
     shaders.spotLight.init();
     shaders.spotLight.vertex("./gamma/opengl/shaders/light-disc.vert.glsl");
     shaders.spotLight.fragment("./gamma/opengl/shaders/spot-light-without-shadow.frag.glsl");
@@ -122,10 +117,10 @@ namespace Gamma {
     shaders.spotShadowcaster.fragment("./gamma/opengl/shaders/spot-light-with-shadow.frag.glsl");
     shaders.spotShadowcaster.link();
 
-    shaders.spotShadowcasterView.init();
-    shaders.spotShadowcasterView.vertex("./gamma/opengl/shaders/spot-light-view.vert.glsl");
-    shaders.spotShadowcasterView.fragment("./gamma/opengl/shaders/spot-light-view.frag.glsl");
-    shaders.spotShadowcasterView.link();
+    shaders.shadowLightView.init();
+    shaders.shadowLightView.vertex("./gamma/opengl/shaders/shadow-light-view.vert.glsl");
+    shaders.shadowLightView.fragment("./gamma/opengl/shaders/shadow-light-view.frag.glsl");
+    shaders.shadowLightView.link();
 
     shaders.indirectLight.init();
     shaders.indirectLight.vertex("./gamma/opengl/shaders/quad.vert.glsl");
@@ -198,10 +193,9 @@ namespace Gamma {
     shaders.pointShadowcasterView.destroy();
     shaders.directionalLight.destroy();
     shaders.directionalShadowcaster.destroy();
-    shaders.directionalShadowcasterView.destroy();
     shaders.spotLight.destroy();
     shaders.spotShadowcaster.destroy();
-    shaders.spotShadowcasterView.destroy();
+    shaders.shadowLightView.destroy();
     shaders.indirectLight.destroy();
     shaders.indirectLightComposite.destroy();
     shaders.skybox.destroy();
