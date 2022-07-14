@@ -481,7 +481,7 @@ namespace Gamma {
 
     for (auto* glMesh : glMeshes) {
       if (glMesh->isMeshType(MeshType::FOLIAGE)) {
-        auto& foliage = glMesh->getSourceMesh()->foliageBehavior;
+        auto& foliage = glMesh->getSourceMesh()->foliage;
 
         shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
         shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
@@ -555,7 +555,7 @@ namespace Gamma {
         // (will require a handful of other changes to mesh organization/data buffering)
         for (auto* glMesh : glMeshes) {
           auto* sourceMesh = glMesh->getSourceMesh();
-          auto& foliage = sourceMesh->foliageBehavior;
+          auto& foliage = sourceMesh->foliage;
 
           shader.setInt("foliage.type", foliage.type);
           shader.setFloat("foliage.speed", foliage.speed);
@@ -600,7 +600,7 @@ namespace Gamma {
       for (auto* glMesh : glMeshes) {
         auto* sourceMesh = glMesh->getSourceMesh();
         // @todo check foliage behavior for correctness
-        auto& foliage = sourceMesh->foliageBehavior;
+        auto& foliage = sourceMesh->foliage;
 
         shader.setInt("foliage.type", foliage.type);
         shader.setFloat("foliage.speed", foliage.speed);

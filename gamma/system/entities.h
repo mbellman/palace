@@ -177,13 +177,13 @@ namespace Gamma {
   };
 
   /**
-   * FoliageBehaviorType
-   * -------------------
+   * FoliageType
+   * -----------
    *
    * Different categories of foliage, describing different types
    * of geometry displacement behavior.
    */
-  enum FoliageBehaviorType {
+  enum FoliageType {
     NONE,
     FLOWER,
     BRANCH,
@@ -191,13 +191,13 @@ namespace Gamma {
   };
 
   /**
-   * FoliageBehavior
-   * ---------------
+   * Foliage
+   * -------
    *
    * @todo description
    */
-  struct FoliageBehavior {
-    FoliageBehaviorType type = FoliageBehaviorType::NONE;
+  struct Foliage {
+    FoliageType type = FoliageType::NONE;
     float speed = 1.f;
   };
 
@@ -297,7 +297,7 @@ namespace Gamma {
     /**
      * Configuration for foliage meshes.
      */
-    FoliageBehavior foliageBehavior;
+    Foliage foliage;
 
     static Mesh* Cube();
     static Mesh* Model(const char* path);

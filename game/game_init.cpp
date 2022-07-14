@@ -354,16 +354,16 @@ static void addMeshes(Globals) {
 
   addMesh("arch-vines", 1000, Mesh::Model("./game/models/arch-vines.obj"));
   mesh("arch-vines")->type = MeshType::FOLIAGE;
-  mesh("arch-vines")->foliageBehavior.type = FoliageBehaviorType::LEAF;
-  mesh("arch-vines")->foliageBehavior.speed = 3.f;
+  mesh("arch-vines")->foliage.type = FoliageType::LEAF;
+  mesh("arch-vines")->foliage.speed = 3.f;
 
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;
-  mesh("tulips")->foliageBehavior.type = FoliageBehaviorType::FLOWER;
+  mesh("tulips")->foliage.type = FoliageType::FLOWER;
 
   addMesh("tulip-petals", 1000, Mesh::Model("./game/models/tulip-petals.obj"));
   mesh("tulip-petals")->type = MeshType::FOLIAGE;
-  mesh("tulip-petals")->foliageBehavior.type = FoliageBehaviorType::FLOWER;
+  mesh("tulip-petals")->foliage.type = FoliageType::FLOWER;
 
   addMesh("grass", 1000, Mesh::Model("./game/models/grass.obj"));
 
