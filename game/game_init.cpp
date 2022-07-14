@@ -346,6 +346,10 @@ static void addMeshes(Globals) {
   mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
   mesh("dirt-wall")->normalMap = "./game/textures/dirt-normals.png";
 
+  // Water plane mesh
+  addMesh("water", 1000, Mesh::Plane(2));
+  mesh("water")->type = MeshType::WATER;
+
   // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
 

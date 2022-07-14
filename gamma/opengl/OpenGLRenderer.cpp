@@ -266,6 +266,7 @@ namespace Gamma {
     ctx.hasEmissiveObjects = false;
     ctx.hasReflectiveObjects = false;
     ctx.hasRefractiveObjects = false;
+    ctx.hasWaterObjects = false;
 
     for (auto* glMesh : glMeshes) {
       if (glMesh->getObjectCount() > 0) {
@@ -275,6 +276,8 @@ namespace Gamma {
           ctx.hasReflectiveObjects = true;
         } else if (glMesh->isMeshType(MeshType::REFRACTIVE)) {
           ctx.hasRefractiveObjects = true;
+        } else if (glMesh->isMeshType(MeshType::WATER)) {
+          ctx.hasWaterObjects = true;
         }
       }
     }
@@ -405,6 +408,10 @@ namespace Gamma {
 
     if (ctx.hasRefractiveObjects && Gm_IsFlagEnabled(GammaFlags::RENDER_REFRACTIVE_GEOMETRY)) {
       renderRefractiveGeometry();
+    }
+
+    if (ctx.hasWaterObjects) {
+      renderWater();
     }
 
     swapAccumulationBuffers();
@@ -1163,6 +1170,74 @@ namespace Gamma {
     ctx.accumulationTarget->write();
 
     glStencilFunc(GL_EQUAL, MeshType::REFRACTIVE, 0xFF);
+
+    shaders.copyFrame.use();
+    shaders.copyFrame.setVec4f("transform", FULL_SCREEN_TRANSFORM);
+    shaders.copyFrame.setInt("texColorAndDepth", 0);
+
+    OpenGLScreenQuad::render();
+  }
+
+  /**
+   * @todo description
+   */
+  void OpenGLRenderer::renderWater() {
+    auto& camera = *ctx.activeCamera;
+
+    // Swap buffers so we can temporarily render the
+    // refracted geometry to the second accumulation
+    // buffer while reading from the first
+    swapAccumulationBuffers();
+
+    // At this point, the accumulation source buffer
+    // will contain all effects/shading rendered up
+    // to this point, which we can read from when
+    // rendering refractions. Write to the second
+    // accumulation buffer so we can copy that back
+    // into the first afterward.
+    ctx.accumulationSource->read();
+    ctx.accumulationTarget->write();
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glStencilFunc(GL_ALWAYS, MeshType::WATER, 0xFF);
+    glStencilMask(0xFF);
+
+    shaders.water.use();
+
+    #if GAMMA_DEVELOPER_MODE
+      Vec2f screenSize((float)internalResolution.width, (float)internalResolution.height);
+
+      shaders.water.setVec2f("screenSize", screenSize);
+    #endif
+
+    shaders.water.setInt("texColorAndDepth", 0);
+    shaders.water.setMatrix4f("matProjection", ctx.matProjection);
+    shaders.water.setMatrix4f("matInverseProjection", ctx.matInverseProjection);
+    shaders.water.setMatrix4f("matView", ctx.matView);
+    shaders.water.setMatrix4f("matInverseView", ctx.matInverseView);
+    shaders.water.setVec3f("cameraPosition", camera.position);
+    shaders.water.setFloat("time", gmContext->scene.runningTime);
+
+    for (auto* glMesh : glMeshes) {
+      if (glMesh->isMeshType(MeshType::WATER)) {
+        glMesh->render(ctx.primitiveMode);
+      }
+    }
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    // Now that the current target accumulation buffer contains
+    // the rendered refractive geometry, swap the buffers so we
+    // can write refractions back into the original target
+    // accumulation buffer
+    swapAccumulationBuffers();
+
+    ctx.accumulationSource->read();
+    ctx.accumulationTarget->write();
+
+    glStencilFunc(GL_EQUAL, MeshType::WATER, 0xFF);
 
     shaders.copyFrame.use();
     shaders.copyFrame.setVec4f("transform", FULL_SCREEN_TRANSFORM);

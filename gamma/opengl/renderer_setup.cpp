@@ -153,15 +153,20 @@ namespace Gamma {
     shaders.reflectionsDenoise.fragment("./gamma/opengl/shaders/reflections-denoise.frag.glsl");
     shaders.reflectionsDenoise.link();
 
+    shaders.refractivePrepass.init();
+    shaders.refractivePrepass.vertex("./gamma/opengl/shaders/geometry.vert.glsl");
+    shaders.refractivePrepass.fragment("./gamma/opengl/shaders/refractive-prepass.frag.glsl");
+    shaders.refractivePrepass.link();
+
     shaders.refractiveGeometry.init();
     shaders.refractiveGeometry.vertex("./gamma/opengl/shaders/geometry.vert.glsl");
     shaders.refractiveGeometry.fragment("./gamma/opengl/shaders/refractive-geometry.frag.glsl");
     shaders.refractiveGeometry.link();
 
-    shaders.refractivePrepass.init();
-    shaders.refractivePrepass.vertex("./gamma/opengl/shaders/geometry.vert.glsl");
-    shaders.refractivePrepass.fragment("./gamma/opengl/shaders/refractive-prepass.frag.glsl");
-    shaders.refractivePrepass.link();
+    shaders.water.init();
+    shaders.water.vertex("./gamma/opengl/shaders/geometry.vert.glsl");
+    shaders.water.fragment("./gamma/opengl/shaders/water.frag.glsl");
+    shaders.water.link();
 
     #if GAMMA_DEVELOPER_MODE
       shaders.gBufferDev.init();
@@ -202,8 +207,9 @@ namespace Gamma {
     shaders.copyFrame.destroy();
     shaders.reflections.destroy();
     shaders.reflectionsDenoise.destroy();
-    shaders.refractiveGeometry.destroy();
     shaders.refractivePrepass.destroy();
+    shaders.refractiveGeometry.destroy();
+    shaders.water.destroy();
 
     #if GAMMA_DEVELOPER_MODE
       shaders.gBufferDev.destroy();

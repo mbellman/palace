@@ -19,6 +19,7 @@ using namespace Gamma;
   static const std::vector<std::string> meshNames = {
     "dirt-floor",
     "dirt-wall",
+    "water",
     "rock",
     "arch",
     "tulips",

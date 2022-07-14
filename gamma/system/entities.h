@@ -118,6 +118,10 @@ namespace Gamma {
      */
     FOLIAGE = 0xFC,
     /**
+     * @todo description
+     */
+    WATER = 0xFD,
+    /**
      * Defines standard Meshes without any unique rendering properties.
      */
     NON_EMISSIVE = 0xFF
