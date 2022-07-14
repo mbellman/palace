@@ -17,7 +17,22 @@ layout (location = 5) in mat4 modelMatrix;
 
 void main() {
   // @hack invert Z
-  gl_Position = matLightViewProjection * glVec4(modelMatrix * vec4(vertexPosition, 1.0));
+  vec4 world_position = glVec4(modelMatrix * vec4(vertexPosition, 1.0));
+
+  // @todo make a utility for this
+  switch (foliage.type) {
+    case FLOWER:
+      world_position.xyz += getFlowerFoliageOffset(world_position.xyz);
+      break;
+    case BRANCH:
+      world_position.xyz += getBranchFoliageOffset(world_position.xyz);
+      break;
+    case LEAF:
+      world_position.xyz += getLeafFoliageOffset(world_position.xyz);
+      break;
+  }
+
+  gl_Position = matLightViewProjection * world_position;
 
   // @todo once mesh textures are checked for alpha
   // fragUv = vertexUv;

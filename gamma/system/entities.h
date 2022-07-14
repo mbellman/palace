@@ -184,6 +184,7 @@ namespace Gamma {
    * of geometry displacement behavior.
    */
   enum FoliageBehaviorType {
+    NONE,
     FLOWER,
     BRANCH,
     LEAF
@@ -196,7 +197,7 @@ namespace Gamma {
    * @todo description
    */
   struct FoliageBehavior {
-    FoliageBehaviorType type = FoliageBehaviorType::FLOWER;
+    FoliageBehaviorType type = FoliageBehaviorType::NONE;
     float speed = 1.f;
   };
 

@@ -359,9 +359,11 @@ static void addMeshes(Globals) {
 
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;
+  mesh("tulips")->foliageBehavior.type = FoliageBehaviorType::FLOWER;
 
   addMesh("tulip-petals", 1000, Mesh::Model("./game/models/tulip-petals.obj"));
   mesh("tulip-petals")->type = MeshType::FOLIAGE;
+  mesh("tulip-petals")->foliageBehavior.type = FoliageBehaviorType::FLOWER;
 
   addMesh("grass", 1000, Mesh::Model("./game/models/grass.obj"));
 

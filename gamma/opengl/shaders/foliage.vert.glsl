@@ -50,7 +50,8 @@ void main() {
   vec4 world_position = glVec4(modelMatrix * vec4(vertexPosition, 1.0));
   mat3 normal_matrix = transpose(inverse(mat3(modelMatrix)));
 
-  switch (behavior.type) {
+  // @todo make a utility for this
+  switch (foliage.type) {
     case FLOWER:
       world_position.xyz += getFlowerFoliageOffset(world_position.xyz);
       break;

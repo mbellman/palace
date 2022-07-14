@@ -1,18 +1,19 @@
-#define FLOWER 0
-#define BRANCH 1
-#define LEAF 2
+#define NONE 0
+#define FLOWER 1
+#define BRANCH 2
+#define LEAF 3
 
 struct FoliageBehavior {
   int type;
   float speed;
 };
 
-uniform FoliageBehavior behavior;
+uniform FoliageBehavior foliage;
 uniform float time;
 
 vec3 getFlowerFoliageOffset(vec3 world_position) {
   float vertex_distance_from_ground = abs(vertexPosition.y);
-  float rate = time * behavior.speed;
+  float rate = time * foliage.speed;
   float x_3 = world_position.x / 3.0;
   float z_3 = world_position.z / 3.0;
   float displacement_factor = pow(vertex_distance_from_ground / 1.5, 2);
@@ -34,7 +35,7 @@ vec3 getLeafFoliageOffset(vec3 world_position) {
   float x_3 = world_position.x / 3.0;
   float y_3 = world_position.y / 3.0;
   float z_3 = world_position.z / 3.0;
-  float rate = time * behavior.speed;
+  float rate = time * foliage.speed;
 
   float offset_x = sin(rate + z_3) + sin(rate * 0.5 + z_3) * 0.5;
   float offset_y = cos(rate + x_3) + cos(rate * 0.7 + x_3) * 0.5;

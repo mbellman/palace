@@ -9,6 +9,7 @@
 #include "glew.h"
 
 namespace Gamma {
+  // { near, far }
   const static float cascadeDepthRanges[3][2] = {
     { 1.0f, 200.0f },
     { 200.0f, 600.0f },

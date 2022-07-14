@@ -481,12 +481,12 @@ namespace Gamma {
 
     for (auto* glMesh : glMeshes) {
       if (glMesh->isMeshType(MeshType::FOLIAGE)) {
-        auto& behavior = glMesh->getSourceMesh()->foliageBehavior;
+        auto& foliage = glMesh->getSourceMesh()->foliageBehavior;
 
         shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
         shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
-        shaders.foliage.setInt("behavior.type", behavior.type);
-        shaders.foliage.setFloat("behavior.speed", behavior.speed);
+        shaders.foliage.setInt("foliage.type", foliage.type);
+        shaders.foliage.setFloat("foliage.speed", foliage.speed);
 
         glMesh->render(ctx.primitiveMode);
       }
@@ -535,6 +535,7 @@ namespace Gamma {
     auto& shader = shaders.shadowLightView;
 
     shader.use();
+    shader.setFloat("time", gmContext->scene.runningTime);
 
     for (u32 mapIndex = 0; mapIndex < glDirectionalShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glDirectionalShadowMaps[mapIndex];
@@ -554,8 +555,10 @@ namespace Gamma {
         // (will require a handful of other changes to mesh organization/data buffering)
         for (auto* glMesh : glMeshes) {
           auto* sourceMesh = glMesh->getSourceMesh();
+          auto& foliage = sourceMesh->foliageBehavior;
 
-          // @todo set foliage parameters if applicable
+          shader.setInt("foliage.type", foliage.type);
+          shader.setFloat("foliage.speed", foliage.speed);
 
           if (sourceMesh->canCastShadows && sourceMesh->maxCascade >= cascade) {
             glMesh->render(ctx.primitiveMode, true);
@@ -596,6 +599,11 @@ namespace Gamma {
       // @todo allow specific meshes to be associated with spot lights + rendered to shadow maps
       for (auto* glMesh : glMeshes) {
         auto* sourceMesh = glMesh->getSourceMesh();
+        // @todo check foliage behavior for correctness
+        auto& foliage = sourceMesh->foliageBehavior;
+
+        shader.setInt("foliage.type", foliage.type);
+        shader.setFloat("foliage.speed", foliage.speed);
 
         if (sourceMesh->canCastShadows) {
           glMesh->render(ctx.primitiveMode, true);
@@ -646,6 +654,8 @@ namespace Gamma {
       // @todo allow specific meshes to be associated with point lights + rendered to shadow maps
       for (auto* glMesh : glMeshes) {
         auto* sourceMesh = glMesh->getSourceMesh();
+
+        // @todo handle foliage (requires point shadowcaster view shader updates)
 
         if (sourceMesh->canCastShadows) {
           glMesh->render(ctx.primitiveMode, true);
