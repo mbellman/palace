@@ -37,36 +37,22 @@ mat3 getTBNMatrix() {
   return mat3(surfaceTangent, surfaceBitangent, surfaceNormal);
 }
 
-float createRadialWave(float x, float y, float frequency, float offset) {
-  const float PI = 3.141592;
-  const float HALF_PI = PI * 0.5;
+vec3 getNormal(vec3 world_position) {
+  float wx = world_position.x;
+  float wz = world_position.z;
+  float t = time;
+  float x = 0;
+  float y = 0;
 
-  float cx = 2.0 * (x - 0.5);
-  float cy = 2.0 * (y - 0.5);
-  float radius = sqrt(cx * cx + cy * cy);
+  x = 0.1 * sin(t + wx * 0.5 + sin(t * 5 + wz * 0.5));
+  y = 0.1 * sin(t + wz * 0.5 + sin(t * 5 + wx * 0.5));
 
-  return sin(cx * HALF_PI + radius * PI * frequency + offset) * cos(cy * HALF_PI);
-}
+  x += 0.1 * sin(wx + sin(wz * 0.3));
+  y += 0.1 * sin(wz + sin(wx * 0.3));
 
-vec3 getNormal() {
-  float u = fragUv.x;
-  float v = fragUv.y;
-
-  float x = (
-    createRadialWave(u, v, 10.0, -time) * 0.3 +
-    createRadialWave(u + 0.5, v - 0.3, 10.0, -time) * 0.6 +
-    sin((u + (sin(v * 10.0) + sin(v * (6.0 + v))) * 0.05) * 20.0) * sin(time * 2.0) * 0.2 +
-    sin((u + sin(v * 5.0) * 0.1) * 200.0 + time * 3.0) * 0.01
-  );
-
-  float y = (
-    createRadialWave(v, u, 10.0, -time) * 0.3 +
-    createRadialWave(v + 0.5, u - 0.3, 10.0, -time) * 0.6 +
-    sin((v + (sin(u * 10.0) + sin(u * (3.7 + u))) * 0.05) * 20.0) * cos(time * 2.0) * 0.2 +
-    sin(v * 70.0 + time * 3.0) * 0.2 +
-    sin((v + sin(u * 5.0) * 0.1) * 200.0 + time * 5.0) * 0.2 +
-    cos((v + sin(u * 10.0) * 0.025) * 300.0 + time * 5.0) * 0.01
-  );
+  // Choppiness
+  x += 0.03 * sin(time + wz * 2.0 + sin(time + wx * 2.0));
+  y += 0.03 * sin(time + wx * 2.0 + sin(time + wz * 2.0));
 
   vec3 normal = vec3(x, y, 1.0);
 
@@ -79,7 +65,7 @@ void main() {
   vec3 world_position = getWorldPosition(gl_FragCoord.z, getPixelCoords(), matInverseProjection, matInverseView);
   vec3 normalized_fragment_to_camera = normalize(cameraPosition - world_position);
   vec3 color = vec3(1.0);
-  vec3 normal = getNormal();// normalize(fragNormal);
+  vec3 normal = getNormal(world_position);// normalize(fragNormal);
 
   // normal = normalize(normal + getNormalOffset(world_position));
 
@@ -120,7 +106,9 @@ void main() {
   // Slightly darken fragments facing the camera more directly
   float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);
 
-  refracted_color_and_depth.rgb *= fragColor;
+  // refracted_color_and_depth.rgb *= fragColor;
+
+  // refracted_color_and_depth.rgb = vec3(reflection_ray.y);
 
   out_color_and_depth = vec4(refracted_color_and_depth.rgb * intensity, gl_FragCoord.z);
 }
