@@ -26,37 +26,60 @@ vec2 getPixelCoords() {
   return gl_FragCoord.xy / screenSize;
 }
 
-mat3 getTBNMatrix() {
-  vec3 surfaceNormal = normalize(fragNormal);
-  vec3 surfaceTangent = normalize(fragTangent);
+vec2 createRadialWave(vec2 offset) {
+  const float TAU = 3.141592 * 2.0;
+  // @todo make configurable
+  const float speed = 1.0;
+  const float frequency = 10.0;
 
-  surfaceTangent = normalize(surfaceTangent - dot(surfaceTangent, surfaceNormal) * surfaceNormal);
+  float u = fragUv.x;
+  float v = fragUv.y;
+  float radius = length(fragUv - vec2(0.5) + offset);
+  float t = -time * speed;
+  float r = radius * frequency * TAU;
 
-  vec3 surfaceBitangent = cross(surfaceTangent, surfaceNormal);
-
-  return mat3(surfaceTangent, surfaceBitangent, surfaceNormal);
+  return vec2(
+    sin(t + r + u),
+    cos(t + r + v)
+  );
 }
 
 vec3 getNormal(vec3 world_position) {
   float wx = world_position.x;
   float wz = world_position.z;
   float t = time;
-  float x = 0;
-  float y = 0;
+  vec2 n = vec2(0);
 
-  x = 0.1 * sin(t + wx * 0.5 + sin(t * 5 + wz * 0.5));
-  y = 0.1 * sin(t + wz * 0.5 + sin(t * 5 + wx * 0.5));
+  // @todo make configurable
+  n += createRadialWave(vec2(0)) * 0.5;
+  n += createRadialWave(vec2(0.3, -0.2)) * 0.4;
+  n += createRadialWave(vec2(-0.7, 0.3)) * 0.3;
 
-  x += 0.1 * sin(wx + sin(wz * 0.3));
-  y += 0.1 * sin(wz + sin(wx * 0.3));
+  n.x += 0.5 * sin(t + wx * 0.2 + sin(t * 3 + wz * 0.2));
+  n.y += 0.5 * sin(t + wz * 0.2 + sin(t * 3 + wx * 0.2));
 
-  // Choppiness
-  x += 0.03 * sin(time + wz * 2.0 + sin(time + wx * 2.0));
-  y += 0.03 * sin(time + wx * 2.0 + sin(time + wz * 2.0));
+  n.x += 0.3 * sin(wx * 0.3 + sin(wz * 0.3));
+  n.y += 0.3 * sin(wz * 0.3 + sin(wx * 0.3));
 
-  vec3 normal = vec3(x, y, 1.0);
+  n.x += 0.2 * sin(time + wz * 1.0 + sin(time + wx * 1.0));
+  n.y += 0.2 * sin(time + wx * 1.0 + sin(time + wz * 1.0));
 
-  return normalize(getTBNMatrix() * normal);
+  vec3 n_normal = normalize(fragNormal);
+  vec3 n_tangent = normalize(fragTangent);
+  vec3 n_bitangent = normalize(fragBitangent);
+
+  mat3 tbn_matrix = mat3(
+    n_tangent,
+    n_bitangent,
+    n_normal
+  );
+
+  vec3 tangent_normal = vec3(n.x, n.y, 1.0);
+  vec3 world_normal = normalize(tbn_matrix * tangent_normal);
+
+  world_normal.y += n_normal.y * 3.0;
+
+  return normalize(world_normal);
 }
 
 void main() {
@@ -106,9 +129,7 @@ void main() {
   // Slightly darken fragments facing the camera more directly
   float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);
 
-  // refracted_color_and_depth.rgb *= fragColor;
-
-  // refracted_color_and_depth.rgb = vec3(reflection_ray.y);
+  refracted_color_and_depth.rgb *= fragColor;
 
   out_color_and_depth = vec4(refracted_color_and_depth.rgb * intensity, gl_FragCoord.z);
 }
