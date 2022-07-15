@@ -61,8 +61,8 @@ vec3 getNormal(vec3 world_position) {
   n.x += 0.3 * sin(wx * 0.3 + sin(wz * 0.3));
   n.y += 0.3 * sin(wz * 0.3 + sin(wx * 0.3));
 
-  n.x += 0.2 * sin(time + wz * 1.0 + sin(time + wx * 1.0));
-  n.y += 0.2 * sin(time + wx * 1.0 + sin(time + wz * 1.0));
+  n.x += 0.1 * sin(time + wz * 2.0 + sin(time + wx));
+  n.y += 0.1 * sin(time + wx * 2.0 + sin(time + wz)); 
 
   vec3 n_normal = normalize(fragNormal);
   vec3 n_tangent = normalize(fragTangent);
@@ -100,9 +100,10 @@ void main() {
   float sample_depth = texture(texColorAndDepth, getPixelCoords()).w;
 
   if (sample_depth < 1.0 && isOffScreen(refracted_color_coords, 0.0)) {
-    // If the fragment has a depth closer than the far plane,
-    // discard any attempts at offscreen color reading
-    discard;
+    // If the refraction sample coordinates are off-screen,
+    // disable refractive effects
+    // @todo improve this
+    refracted_color_coords = getPixelCoords();
   }
 
   if (gl_FragCoord.z > sample_depth) {
@@ -116,15 +117,22 @@ void main() {
   }
 
   vec4 refracted_color_and_depth = texture(texColorAndDepth, refracted_color_coords);
+  float refraction_fresnel = dot(-refraction_ray, normalized_fragment_to_camera);
 
   if (refracted_color_and_depth.w < gl_FragCoord.z) {
     refracted_color_and_depth.rgb = vec3(0);
   }
 
+  // @hack @todo description
+  if (refraction_fresnel < 0) refraction_fresnel *= -1;
+
+  refracted_color_and_depth.rgb *= refraction_fresnel;
+
   // Skybox
   vec3 reflection_ray = reflect(normalized_fragment_to_camera * -1, normal);
+  float reflection_fresnel = min(1.0, 1.0 - dot(reflection_ray, normalized_fragment_to_camera));
 
-  refracted_color_and_depth.rgb += getSkyColor(reflection_ray);
+  refracted_color_and_depth.rgb += getSkyColor(reflection_ray) * reflection_fresnel;
 
   // Slightly darken fragments facing the camera more directly
   float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);

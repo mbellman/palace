@@ -708,7 +708,7 @@ void initializeGame(Globals) {
 
   auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
 
-  moonlight.direction = Vec3f(0.3f, 0.5f, -1.f).invert();
+  moonlight.direction = Vec3f(0.3f, 0.5f, 1.f).invert();
   moonlight.color = Vec3f(0.8f, 0.8f, 1.f);
 
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
