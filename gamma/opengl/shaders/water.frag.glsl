@@ -117,22 +117,21 @@ void main() {
   }
 
   vec4 refracted_color_and_depth = texture(texColorAndDepth, refracted_color_coords);
-  float refraction_fresnel = dot(-refraction_ray, normalized_fragment_to_camera);
+  float fresnel_factor = dot(normalized_fragment_to_camera, normal);
 
   if (refracted_color_and_depth.w < gl_FragCoord.z) {
     refracted_color_and_depth.rgb = vec3(0);
   }
 
   // @hack @todo description
-  if (refraction_fresnel < 0) refraction_fresnel *= -1;
+  if (fresnel_factor < 0) fresnel_factor *= -1;
 
-  refracted_color_and_depth.rgb *= refraction_fresnel;
+  refracted_color_and_depth.rgb *= fresnel_factor;
 
   // Skybox
   vec3 reflection_ray = reflect(normalized_fragment_to_camera * -1, normal);
-  float reflection_fresnel = min(1.0, 1.0 - dot(reflection_ray, normalized_fragment_to_camera));
 
-  refracted_color_and_depth.rgb += getSkyColor(reflection_ray) * reflection_fresnel;
+  refracted_color_and_depth.rgb += getSkyColor(reflection_ray) * (1.0 - fresnel_factor);
 
   // Slightly darken fragments facing the camera more directly
   float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);
