@@ -384,6 +384,23 @@ using namespace Gamma;
     state.editor.isPlacingLight = false;
   }
 
+  static void handleLightDeletionAction(Globals) {
+    auto& editor = state.editor;
+    auto* indicator = findObjectByPosition(objects("light-indicator"), editor.selectedLight->position);
+
+    if (indicator != nullptr) {
+      removeObject(*indicator);
+    }
+
+    removeLight(editor.selectedLight);
+
+    editor.selectedLight = nullptr;
+    editor.isFindingLight = true;
+    editor.isPlacingLight = false;
+
+    saveLightData(globals);
+  }
+
   void toggleEditor(Globals) {
     auto& editor = state.editor;
 
@@ -394,6 +411,7 @@ using namespace Gamma;
 
       if (editor.isPlacingMesh) {
         stopPlacingMesh(globals);
+        saveMeshData(globals);
       }
 
       if (editor.isFindingMesh) {
@@ -422,7 +440,6 @@ using namespace Gamma;
       disableMeshFinder(globals);
     }
 
-    // @todo disableGridEntityPlacement()
     hideEntityPlacementPreview(globals);
 
     // @todo disableLightPlacement()
@@ -436,7 +453,6 @@ using namespace Gamma;
     editor.isFindingLight = !editor.isFindingLight;
     editor.enabled = editor.isFindingLight;
 
-    // @todo disableGridEntityPlacement()
     hideEntityPlacementPreview(globals);
 
     // @todo disableMeshPlacement()
@@ -770,6 +786,20 @@ using namespace Gamma;
     } else {
       handleGridCellClickAction(globals);
       saveWorldGridData(globals);
+    }
+  }
+
+  void handleEditorDeletionAction(Globals) {
+    auto& editor = state.editor;
+
+    if (editor.isPlacingMesh) {
+      stopPlacingMesh(globals);
+      saveMeshData(globals);
+
+      editor.isFindingMesh = true;
+    } else if (editor.isPlacingLight) {
+      handleLightDeletionAction(globals);
+      saveLightData(globals);
     }
   }
 

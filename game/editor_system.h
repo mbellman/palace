@@ -88,6 +88,7 @@ struct WorldEditor {
   void showLightFinderPreview(Globals);
   void createPlaceableLight(Globals, Gamma::LightType lightType);
   void handleEditorClickAction(Globals);
+  void handleEditorDeletionAction(Globals);
   void undoPreviousEditAction(Globals);
   void placeCameraAtClosestWalkableTile(Globals);
   void saveWorldGridData(Globals);

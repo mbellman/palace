@@ -574,22 +574,7 @@ void initializeGame(Globals) {
         }
 
         if (key == Key::BACKSPACE) {
-          if (editor.isPlacingLight) {
-            // @todo deleteEditorLight()
-            auto* indicator = findObjectByPosition(objects("light-indicator"), editor.selectedLight->position);
-
-            if (indicator != nullptr) {
-              removeObject(*indicator);
-            }
-
-            removeLight(editor.selectedLight);
-
-            editor.selectedLight = nullptr;
-            editor.isFindingLight = true;
-            editor.isPlacingLight = false;
-
-            saveLightData(globals);
-          }
+          handleEditorDeletionAction(globals);
         }
 
         if (key == Key::NUM_0) {
