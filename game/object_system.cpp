@@ -184,7 +184,7 @@ void synchronizeCompoundMeshes(Globals, const std::string& meshName) {
       // Remove any residual extension mesh objects
       // if their base mesh objects were removed
       while (extensions.totalActive() > baseObjects.totalActive()) {
-        remove(extensions[extensions.totalActive() - 1]);
+        removeObject(extensions[extensions.totalActive() - 1]);
       }
 
       for (u8 i = 0; i < baseObjects.totalActive(); i++) {

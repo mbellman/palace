@@ -521,6 +521,7 @@ void initializeGame(Globals) {
       }
 
       auto key = event.key;
+      auto& editor = state.editor;
 
       if (key == Key::E) {
         toggleEditor(globals);
@@ -538,7 +539,7 @@ void initializeGame(Globals) {
       }
 
       // Editor controls
-      #define bindEditorWorldOrientationKey(keyCode, worldOrientation) if (key == keyCode) state.editor.currentSelectedWorldOrientation = worldOrientation
+      #define bindEditorWorldOrientationKey(keyCode, worldOrientation) if (key == keyCode) editor.currentSelectedWorldOrientation = worldOrientation
 
       bindEditorWorldOrientationKey(Key::NUM_1, POSITIVE_Y_UP);
       bindEditorWorldOrientationKey(Key::NUM_2, NEGATIVE_Y_UP);
@@ -556,20 +557,39 @@ void initializeGame(Globals) {
       }
 
       // Editor controls while enabled
-      if (state.editor.enabled) {
+      if (editor.enabled) {
         // Toggle ranged tile placement
         if (key == Key::R) {
-          state.editor.useRange = !state.editor.useRange;
+          editor.useRange = !editor.useRange;
 
-          if (!state.editor.useRange) {
-            state.editor.rangeFromSelected = false;
+          if (!editor.useRange) {
+            editor.rangeFromSelected = false;
 
             objects("range-preview").reset();
           }
         }
 
         if (key == Key::G) {
-          state.editor.snapMeshesToGrid = !state.editor.snapMeshesToGrid;
+          editor.snapMeshesToGrid = !editor.snapMeshesToGrid;
+        }
+
+        if (key == Key::BACKSPACE) {
+          if (editor.isPlacingLight) {
+            // @todo deleteEditorLight()
+            auto* indicator = findObjectByPosition(objects("light-indicator"), editor.selectedLight->position);
+
+            if (indicator != nullptr) {
+              removeObject(*indicator);
+            }
+
+            removeLight(editor.selectedLight);
+
+            editor.selectedLight = nullptr;
+            editor.isFindingLight = true;
+            editor.isPlacingLight = false;
+
+            saveLightData(globals);
+          }
         }
 
         if (key == Key::NUM_0) {
@@ -577,7 +597,7 @@ void initializeGame(Globals) {
           // since a plain cube will do
           setCurrentSelectedEntityType(globals, GROUND);
 
-          state.editor.deleting = true;
+          editor.deleting = true;
         }
 
         if (key == Key::ARROW_UP) adjustCurrentEntityOrientation(globals, { 0, Gm_HALF_PI, 0 });

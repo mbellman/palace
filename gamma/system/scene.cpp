@@ -5,6 +5,7 @@
 #include "system/console.h"
 #include "system/context.h"
 #include "system/flags.h"
+#include "system/vector_helpers.h"
 #include "system/yaml_parser.h"
 
 using namespace Gamma;
@@ -61,7 +62,6 @@ void Gm_AddProbe(GmContext* context, const std::string& probeName, const Gamma::
 Gamma::Light& Gm_CreateLight(GmContext* context, Gamma::LightType type) {
   auto& lights = context->scene.lights;
 
-  // @todo recycle removed/deactivated Lights
   lights.push_back(new Light());
 
   auto& light = *lights.back();
@@ -236,6 +236,17 @@ void Gm_RemoveObject(GmContext* context, const Gamma::Object& object) {
   auto& mesh = context->scene.meshes[record.meshIndex];
 
   mesh->objects.removeById(record.id);
+}
+
+void Gm_RemoveLight(GmContext* context, Gamma::Light* light) {
+  auto& scene = context->scene;
+  auto& renderer = context->renderer;
+
+  renderer->destroyShadowMap(light);
+
+  Gm_VectorRemove(scene.lights, light);
+
+  delete light;
 }
 
 void Gm_PointCameraAt(GmContext* context, const Gamma::Object& object, bool upsideDown) {

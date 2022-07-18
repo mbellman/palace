@@ -19,6 +19,7 @@
 #include "system/entities.h"
 #include "system/flags.h"
 #include "system/scene.h"
+#include "system/vector_helpers.h"
 
 namespace Gamma {
   const static u32 MAX_LIGHTS = 1000;
@@ -1327,7 +1328,47 @@ namespace Gamma {
   }
 
   void OpenGLRenderer::destroyShadowMap(const Light* light) {
-    // @todo
+    // @todo reduce the repetition between cases here
+    // @todo test this to make sure it works!
+    switch (light->type) {
+      case DIRECTIONAL_SHADOWCASTER:
+        for (auto& shadowMap : glDirectionalShadowMaps) {
+          if (shadowMap->light == light) {
+            shadowMap->buffer.destroy();
+
+            Gm_VectorRemove(glDirectionalShadowMaps, shadowMap);
+
+            break;
+          }
+        }
+
+        break;
+      case POINT_SHADOWCASTER:
+        for (auto& shadowMap : glPointShadowMaps) {
+          if (shadowMap->light == light) {
+            shadowMap->buffer.destroy();
+
+            Gm_VectorRemove(glPointShadowMaps, shadowMap);
+
+            break;
+          }
+        }
+
+        break;
+      case SPOT_SHADOWCASTER:
+        for (auto& shadowMap : glSpotShadowMaps) {
+          if (shadowMap->light == light) {
+            shadowMap->buffer.destroy();
+
+            Gm_VectorRemove(glSpotShadowMaps, shadowMap);
+
+            break;
+          }
+        }
+
+        break;
+    }
+
     Console::log("[Gamma] Shadowcaster destroyed!");
   }
 

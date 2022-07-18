@@ -25,7 +25,8 @@
 #define findObject(objectName) Gm_FindObject(context, objectName)
 #define object(objectName) Gm_GetObject(context, objectName)
 #define light(lightName) Gm_GetLight(context, lightName)
-#define remove(object) Gm_RemoveObject(context, object)
+#define removeObject(object) Gm_RemoveObject(context, object)
+#define removeLight(light) Gm_RemoveLight(context, light)
 #define mesh(meshName) context->scene.meshMap.at(meshName)
 #define objects(meshName) Gm_GetObjects(context, meshName)
 #define pointCameraAt(...) Gm_PointCameraAt(context, __VA_ARGS__)
@@ -76,6 +77,7 @@ Gamma::Object* Gm_FindObject(GmContext* context, const std::string& objectName);
 Gamma::Object& Gm_GetObject(GmContext* context, const std::string& objectName);
 Gamma::Light& Gm_GetLight(GmContext* context, const std::string& lightName);
 void Gm_RemoveObject(GmContext* context, const Gamma::Object& object);
+void Gm_RemoveLight(GmContext* context, Gamma::Light* light);
 void Gm_PointCameraAt(GmContext* context, const Gamma::Object& object, bool upsideDown = false);
 void Gm_PointCameraAt(GmContext* context, const Gamma::Vec3f& position, bool upsideDown = false);
 void Gm_HandleFreeCameraMode(GmContext* context, float dt);

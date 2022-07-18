@@ -37,7 +37,7 @@ using namespace Gamma;
     auto* object = findObjectByPosition(objects, position);
 
     if (object != nullptr) {
-      remove(*object);
+      removeObject(*object);
     }
   }
 
@@ -202,7 +202,7 @@ using namespace Gamma;
   static void stopPlacingMesh(Globals) {
     auto& editor = state.editor;
 
-    remove(object("mesh-preview"));
+    removeObject(object("mesh-preview"));
 
     synchronizeCompoundMeshes(globals, editor.currentMeshName);
 
@@ -458,7 +458,7 @@ using namespace Gamma;
     auto existingPreviewRotation = existingPreview.rotation;
     std::string previewMeshName;
 
-    remove(existingPreview);
+    removeObject(existingPreview);
 
     // @todo define a map for this
     if (type == GROUND) previewMeshName = "ground";
@@ -632,7 +632,7 @@ using namespace Gamma;
         editor.isPlacingMesh &&
         meshName != editor.currentMeshName
       ) {
-        remove(object("mesh-preview"));
+        removeObject(object("mesh-preview"));
       }
 
       editor.enabled = true;
