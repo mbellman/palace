@@ -88,10 +88,18 @@ void main() {
   vec3 world_position = getWorldPosition(gl_FragCoord.z, getPixelCoords(), matInverseProjection, matInverseView);
   vec3 normalized_fragment_to_camera = normalize(cameraPosition - world_position);
   vec3 color = vec3(1.0);
-  vec3 normal = getNormal(world_position);// normalize(fragNormal);
+  vec3 normal = getNormal(world_position);
 
-  // normal = normalize(normal + getNormalOffset(world_position));
+  // Fresnel effect
+  float fresnel_factor = dot(normalized_fragment_to_camera, normal);
 
+  // Hack for when the camera is positioned below/inside the water,
+  // causing the fragment-to-camera vector to be pointed away from
+  // the surface normal, resulting in a negative dot product and
+  // inverting the refracted image color
+  if (fresnel_factor < 0) fresnel_factor *= -1;
+
+  // Refraction
   vec3 refraction_ray = refract(normalized_fragment_to_camera, normal, 0.7);
   vec3 world_refraction_ray = world_position + refraction_ray * REFRACTION_INTENSITY;
   // @hack invert Z
@@ -117,26 +125,37 @@ void main() {
   }
 
   vec4 refracted_color_and_depth = texture(texColorAndDepth, refracted_color_coords);
-  float fresnel_factor = dot(normalized_fragment_to_camera, normal);
+  vec3 water_color = refracted_color_and_depth.rgb;
 
   if (refracted_color_and_depth.w < gl_FragCoord.z) {
-    refracted_color_and_depth.rgb = vec3(0);
+    water_color = vec3(0);
   }
 
-  // @hack @todo description
-  if (fresnel_factor < 0) fresnel_factor *= -1;
+  water_color *= fresnel_factor;
 
-  refracted_color_and_depth.rgb *= fresnel_factor;
-
-  // Skybox
+  // Reflection
   vec3 reflection_ray = reflect(normalized_fragment_to_camera * -1, normal);
+  vec3 view_reflection_ray = glVec3(matView * glVec4(world_position + reflection_ray * 5.0));
+  vec2 reflected_color_coords = getScreenCoordinates(view_reflection_ray, matProjection);
+  vec4 reflection_color_and_depth = texture(texColorAndDepth, reflected_color_coords);
+  vec3 sky_color = getSkyColor(reflection_ray);
+  vec3 reflection_color = vec3(0);
 
-  refracted_color_and_depth.rgb += getSkyColor(reflection_ray) * (1.0 - fresnel_factor);
+  if (isOffScreen(reflected_color_coords, 0)) {
+    reflection_color = sky_color;
+  } else {
+    // Fade from geometry reflections to sky reflections depending on
+    // how deep into the geometry the reflection ray went. We want a
+    // gradual transition from geometry to sky reflections instead of
+    // an abrupt cutoff/fallback if no geometry is reflected.
+    float depth_distance = getLinearizedDepth(reflection_color_and_depth.w) - view_reflection_ray.z;
+    float alpha = max(0.0, min(1.0, depth_distance / 20.0));
 
-  // Slightly darken fragments facing the camera more directly
-  float intensity = 1.0 - 0.2 * dot(normal, normalized_fragment_to_camera);
+    reflection_color = mix(reflection_color_and_depth.rgb, sky_color, alpha);
+  }
 
-  refracted_color_and_depth.rgb *= fragColor;
+  water_color += reflection_color * (1.0 - fresnel_factor);
+  water_color *= fragColor;
 
-  out_color_and_depth = vec4(refracted_color_and_depth.rgb * intensity, gl_FragCoord.z);
+  out_color_and_depth = vec4(water_color, gl_FragCoord.z);
 }
