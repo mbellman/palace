@@ -1,3 +1,3 @@
 #pragma once
 
-#define DEVELOPMENT 1
+#define DEVELOPMENT 0

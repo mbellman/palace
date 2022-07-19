@@ -333,6 +333,7 @@ static void addParticles(Globals) {
 static void addMeshes(Globals) {
   // Grid entity objects
   addMesh("ground", 0xffff, Mesh::Cube());
+  mesh("ground")->canCastShadows = false;
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
@@ -706,7 +707,9 @@ void initializeGame(Globals) {
 
     createLightIndicatorObjects(globals);
   #else
-    // @todo
+    loadWorldGridData(globals);
+    loadMeshData(globals);
+    loadLightData(globals);
   #endif
 
   createGridEntityObjects(globals);
@@ -718,8 +721,10 @@ void initializeGame(Globals) {
 
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
 
-  state.cameraStartPosition = camera.position;
-  state.cameraTargetPosition = camera.position;
+  #if DEVELOPMENT == 1
+    state.cameraStartPosition = camera.position;
+    state.cameraTargetPosition = camera.position;
+  #endif
 
   Gm_EnableFlags(GammaFlags::VSYNC);
 }

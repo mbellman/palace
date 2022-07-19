@@ -129,7 +129,9 @@ void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates
 
   switch (entity->type) {
     case GROUND:
-      createGroundObject(globals, coordinates);
+      #if DEVELOPMENT == 1
+        createGroundObject(globals, coordinates);
+      #endif
       break;
     case STAIRCASE:
       createStaircaseObject(globals, coordinates, ((Staircase*)entity)->orientation);        

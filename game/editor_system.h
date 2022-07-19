@@ -94,7 +94,8 @@ struct WorldEditor {
   void saveWorldGridData(Globals);
   void saveMeshData(Globals);
   void saveLightData(Globals);
-  void loadWorldGridData(Globals);
-  void loadMeshData(Globals);
-  void loadLightData(Globals);
 #endif
+
+void loadWorldGridData(Globals);
+void loadMeshData(Globals);
+void loadLightData(Globals);

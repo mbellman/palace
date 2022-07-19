@@ -109,9 +109,17 @@ namespace Gamma {
       shaders.indirectLightComposite.use();
       shaders.indirectLightComposite.setVec2f("screenSize", screenSize);
 
+      shaders.reflectionsDenoise.use();
       shaders.reflectionsDenoise.setVec2f("screenSize", screenSize);
+
+      shaders.refractivePrepass.use();
       shaders.refractivePrepass.setVec2f("screenSize", screenSize);
+
+      shaders.refractiveGeometry.use();
       shaders.refractiveGeometry.setVec2f("screenSize", screenSize);
+
+      shaders.water.use();
+      shaders.water.setVec2f("screenSize", screenSize);
 
       // @todo set sampler2D texture units
     #endif

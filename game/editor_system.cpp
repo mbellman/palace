@@ -15,19 +15,19 @@
 
 using namespace Gamma;
 
-#if DEVELOPMENT == 1
-  static const std::vector<std::string> meshNames = {
-    "dirt-floor",
-    "dirt-wall",
-    "water",
-    "rock",
-    "arch",
-    "tulips",
-    "grass",
-    "hedge",
-    "stone-tile"
-  };
+static const std::vector<std::string> placeableMeshNames = {
+  "dirt-floor",
+  "dirt-wall",
+  "water",
+  "rock",
+  "arch",
+  "tulips",
+  "grass",
+  "hedge",
+  "stone-tile"
+};
 
+#if DEVELOPMENT == 1
   static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
     { "dirt-floor", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) }
@@ -114,7 +114,7 @@ using namespace Gamma;
 
     // @todo see if we need to optimize this once the number
     // of objects per mesh extends into the hundreds/thousands
-    for (auto& meshName : meshNames) {
+    for (auto& meshName : placeableMeshNames) {
       for (auto& object : objects(meshName)) {
         auto cameraToObject = object.position - camera.position;
         auto objectDistance = cameraToObject.magnitude();
@@ -640,7 +640,7 @@ using namespace Gamma;
   }
 
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
-    if (Gm_VectorContains(meshNames, meshName)) {
+    if (Gm_VectorContains(placeableMeshNames, meshName)) {
       auto& editor = state.editor;
 
       // Remove the existing mesh preview when swapping it for a different mesh
@@ -939,7 +939,7 @@ using namespace Gamma;
     std::stringstream serialized;
     auto* previewMesh = findObject("mesh-preview");
 
-    for (auto& meshName : meshNames) {
+    for (auto& meshName : placeableMeshNames) {
       serialized << meshName + "\n";
 
       for (auto& object : objects(meshName)) {
@@ -982,162 +982,162 @@ using namespace Gamma;
 
     Gm_WriteFileContents("./game/world/light_data.txt", serialized.str());
   }
+#endif
 
-  void loadWorldGridData(Globals) {
-    auto& grid = state.world.grid;
-    EntityType currentEntityType;
-    std::ifstream file("./game/world/grid_data.txt");
+void loadWorldGridData(Globals) {
+  auto& grid = state.world.grid;
+  EntityType currentEntityType;
+  std::ifstream file("./game/world/grid_data.txt");
 
-    if (file.fail()) {
-      return;
-    }
+  if (file.fail()) {
+    return;
+  }
 
-    defer(file.close());
+  defer(file.close());
 
-    std::string line;
+  std::string line;
 
-    // @todo define in orientation_system
-    static std::map<std::string, WorldOrientation> stringToWorldOrientation = {
-      { "+Y", POSITIVE_Y_UP },
-      { "-Y", NEGATIVE_Y_UP },
-      { "+X", POSITIVE_X_UP },
-      { "-X", NEGATIVE_X_UP },
-      { "+Z", POSITIVE_Z_UP },
-      { "-Z", NEGATIVE_Z_UP }
-    };
+  // @todo define in orientation_system
+  static std::map<std::string, WorldOrientation> stringToWorldOrientation = {
+    { "+Y", POSITIVE_Y_UP },
+    { "-Y", NEGATIVE_Y_UP },
+    { "+X", POSITIVE_X_UP },
+    { "-X", NEGATIVE_X_UP },
+    { "+Z", POSITIVE_Z_UP },
+    { "-Z", NEGATIVE_Z_UP }
+  };
 
-    while (std::getline(file, line)) {
-      if (line == "ground") {
-        currentEntityType = GROUND;
-      } else if (line == "staircase") {
-        currentEntityType = STAIRCASE;
-      } else if (line == "switch") {
-        currentEntityType = SWITCH;
-      } else if (line == "woc") {
-        currentEntityType = WORLD_ORIENTATION_CHANGE;
-      } else {
-        auto data = Gm_SplitString(line, ",");
-        auto x = (s16)stoi(data[0]);
-        auto y = (s16)stoi(data[1]);
-        auto z = (s16)stoi(data[2]);
+  while (std::getline(file, line)) {
+    if (line == "ground") {
+      currentEntityType = GROUND;
+    } else if (line == "staircase") {
+      currentEntityType = STAIRCASE;
+    } else if (line == "switch") {
+      currentEntityType = SWITCH;
+    } else if (line == "woc") {
+      currentEntityType = WORLD_ORIENTATION_CHANGE;
+    } else {
+      auto data = Gm_SplitString(line, ",");
+      auto x = (s16)stoi(data[0]);
+      auto y = (s16)stoi(data[1]);
+      auto z = (s16)stoi(data[2]);
 
-        switch (currentEntityType) {
-          case GROUND:
-            grid.set({ x, y, z }, new Ground);
-            break;
-          case STAIRCASE: {
-            auto pitch = stof(data[3]);
-            auto yaw = stof(data[4]);
-            auto roll = stof(data[5]);
-            auto* staircase = new Staircase;
+      switch (currentEntityType) {
+        case GROUND:
+          grid.set({ x, y, z }, new Ground);
+          break;
+        case STAIRCASE: {
+          auto pitch = stof(data[3]);
+          auto yaw = stof(data[4]);
+          auto roll = stof(data[5]);
+          auto* staircase = new Staircase;
 
-            staircase->orientation = { roll, pitch, yaw };
+          staircase->orientation = { roll, pitch, yaw };
 
-            grid.set({ x, y, z }, staircase);
-            break;
-          }
-          case SWITCH:
-            grid.set({ x, y, z }, new Switch);
-            break;
-          case WORLD_ORIENTATION_CHANGE: {
-            auto worldOrientation = stringToWorldOrientation[data[3]];
-            auto* worldOrientationChange = new WorldOrientationChange;
+          grid.set({ x, y, z }, staircase);
+          break;
+        }
+        case SWITCH:
+          grid.set({ x, y, z }, new Switch);
+          break;
+        case WORLD_ORIENTATION_CHANGE: {
+          auto worldOrientation = stringToWorldOrientation[data[3]];
+          auto* worldOrientationChange = new WorldOrientationChange;
 
-            worldOrientationChange->targetWorldOrientation = worldOrientation;
+          worldOrientationChange->targetWorldOrientation = worldOrientation;
 
-            grid.set({ x, y, z }, worldOrientationChange);
-            break;
-          }
+          grid.set({ x, y, z }, worldOrientationChange);
+          break;
         }
       }
     }
   }
+}
 
-  void loadMeshData(Globals) {
-    std::ifstream file("./game/world/mesh_data.txt");
+void loadMeshData(Globals) {
+  std::ifstream file("./game/world/mesh_data.txt");
 
-    if (file.fail()) {
-      return;
-    }
-
-    defer(file.close());
-
-    std::string line;
-    std::string currentMeshName;
-
-    while (std::getline(file, line)) {
-      if (Gm_VectorContains(meshNames, line)) {
-        currentMeshName = line;
-      } else {
-        auto data = Gm_SplitString(line, ",");
-
-        Vec3f position = {
-          stof(data[0]),
-          stof(data[1]),
-          stof(data[2])
-        };
-
-        Vec3f rotation = {
-          stof(data[3]),
-          stof(data[4]),
-          stof(data[5])
-        };
-
-        pVec4 color = {
-          (u8)stoi(data[6]),
-          (u8)stoi(data[7]),
-          (u8)stoi(data[8])
-        };
-
-        Vec3f scale = stof(data[9]);
-
-        auto& object = createMeshObject(globals, currentMeshName);
-
-        object.position = position;
-        object.rotation = rotation;
-        object.color = color;
-        object.scale = scale;
-
-        commit(object);
-      }
-    }
-
-    synchronizeCompoundMeshes(globals);
+  if (file.fail()) {
+    return;
   }
 
-  void loadLightData(Globals) {
-    std::ifstream file("./game/world/light_data.txt");
+  defer(file.close());
 
-    if (file.fail()) {
-      return;
-    }
+  std::string line;
+  std::string currentMeshName;
 
-    defer(file.close());
+  while (std::getline(file, line)) {
+    if (Gm_VectorContains(placeableMeshNames, line)) {
+      currentMeshName = line;
+    } else {
+      auto data = Gm_SplitString(line, ",");
 
-    std::string line;
-    LightType currentLightType;
+      Vec3f position = {
+        stof(data[0]),
+        stof(data[1]),
+        stof(data[2])
+      };
 
-    while (std::getline(file, line)) {
-      if (line == "point") {
-        currentLightType = LightType::POINT;
-      } else {
-        auto data = Gm_SplitString(line, ",");
-        auto& light = createLight(currentLightType);
+      Vec3f rotation = {
+        stof(data[3]),
+        stof(data[4]),
+        stof(data[5])
+      };
 
-        light.position = {
-          stof(data[0]),
-          stof(data[1]),
-          stof(data[2])
-        };
+      pVec4 color = {
+        (u8)stoi(data[6]),
+        (u8)stoi(data[7]),
+        (u8)stoi(data[8])
+      };
 
-        light.color = {
-          stof(data[3]),
-          stof(data[4]),
-          stof(data[5])
-        };
+      Vec3f scale = stof(data[9]);
 
-        light.radius = stof(data[6]);
-      }
+      auto& object = createMeshObject(globals, currentMeshName);
+
+      object.position = position;
+      object.rotation = rotation;
+      object.color = color;
+      object.scale = scale;
+
+      commit(object);
     }
   }
-#endif
+
+  synchronizeCompoundMeshes(globals);
+}
+
+void loadLightData(Globals) {
+  std::ifstream file("./game/world/light_data.txt");
+
+  if (file.fail()) {
+    return;
+  }
+
+  defer(file.close());
+
+  std::string line;
+  LightType currentLightType;
+
+  while (std::getline(file, line)) {
+    if (line == "point") {
+      currentLightType = LightType::POINT;
+    } else {
+      auto data = Gm_SplitString(line, ",");
+      auto& light = createLight(currentLightType);
+
+      light.position = {
+        stof(data[0]),
+        stof(data[1]),
+        stof(data[2])
+      };
+
+      light.color = {
+        stof(data[3]),
+        stof(data[4]),
+        stof(data[5])
+      };
+
+      light.radius = stof(data[6]);
+    }
+  }
+}

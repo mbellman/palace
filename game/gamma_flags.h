@@ -1,3 +1,3 @@
 #pragma once
 
-#define GAMMA_DEVELOPER_MODE 1
+#define GAMMA_DEVELOPER_MODE 0
