@@ -202,6 +202,10 @@ namespace Gamma {
     colors = new pVec4[size];
   }
 
+  void ObjectPool::showAll() {
+    totalVisibleObjects = totalActiveObjects;
+  }
+
   void ObjectPool::swapObjects(u16 indexA, u16 indexB) {
     Object objectA = objects[indexA];
     Matrix4f matrixA = matrices[indexA];

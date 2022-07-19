@@ -37,6 +37,7 @@ namespace Gamma {
     void reset();
     void reserve(u16 size);
     void setColorById(u16 objectId, const pVec4& color);
+    void showAll();
     u16 totalActive() const;
     u16 totalVisible() const;
     void transformById(u16 objectId, const Matrix4f& matrix);

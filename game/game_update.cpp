@@ -90,6 +90,16 @@ void updateGame(Globals, float dt) {
       }
     }
 
+    if (state.editor.enabled) {
+      objects("tulips").showAll();
+      objects("tulip-petals").showAll();
+    } else {
+      useFrustumCulling({
+        "tulips",
+        "tulip-petals"
+      });
+    }
+
     mesh("trigger-indicator")->disabled = !state.editor.enabled;
     mesh("light-indicator")->disabled = !state.editor.enabled;
 
