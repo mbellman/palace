@@ -12,30 +12,6 @@
 
 using namespace Gamma;
 
-static void addKeyHandlers(Globals) {
-  auto& input = getInput();
-
-  input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
-    if (!SDL_GetRelativeMouseMode()) {
-      SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-  });
-
-  input.on<Key>("keyup", [context, &state](Key key) {
-    if (key == Key::ESCAPE) {
-      SDL_SetRelativeMouseMode(SDL_FALSE);
-    }
-
-    if (key == Key::V) {
-      if (Gm_IsFlagEnabled(GammaFlags::VSYNC)) {
-        Gm_DisableFlags(GammaFlags::VSYNC);
-      } else {
-        Gm_EnableFlags(GammaFlags::VSYNC);
-      }
-    }
-  });
-}
-
 // @todo move to a separate file
 static void addOrientationTestLayout(Globals) {
   auto& grid = state.world.grid;
@@ -316,20 +292,6 @@ static void addOrientationTestLayout(Globals) {
   light.isStatic = true;
 }
 
-static void addParticles(Globals) {
-  addMesh("particles", 1000, Mesh::Particles());
-
-  auto& particles = mesh("particles")->particleSystem;
-
-  particles.spread = 100.f;
-  particles.medianSpeed = 0.3f;
-  particles.speedVariation = 0.15f;
-  particles.deviation = 10.f;
-  particles.sizeVariation = 3.f;
-  particles.medianSize = 5.f;
-  particles.spawn = gridCoordinatesToWorldPosition({ 2, -2, -7 });
-}
-
 static void addMeshes(Globals) {
   // Grid entity objects
   addMesh("ground", 0xffff, Mesh::Cube());
@@ -393,6 +355,67 @@ static void addMeshes(Globals) {
   #endif
 }
 
+static void addZones(Globals) {
+
+}
+
+static void addSwitchEntityEffects(Globals) {
+  addMesh("switch-particles", 500, Mesh::Particles());
+
+  auto& switchParticles = mesh("switch-particles")->particleSystem;
+  auto& switchLight = createLight(POINT);
+
+  switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
+  switchLight.power = 0.f;
+
+  switchParticles.spread = TILE_SIZE;
+  switchParticles.medianSpeed = 0.5f;
+  switchParticles.deviation = 2.f;
+  switchParticles.path.push_back(Vec3f(0));
+  switchParticles.path.push_back(Vec3f(0));
+  switchParticles.isCircuit = false;
+
+  saveLight("switch-light", &switchLight);
+}
+
+static void addParticles(Globals) {
+  addMesh("particles", 1000, Mesh::Particles());
+
+  auto& particles = mesh("particles")->particleSystem;
+
+  particles.spread = 100.f;
+  particles.medianSpeed = 0.3f;
+  particles.speedVariation = 0.15f;
+  particles.deviation = 10.f;
+  particles.sizeVariation = 3.f;
+  particles.medianSize = 5.f;
+  particles.spawn = gridCoordinatesToWorldPosition({ 2, -2, -7 });
+}
+
+static void addKeyHandlers(Globals) {
+  auto& input = getInput();
+
+  input.on<MouseButtonEvent>("mousedown", [&](const MouseButtonEvent& event) {
+    if (!SDL_GetRelativeMouseMode()) {
+      SDL_SetRelativeMouseMode(SDL_TRUE);
+    }
+  });
+
+  input.on<Key>("keyup", [context, &state](Key key) {
+    if (key == Key::ESCAPE) {
+      SDL_SetRelativeMouseMode(SDL_FALSE);
+    }
+
+    if (key == Key::V) {
+      if (Gm_IsFlagEnabled(GammaFlags::VSYNC)) {
+        Gm_DisableFlags(GammaFlags::VSYNC);
+      } else {
+        Gm_EnableFlags(GammaFlags::VSYNC);
+      }
+    }
+  });
+}
+
 static void createGridEntityObjects(Globals) {
   auto& grid = state.world.grid;
 
@@ -422,25 +445,6 @@ static void createLightIndicatorObjects(Globals) {
       commit(indicator);
     }
   }
-}
-
-static void addSwitchEntityEffects(Globals) {
-  addMesh("switch-particles", 500, Mesh::Particles());
-
-  auto& switchParticles = mesh("switch-particles")->particleSystem;
-  auto& switchLight = createLight(POINT);
-
-  switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
-  switchLight.power = 0.f;
-
-  switchParticles.spread = TILE_SIZE;
-  switchParticles.medianSpeed = 0.5f;
-  switchParticles.deviation = 2.f;
-  switchParticles.path.push_back(Vec3f(0));
-  switchParticles.path.push_back(Vec3f(0));
-  switchParticles.isCircuit = false;
-
-  saveLight("switch-light", &switchLight);
 }
 
 void initializeGame(Globals) {
@@ -695,6 +699,7 @@ void initializeGame(Globals) {
   #endif
 
   addMeshes(globals);
+  addZones(globals);
   addSwitchEntityEffects(globals);
   addParticles(globals);  // @temporary
   addKeyHandlers(globals);

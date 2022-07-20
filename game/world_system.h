@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "grid_utilities.h"
 #include "game_entities.h"
@@ -92,13 +94,17 @@ struct DynamicEntityManager {
   DynamicEntity* entities = nullptr;
 };
 
-struct Area {
-  // @todo
+struct Zone {
+  std::string name;
+  GridCoordinates min;
+  GridCoordinates max;
+  std::vector<std::string> meshNames;
 };
 
 struct World {
   GridMap<GridEntity> grid;
   DynamicEntityManager entities;
+  std::vector<Zone> zones;
 };
 
 // @todo we probably won't need this once level loading is in place
