@@ -17,7 +17,7 @@ static bool cameraIsWithinZoneBoundaries(const Zone& zone, const Camera& camera)
   );
 }
 
-static bool toggleMeshesWithinZone(Globals, const Zone& zone, bool enabled) {
+static void toggleMeshesWithinZone(Globals, const Zone& zone, bool enabled) {
   for (auto& meshName : zone.meshNames) {
     mesh(meshName)->disabled = !enabled;
   }
