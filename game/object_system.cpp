@@ -29,6 +29,10 @@ const static std::map<EntityType, ObjectParameters> gridObjectParametersMap = {
   {WORLD_ORIENTATION_CHANGE, {
     scale(TILE_SIZE * 0.075f),
     color(1.f, 0, 0)
+  }},
+  {TELEPORTER, {
+    scale(TILE_SIZE * 0.075f),
+    color(0, 0, 1.f)
   }}
 };
 

@@ -7,7 +7,8 @@ enum EntityType {
   GROUND,
   STAIRCASE,
   SWITCH,
-  WORLD_ORIENTATION_CHANGE
+  WORLD_ORIENTATION_CHANGE,
+  TELEPORTER
 };
 
 /**
@@ -50,6 +51,18 @@ struct WorldOrientationChange : GridEntity {
   }
 
   WorldOrientation targetWorldOrientation;
+};
+
+struct Teleporter : GridEntity {
+  Teleporter(): GridEntity(TELEPORTER) {};
+
+  Teleporter(const Teleporter* entity): Teleporter() {
+    toCoordinates = entity->toCoordinates;
+    toOrientation = entity->toOrientation;
+  }
+
+  GridCoordinates toCoordinates;
+  WorldOrientationChange toOrientation;
 };
 
 /**

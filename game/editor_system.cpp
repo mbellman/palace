@@ -187,6 +187,8 @@ static const std::vector<std::string> placeableMeshNames = {
       case WORLD_ORIENTATION_CHANGE:
         copy = new WorldOrientationChange((WorldOrientationChange*)source);
         break;
+      case TELEPORTER:
+        copy = new Teleporter((Teleporter*)source);
       default:
         break;
     }
@@ -241,7 +243,6 @@ static const std::vector<std::string> placeableMeshNames = {
       }
 
       switch (state.editor.currentSelectedEntityType) {
-        default:
         case GROUND:
           newEntity = new Ground;
           break;
@@ -255,6 +256,10 @@ static const std::vector<std::string> placeableMeshNames = {
         case WORLD_ORIENTATION_CHANGE:
           newEntity = new WorldOrientationChange;
           ((WorldOrientationChange*)newEntity)->targetWorldOrientation = state.editor.currentSelectedWorldOrientation;
+          break;
+        case TELEPORTER:
+          newEntity = new Teleporter;
+        default:
           break;
       }
     }
@@ -481,6 +486,7 @@ static const std::vector<std::string> placeableMeshNames = {
     if (type == STAIRCASE) previewMeshName = "staircase";
     if (type == SWITCH) previewMeshName = "switch";
     if (type == WORLD_ORIENTATION_CHANGE) previewMeshName = "trigger-indicator";
+    if (type == TELEPORTER) previewMeshName = "trigger-indicator";
 
     auto& preview = createObjectFrom(previewMeshName);
 
@@ -932,6 +938,8 @@ static const std::vector<std::string> placeableMeshNames = {
       }
     }
 
+    // @todo serialize teleporters
+
     Gm_WriteFileContents("./game/world/grid_data.txt", serialized);
   }
 
@@ -1007,6 +1015,7 @@ void loadWorldGridData(Globals) {
     { "-Z", NEGATIVE_Z_UP }
   };
 
+  // @todo deserialize teleporters
   while (std::getline(file, line)) {
     if (line == "ground") {
       currentEntityType = GROUND;

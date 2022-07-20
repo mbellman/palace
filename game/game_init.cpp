@@ -515,6 +515,7 @@ void initializeGame(Globals) {
     });
 
     input.on<MouseWheelEvent>("mousewheel", [context, &state](const MouseWheelEvent& event) {
+      // @todo handleEditorEntityCycleAction()
       if (
         !state.editor.enabled ||
         // Debounce wheel events since multiple sometimes fire in rapid succession

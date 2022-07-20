@@ -19,7 +19,8 @@ const static std::vector<u8> editorEntityCycle = {
   GROUND,
   STAIRCASE,
   SWITCH,
-  WORLD_ORIENTATION_CHANGE
+  WORLD_ORIENTATION_CHANGE,
+  TELEPORTER
 };
 
 struct ReplacedEntityRecord {
