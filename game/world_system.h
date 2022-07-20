@@ -96,8 +96,8 @@ struct DynamicEntityManager {
 
 struct Zone {
   std::string name;
-  GridCoordinates min;
-  GridCoordinates max;
+  GridCoordinates start;
+  GridCoordinates end;
   std::vector<std::string> meshNames;
 };
 

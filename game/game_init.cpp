@@ -356,7 +356,36 @@ static void addMeshes(Globals) {
 }
 
 static void addZones(Globals) {
+  Zone z1 = {
+    "Lunar Garden",
+    { -5, -5, -20 },
+    { 10, 7, 26 },
+    {
+      "dirt-floor",
+      "dirt-wall",
+      "water",
+      "rock",
+      "arch",
+      "arch-vines",
+      "tulips",
+      "tulip-petals",
+      "grass",
+      "hedge",
+      "stone-tile"
+    }
+  };
 
+  Zone z2 = {
+    "Palace of the Moon",
+    { -17, -32, 6 },
+    { 17, 27, 67 },
+    {
+      // @todo
+    }
+  };
+
+  state.world.zones.push_back(z1);
+  state.world.zones.push_back(z2);
 }
 
 static void addSwitchEntityEffects(Globals) {

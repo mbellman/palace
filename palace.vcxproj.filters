@@ -141,6 +141,9 @@
     <ClCompile Include="game\entity_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\zone_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\glew\include\eglew.h">
@@ -582,6 +585,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\entity_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\zone_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
