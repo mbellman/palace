@@ -25,6 +25,10 @@ using namespace Gamma;
     }
   }
 
+  static std::string gridCoordinatesToString(const GridCoordinates& coordinates) {
+    return std::to_string(coordinates.x) + ", " + std::to_string(coordinates.y) + ", " + std::to_string(coordinates.z);
+  }
+
   static void addDebugMessages(Globals) {
     auto& camera = getCamera();
     auto& coordinates = worldPositionToGridCoordinates(camera.position);
@@ -47,6 +51,7 @@ using namespace Gamma;
     std::string worldOrientationLabel = "World orientation: " + worldOrientationToString(state.worldOrientationState.worldOrientation);
     std::string entitiesLabel = "Total static entities: " + std::to_string(state.world.grid.size());
     std::string editorWorldOrientationLabel = "Editor world orientation: " + worldOrientationToString(state.editor.currentSelectedWorldOrientation);
+    std::string editorGridCoordinatesLabel = "Editor grid coordinates: " + gridCoordinatesToString(state.editor.currentSelectedGridCoordinates);
 
     addDebugMessage(worldPositionLabel);
     addDebugMessage(gridPositionLabel);
@@ -54,6 +59,7 @@ using namespace Gamma;
     addDebugMessage(worldOrientationLabel);
     addDebugMessage(entitiesLabel);
     addDebugMessage(editorWorldOrientationLabel);
+    addDebugMessage(editorGridCoordinatesLabel);
   }
 #endif
 
@@ -92,6 +98,7 @@ void updateGame(Globals, float dt) {
       }
     }
 
+    // @todo create a separate routine for object/visibility culling behaviors
     if (state.editor.enabled) {
       objects("tulips").showAll();
       objects("tulip-petals").showAll();

@@ -62,11 +62,14 @@ struct WorldEditor {
   Gamma::Light* selectedLight = nullptr;
   float selectedLightDistance = TILE_SIZE * 2.f;
 
-  // Default orientation for placed entities
+  // Target orientation for placed entities
   Gamma::Orientation currentEntityOrientation;
 
-  // Default world orientation target for World Orientation Change triggers
+  // Target world orientation for World Orientation Changes or Teleporters
   WorldOrientation currentSelectedWorldOrientation = POSITIVE_Y_UP;
+
+  // Target grid coordinates for Teleporters
+  GridCoordinates currentSelectedGridCoordinates;
 
   // Edit action history/undo management
   EditAction editActions[MAX_EDIT_ACTIONS];

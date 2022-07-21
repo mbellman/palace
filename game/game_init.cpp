@@ -724,6 +724,18 @@ void initializeGame(Globals) {
             commit(object("mesh-preview"));
           }
         }
+      } else if (Gm_StringStartsWith(command, "coords")) {
+        // @todo handleCoordsCommand()
+        auto parts = Gm_SplitString(command, " ");
+
+        if (parts.size() > 1) {
+          auto data = Gm_SplitString(parts[1], ",");
+          auto x = (s16)stoi(data[0]);
+          auto y = (s16)stoi(data[1]);
+          auto z = (s16)stoi(data[2]);
+
+          state.editor.currentSelectedGridCoordinates = { x, y, z };
+        }
       }
     });
   #endif
