@@ -132,14 +132,15 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
     typeOfEntity(targetTileTwoBelow) == GROUND &&
     // Ground tiles are only walkable if the tile
     // immediately below the camera is empty or
-    // passable, and the target tile is empty
+    // passable, and the target tile is non-solid
     (
       (
         targetTileBelow == nullptr ||
         targetTileBelow->type == STAIRCASE ||
         targetTileBelow->type == SWITCH
       ) &&
-      targetTile == nullptr
+      targetTile == nullptr ||
+      targetTile->type == TELEPORTER
     )
   ) {
     if (typeOfEntity(targetTileBelow) == SWITCH) {
@@ -152,7 +153,7 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
   return false;
 }
 
-static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates) {
+static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates, Vec3f& targetCameraPosition) {
   auto* targetEntity = state.world.grid.get(targetGridCoordinates);
 
   if (targetEntity == nullptr) {
@@ -163,10 +164,20 @@ static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targ
     case WORLD_ORIENTATION_CHANGE:
       setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
       break;
-    case TELEPORTER:
-      immediatelySetWorldOrientation(globals, ((Teleporter*)targetEntity)->toOrientation);
-      // @todo set new position/target position/camera orientation/adjust move queue
+    case TELEPORTER: {
+      auto& camera = getCamera();
+      auto* teleporter = (Teleporter*)targetEntity;
+
+      immediatelySetWorldOrientation(globals, teleporter->toOrientation);
+
+      // @todo teleport to the equivalent position adjacent to the target coordinates,
+      // but not the target coordinates exactly
+      camera.position = gridCoordinatesToWorldPosition(teleporter->toCoordinates);
+      // @todo set to the target grid coordinates' world position
+      targetCameraPosition = camera.position;
+      // @todo set new camera orientation/adjust move queue
       break;
+    }
   }
 }
 
@@ -219,7 +230,7 @@ static void handleNextMove(Globals) {
 
   auto& targetGridCoordinates = worldPositionToGridCoordinates(targetCameraPosition);
 
-  handleTriggerEntitiesBeforeMove(globals, targetGridCoordinates);
+  handleTriggerEntitiesBeforeMove(globals, targetGridCoordinates, targetCameraPosition);
 
   if (!isMoving(globals) || timeSinceCurrentMoveBegan > 0.4f) {
     // The move was either entered while standing still,
