@@ -923,6 +923,7 @@ static const std::vector<std::string> placeableMeshNames = {
     serialized += "woc\n";
 
     // @todo define in orientation_system
+    // @todo use in game_update -> addDebugMessages
     static std::map<WorldOrientation, std::string> worldOrientationToString = {
       { POSITIVE_Y_UP, "+Y" },
       { NEGATIVE_Y_UP, "-Y" },
@@ -941,7 +942,18 @@ static const std::vector<std::string> placeableMeshNames = {
       }
     }
 
-    // @todo serialize teleporters
+    serialized += "teleporter\n";
+
+    for (auto& [ coordinates, entity ] : state.world.grid) {
+      if (entity->type == TELEPORTER) {
+        auto toCoordinates = ((Teleporter*)entity)->toCoordinates;
+        auto toOrientation = ((Teleporter*)entity)->toOrientation;
+
+        serialized += serialize3Vector(coordinates) + ",";
+        serialized += serialize3Vector(toCoordinates) + ",";
+        serialized += worldOrientationToString[toOrientation] + "\n";
+      }
+    }
 
     Gm_WriteFileContents("./game/world/grid_data.txt", serialized);
   }
@@ -1018,7 +1030,6 @@ void loadWorldGridData(Globals) {
     { "-Z", NEGATIVE_Z_UP }
   };
 
-  // @todo deserialize teleporters
   while (std::getline(file, line)) {
     if (line == "ground") {
       currentEntityType = GROUND;
@@ -1028,6 +1039,8 @@ void loadWorldGridData(Globals) {
       currentEntityType = SWITCH;
     } else if (line == "woc") {
       currentEntityType = WORLD_ORIENTATION_CHANGE;
+    } else if (line == "teleporter") {
+      currentEntityType = TELEPORTER;
     } else {
       auto data = Gm_SplitString(line, ",");
       auto x = (s16)stoi(data[0]);
@@ -1059,6 +1072,20 @@ void loadWorldGridData(Globals) {
           worldOrientationChange->targetWorldOrientation = worldOrientation;
 
           grid.set({ x, y, z }, worldOrientationChange);
+          break;
+        }
+        case TELEPORTER: {
+          auto* teleporter = new Teleporter;
+
+          teleporter->toCoordinates = {
+            (s16)stoi(data[3]),
+            (s16)stoi(data[4]),
+            (s16)stoi(data[5])
+          };
+
+          teleporter->toOrientation = stringToWorldOrientation[data[6]];
+
+          grid.set({ x, y, z }, teleporter);
           break;
         }
       }
