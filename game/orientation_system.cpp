@@ -206,6 +206,14 @@ void setWorldOrientation(Globals, WorldOrientation targetWorldOrientation) {
   camera.orientation = state.worldOrientationState.orientationTo;
 }
 
+void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation) {
+  setWorldOrientation(globals, worldOrientation);
+
+  // @hack
+  // @todo find a better way to achieve this
+  state.worldOrientationState.startTime = getRunningTime() - 0.5f;
+}
+
 void handleWorldOrientation(Globals, float dt) {
   auto& camera = getCamera();
   auto& orientationFrom = state.worldOrientationState.orientationFrom;

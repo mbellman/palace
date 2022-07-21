@@ -226,11 +226,12 @@ static const std::vector<std::string> placeableMeshNames = {
 
   static void handleGridCellClickAction(Globals) {
     auto& grid = state.world.grid;
+    auto& editor = state.editor;
     GridCoordinates targetCoordinates;
     EditAction editAction;
     GridEntity* newEntity = nullptr;
 
-    if (state.editor.deleting) {
+    if (editor.deleting) {
       if (!findGridEntityDeletionCoordinates(globals, targetCoordinates)) {
         return;
       }
@@ -242,23 +243,25 @@ static const std::vector<std::string> placeableMeshNames = {
         return;
       }
 
-      switch (state.editor.currentSelectedEntityType) {
+      switch (editor.currentSelectedEntityType) {
         case GROUND:
           newEntity = new Ground;
           break;
         case STAIRCASE:
           newEntity = new Staircase;
-          ((Staircase*)newEntity)->orientation = state.editor.currentEntityOrientation;
+          ((Staircase*)newEntity)->orientation = editor.currentEntityOrientation;
           break;
         case SWITCH:
           newEntity = new Switch;
           break;
         case WORLD_ORIENTATION_CHANGE:
           newEntity = new WorldOrientationChange;
-          ((WorldOrientationChange*)newEntity)->targetWorldOrientation = state.editor.currentSelectedWorldOrientation;
+          ((WorldOrientationChange*)newEntity)->targetWorldOrientation = editor.currentSelectedWorldOrientation;
           break;
         case TELEPORTER:
           newEntity = new Teleporter;
+          ((Teleporter*)newEntity)->toCoordinates = editor.currentSelectedGridCoordinates;
+          ((Teleporter*)newEntity)->toOrientation = editor.currentSelectedWorldOrientation;
         default:
           break;
       }

@@ -3,6 +3,7 @@
 #include "Gamma.h"
 
 #include "grid_utilities.h"
+#include "game_macros.h"
 
 enum WorldOrientation {
   POSITIVE_Y_UP,
@@ -23,9 +24,10 @@ struct WorldOrientationState {
 
 struct GameState;
 
-void updateCameraFromMouseMoveEvent(GmContext* context, GameState& state, const Gamma::MouseMoveEvent& event);
-void setWorldOrientation(GmContext* context, GameState& state, WorldOrientation worldOrientation);
-void handleWorldOrientation(GmContext* context, GameState& state, float dt);
+void updateCameraFromMouseMoveEvent(Globals, const Gamma::MouseMoveEvent& event);
+void setWorldOrientation(Globals, WorldOrientation worldOrientation);
+void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation);
+void handleWorldOrientation(Globals, float dt);
 
 GridCoordinates getUpGridCoordinates(WorldOrientation worldOrientation);
 GridCoordinates getDownGridCoordinates(WorldOrientation worldOrientation);

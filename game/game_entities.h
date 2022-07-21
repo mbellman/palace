@@ -62,7 +62,7 @@ struct Teleporter : GridEntity {
   }
 
   GridCoordinates toCoordinates;
-  WorldOrientationChange toOrientation;
+  WorldOrientation toOrientation;
 };
 
 /**

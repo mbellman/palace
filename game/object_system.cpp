@@ -96,9 +96,20 @@ static void createSwitchObject(Globals, const GridCoordinates& coordinates) {
   commit(object);
 }
 
-static void createWorldOrientationChangeObject(Globals, const GridCoordinates& coordinates, WorldOrientation worldOrientation) {
+static void createWorldOrientationChangeObject(Globals, const GridCoordinates& coordinates) {
   auto& object = createObjectFrom("trigger-indicator");
   auto& params = getGridObjectParameters(WORLD_ORIENTATION_CHANGE);
+
+  object.position = gridCoordinatesToWorldPosition(coordinates);
+  object.color = params.color;
+  object.scale = params.scale;
+
+  commit(object);
+}
+
+static void createTeleporterObject(Globals, const GridCoordinates& coordinates) {
+  auto& object = createObjectFrom("trigger-indicator");
+  auto& params = getGridObjectParameters(TELEPORTER);
 
   object.position = gridCoordinatesToWorldPosition(coordinates);
   object.color = params.color;
@@ -145,7 +156,12 @@ void createGridObjectFromCoordinates(Globals, const GridCoordinates& coordinates
       break;
     case WORLD_ORIENTATION_CHANGE:
       #if DEVELOPMENT == 1
-        createWorldOrientationChangeObject(globals, coordinates, ((WorldOrientationChange*)entity)->targetWorldOrientation);
+        createWorldOrientationChangeObject(globals, coordinates);
+      #endif
+      break;
+    case TELEPORTER:
+      #if DEVELOPMENT == 1
+        createTeleporterObject(globals, coordinates);
       #endif
       break;
     default:

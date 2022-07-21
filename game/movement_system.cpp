@@ -155,8 +155,18 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
 static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates) {
   auto* targetEntity = state.world.grid.get(targetGridCoordinates);
 
-  if (typeOfEntity(targetEntity) == WORLD_ORIENTATION_CHANGE) {
-    setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
+  if (targetEntity == nullptr) {
+    return;
+  }
+
+  switch (targetEntity->type) {
+    case WORLD_ORIENTATION_CHANGE:
+      setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
+      break;
+    case TELEPORTER:
+      immediatelySetWorldOrientation(globals, ((Teleporter*)targetEntity)->toOrientation);
+      // @todo set new position/target position/camera orientation/adjust move queue
+      break;
   }
 }
 
