@@ -9,6 +9,17 @@ namespace Gamma {
   struct Mesh;
   struct Light;
 
+  struct FrameFlags {
+    /**
+     * Controls whether we want to use an identical
+     * previous-frame camera view matrix to the current
+     * frame for temporal sampling. The net result is
+     * that points will not be reprojected, but sampled
+     * at the same position from the previous frame buffer.
+     */
+    bool useStableTemporalSampling = false;
+  };
+
   struct RenderStats {
     u32 gpuMemoryTotal;
     u32 gpuMemoryUsed;
@@ -17,6 +28,8 @@ namespace Gamma {
 
   class AbstractRenderer : public Initable, public Renderable, public Destroyable {
   public:
+    FrameFlags frameFlags;
+
     AbstractRenderer(GmContext* gmContext): gmContext(gmContext) {};
     virtual ~AbstractRenderer() {};
 

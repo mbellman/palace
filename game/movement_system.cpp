@@ -196,8 +196,6 @@ static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targ
       setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
       break;
     case TELEPORTER: {
-      // @bug we can lurch backward when letting go of WASD immediately after teleporting;
-      // set a teleportation cooldown time if necessary
       auto& camera = getCamera();
       auto* teleporter = (Teleporter*)targetEntity;
 
@@ -205,8 +203,17 @@ static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targ
       targetCameraPosition = gridCoordinatesToWorldPosition(teleporter->toCoordinates);
 
       immediatelySetWorldOrientation(globals, teleporter->toOrientation);
+      resetMoveQueue(state.moves);
 
-      // @todo set new camera orientation/adjust move queue
+      // Teleporters are designed to transport the camera from one
+      // world position and orientation to a different one in a seamless
+      // fashion. Both ends of a teleporter may have identical layouts
+      // to ensure visual coherence, but the camera view matrix will
+      // differ dramatically between the two points and orientations.
+      // Thus, we use stable temporal sampling (for SSAO/SSGI) on this
+      // frame to prevent erroneous temporal sampling artifacts.
+      context->renderer->frameFlags.useStableTemporalSampling = true;
+
       break;
     }
   }

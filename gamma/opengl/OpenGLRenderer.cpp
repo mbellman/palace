@@ -189,6 +189,9 @@ namespace Gamma {
     #endif
 
     frame++;
+
+    // Reset frame flags at the end of the render pass
+    frameFlags.useStableTemporalSampling = false;
   }
 
   /**
@@ -267,6 +270,10 @@ namespace Gamma {
       // Matrix4f::rotation(ctx.activeCamera->orientation) *
       Matrix4f::translation(ctx.activeCamera->position.invert().gl())
     ).transpose();
+
+    if (frameFlags.useStableTemporalSampling) {
+      ctx.matPreviousView = ctx.matView;
+    }
 
     ctx.matInverseProjection = ctx.matProjection.inverse();
     ctx.matInverseView = ctx.matView.inverse();

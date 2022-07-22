@@ -21,4 +21,5 @@ struct MoveQueue {
 
 void commitMove(MoveQueue& moves, MoveDirection move);
 MoveDirection checkNextMove(MoveQueue& moves, u8 movesAhead = 0);
+void resetMoveQueue(MoveQueue& moves);
 MoveDirection takeNextMove(MoveQueue& moves);

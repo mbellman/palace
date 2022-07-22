@@ -210,8 +210,7 @@ void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation) 
   setWorldOrientation(globals, worldOrientation);
 
   state.worldOrientationState.startTime = 0.f;
-  // @todo adjust orientationTo to preserve relative viewing angle
-  // @todo fix SSAO/SSGI reprojection flicker
+  // @todo adjust camera orientation to preserve relative viewing angle
 }
 
 void handleWorldOrientation(Globals, float dt) {

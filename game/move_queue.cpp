@@ -34,6 +34,14 @@ MoveDirection checkNextMove(MoveQueue& moves, u8 movesAhead) {
   return moves.queue[movesAhead];
 }
 
+void resetMoveQueue(MoveQueue& moves) {
+  moves.size = 0;
+
+  for (u8 i = 0; i < MAX_MOVE_QUEUE_SIZE; i++) {
+    moves.queue[i] = MoveDirection::NONE;
+  }
+}
+
 MoveDirection takeNextMove(MoveQueue& moves) {
   if (moves.size == 0) {
     return MoveDirection::NONE;
