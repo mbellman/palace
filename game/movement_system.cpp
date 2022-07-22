@@ -153,6 +153,37 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
   return false;
 }
 
+static Vec3f getImmediateTeleportationPosition(Globals, const Teleporter* teleporter, const Vec3f& teleporterPosition) {
+  auto& camera = getCamera();
+  auto toPosition = gridCoordinatesToWorldPosition(teleporter->toCoordinates);
+  auto teleporterToCameraDistance = (camera.position - teleporterPosition).magnitude();
+  auto direction = Vec3f(1, 0, 0);
+
+  const static std::initializer_list<GridCoordinates> offsets = {
+    { 1, 0, 0 },
+    { -1, 0, 0 },
+    { 0, 1, 0 },
+    { 0, -1, 0 },
+    { 0, 0, 1 },
+    { 0, 0, -1 }
+  };
+
+  for (auto& offset : offsets) {
+    auto tile = teleporter->toCoordinates + offset;
+    auto* targetEntity = state.world.grid.get(tile);
+
+    if (typeOfEntity(targetEntity) == TELEPORTER) {
+      direction.x = (float)offset.x;
+      direction.y = (float)offset.y;
+      direction.z = (float)offset.z;
+
+      break;
+    }
+  }
+
+  return toPosition + direction * (teleporterToCameraDistance + TILE_SIZE);
+}
+
 static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targetGridCoordinates, Vec3f& targetCameraPosition) {
   auto* targetEntity = state.world.grid.get(targetGridCoordinates);
 
@@ -165,16 +196,16 @@ static void handleTriggerEntitiesBeforeMove(Globals, const GridCoordinates& targ
       setWorldOrientation(globals, ((WorldOrientationChange*)targetEntity)->targetWorldOrientation);
       break;
     case TELEPORTER: {
+      // @bug we can lurch backward when letting go of WASD immediately after teleporting;
+      // set a teleportation cooldown time if necessary
       auto& camera = getCamera();
       auto* teleporter = (Teleporter*)targetEntity;
 
+      camera.position = getImmediateTeleportationPosition(globals, teleporter, targetCameraPosition);
+      targetCameraPosition = gridCoordinatesToWorldPosition(teleporter->toCoordinates);
+
       immediatelySetWorldOrientation(globals, teleporter->toOrientation);
 
-      // @todo teleport to the equivalent position adjacent to the target coordinates,
-      // but not the target coordinates exactly
-      camera.position = gridCoordinatesToWorldPosition(teleporter->toCoordinates);
-      // @todo set to the target grid coordinates' world position
-      targetCameraPosition = camera.position;
       // @todo set new camera orientation/adjust move queue
       break;
     }
