@@ -207,10 +207,22 @@ void setWorldOrientation(Globals, WorldOrientation targetWorldOrientation) {
 }
 
 void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation) {
+  auto& camera = getCamera();
+  float pitch = camera.orientation.pitch;
+
   setWorldOrientation(globals, worldOrientation);
 
+  // @todo flesh this out and determine the proper conversions between orientations
+  switch (worldOrientation) {
+    case NEGATIVE_X_UP:
+      camera.orientation.pitch = pitch + Gm_HALF_PI;
+      break;
+    case NEGATIVE_Z_UP:
+      camera.orientation.pitch = pitch + Gm_PI * 1.5f;
+      break;
+  }
+
   state.worldOrientationState.startTime = 0.f;
-  // @todo adjust camera orientation to preserve relative viewing angle
 }
 
 void handleWorldOrientation(Globals, float dt) {
