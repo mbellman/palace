@@ -130,7 +130,11 @@ namespace Gamma {
     // grid to avoid warbling and other distortions when moving the camera
     float texelsPerUnit = 2048.0f / (radius * 2.0f);
 
-    Matrix4f texelLookAt = Matrix4f::lookAt(Vec3f(0.0f), lightDirection.invert(), Vec3f(0.0f, 1.0f, 0.0f));
+    // Determine the top (up) vector for the lookAt matrix
+    bool isVerticalFacingLight = lightDirection == Vec3f(0, 1, 0) || lightDirection == Vec3f(0, -1, 0);
+    Vec3f topVector = isVerticalFacingLight ? Vec3f(0, 0, 1) : Vec3f(0, 1, 0);
+
+    Matrix4f texelLookAt = Matrix4f::lookAt(Vec3f(0.0f), lightDirection.invert(), topVector);
     Matrix4f texelScale = Matrix4f::scale(texelsPerUnit);
     Matrix4f texelMatrix = texelScale * texelLookAt;
 
@@ -143,7 +147,7 @@ namespace Gamma {
 
     // Compute final light view matrix for rendering the shadow map
     Matrix4f matProjection = Matrix4f::orthographic(radius, -radius, -radius, radius, -radius - 1000.0f, radius);
-    Matrix4f matView = Matrix4f::lookAt(frustumCenter.gl(), lightDirection.invert().gl(), Vec3f(0.0f, 1.0f, 0.0f));
+    Matrix4f matView = Matrix4f::lookAt(frustumCenter.gl(), lightDirection.invert().gl(), topVector);
 
     return (matProjection * matView).transpose();
   }
