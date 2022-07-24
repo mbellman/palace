@@ -338,6 +338,11 @@ static void addMeshes(Globals) {
   mesh("hedge")->texture = "./game/textures/hedge.png";
   mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
 
+  addMesh("tall-grass", 1000, Mesh::Model("./game/models/tall-grass.obj"));
+  mesh("tall-grass")->type = MeshType::FOLIAGE;
+  mesh("tall-grass")->foliage.type = FoliageType::FLOWER;
+  mesh("tall-grass")->foliage.speed = 0.5f;
+
   addMesh("stone-tile", 1000, Mesh::Model("./game/models/stone-tile.obj"));
 
   #if DEVELOPMENT == 1
@@ -356,6 +361,7 @@ static void addMeshes(Globals) {
 }
 
 static void addZones(Globals) {
+  // @todo define these elsewhere
   Zone z1 = {
     "Lunar Garden",
     { -5, -5, -20 },
@@ -371,7 +377,8 @@ static void addZones(Globals) {
       "tulip-petals",
       "grass",
       "hedge",
-      "stone-tile"
+      "stone-tile",
+      "tall-grass"
     }
   };
 

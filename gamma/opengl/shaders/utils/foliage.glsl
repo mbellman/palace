@@ -16,7 +16,7 @@ vec3 getFlowerFoliageOffset(vec3 world_position) {
   float rate = time * foliage.speed;
   float x_3 = world_position.x / 3.0;
   float z_3 = world_position.z / 3.0;
-  float displacement_factor = pow(vertex_distance_from_ground / 1.5, 2);
+  float displacement_factor = min(1.0, pow(vertex_distance_from_ground / 1.5, 2));
 
   // @todo allow some of these magic numbers to be configurable
   float offset_x = sin(rate + x_3 + z_3) + cos(rate * 3.1) * 0.05;

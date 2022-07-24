@@ -139,8 +139,10 @@ static bool isNextMoveValid(Globals, const GridCoordinates& currentGridCoordinat
         targetTileBelow->type == STAIRCASE ||
         targetTileBelow->type == SWITCH
       ) &&
-      targetTile == nullptr ||
-      targetTile->type == TELEPORTER
+      (
+        targetTile == nullptr ||
+        targetTile->type == TELEPORTER
+      )
     )
   ) {
     if (typeOfEntity(targetTileBelow) == SWITCH) {
