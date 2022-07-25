@@ -69,7 +69,7 @@ namespace Gamma {
     float u = stof(readNextChunk());
     float v = stof(readNextChunk());
 
-    textureCoordinates.push_back({ u, v });
+    textureCoordinates.push_back({ u, 1.f - v });
   }
 
   /**

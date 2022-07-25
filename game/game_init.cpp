@@ -338,12 +338,18 @@ static void addMeshes(Globals) {
   mesh("hedge")->texture = "./game/textures/hedge.png";
   mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
 
+  addMesh("stone-tile", 1000, Mesh::Model("./game/models/stone-tile.obj"));
+
   addMesh("tall-grass", 1000, Mesh::Model("./game/models/tall-grass.obj"));
   mesh("tall-grass")->type = MeshType::FOLIAGE;
   mesh("tall-grass")->foliage.type = FoliageType::FLOWER;
   mesh("tall-grass")->foliage.speed = 0.5f;
 
-  addMesh("stone-tile", 1000, Mesh::Model("./game/models/stone-tile.obj"));
+  addMesh("rosebush", 1000, Mesh::Model("./game/models/rosebush-leaves.obj"));
+  mesh("rosebush")->type = MeshType::FOLIAGE;
+  mesh("rosebush")->foliage.type = FoliageType::FLOWER;
+  mesh("rosebush")->texture = "./game/textures/rose-leaves.png";
+  mesh("rosebush")->normalMap = "./game/textures/rose-leaves-normals.png";
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators

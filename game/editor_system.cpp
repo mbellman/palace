@@ -25,14 +25,16 @@ static const std::vector<std::string> placeableMeshNames = {
   "grass",
   "hedge",
   "stone-tile",
-  "tall-grass"
+  "tall-grass",
+  "rosebush"
 };
 
 #if DEVELOPMENT == 1
   static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
     { "dirt-floor", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) },
-    { "tall-grass", Vec3f(0, -HALF_TILE_SIZE, 0) }
+    { "tall-grass", Vec3f(0, -HALF_TILE_SIZE, 0) },
+    { "rosebush", Vec3f(0, -HALF_TILE_SIZE, 0) }
   };
 
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {

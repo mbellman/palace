@@ -559,6 +559,7 @@ namespace Gamma {
 
     shader.use();
     shader.setFloat("time", gmContext->scene.runningTime);
+    shader.setInt("meshTexture", 0);
 
     for (u32 mapIndex = 0; mapIndex < glDirectionalShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glDirectionalShadowMaps[mapIndex];
@@ -582,6 +583,7 @@ namespace Gamma {
 
           shader.setInt("foliage.type", foliage.type);
           shader.setFloat("foliage.speed", foliage.speed);
+          shader.setBool("hasTexture", glMesh->hasTexture());
 
           if (sourceMesh->canCastShadows && sourceMesh->maxCascade >= cascade) {
             glMesh->render(ctx.primitiveMode, true);
@@ -598,6 +600,7 @@ namespace Gamma {
     auto& shader = shaders.shadowLightView;
 
     shader.use();
+    shader.setInt("meshTexture", 0);
 
     for (u32 mapIndex = 0; mapIndex < glSpotShadowMaps.size(); mapIndex++) {
       auto& glShadowMap = *glSpotShadowMaps[mapIndex];
@@ -627,6 +630,7 @@ namespace Gamma {
 
         shader.setInt("foliage.type", foliage.type);
         shader.setFloat("foliage.speed", foliage.speed);
+        shader.setBool("hasTexture", glMesh->hasTexture());
 
         if (sourceMesh->canCastShadows) {
           glMesh->render(ctx.primitiveMode, true);

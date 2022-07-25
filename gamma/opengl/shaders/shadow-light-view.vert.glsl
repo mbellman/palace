@@ -9,8 +9,7 @@ layout (location = 3) in vec2 vertexUv;
 layout (location = 4) in uint modelColor;
 layout (location = 5) in mat4 modelMatrix;
 
-// @todo once mesh textures are checked for alpha
-// out vec2 fragUv;
+out vec2 fragUv;
 
 #include "utils/gl.glsl";
 #include "utils/foliage.glsl";
@@ -34,6 +33,5 @@ void main() {
 
   gl_Position = matLightViewProjection * world_position;
 
-  // @todo once mesh textures are checked for alpha
-  // fragUv = vertexUv;
+  fragUv = vertexUv;
 }

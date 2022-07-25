@@ -162,11 +162,10 @@ void main() {
   #endif
 
   #if USE_SCREEN_SPACE_AMBIENT_OCCLUSION == 1
-    // @todo limit AO intensity
     ambient_occlusion = getScreenSpaceAmbientOcclusionContribution(frag_color_and_depth.w, fragment_position, fragment_normal);
   #endif
 
-  out_gi_and_ao = vec4(global_illumination * 0.75, ambient_occlusion);
+  out_gi_and_ao = vec4(global_illumination * 0.75, ambient_occlusion * 0.5);
 
   #if USE_DENOISING == 1
     vec3 view_fragment_position_t1 = glVec3(matViewT1 * glVec4(fragment_position));
