@@ -351,6 +351,12 @@ static void addMeshes(Globals) {
   mesh("rosebush")->texture = "./game/textures/rose-leaves.png";
   mesh("rosebush")->normalMap = "./game/textures/rose-leaves-normals.png";
 
+  addMesh("rosebush-flowers", 1000, Mesh::Model("./game/models/rosebush-flowers.obj"));
+  mesh("rosebush-flowers")->type = MeshType::FOLIAGE;
+  mesh("rosebush-flowers")->foliage.type = FoliageType::FLOWER;
+  mesh("rosebush-flowers")->texture = "./game/textures/rose-petals.png";
+  mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
+
   #if DEVELOPMENT == 1
     // Trigger entity indicators
     addMesh("trigger-indicator", 0xffff, Mesh::Cube());

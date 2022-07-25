@@ -1137,6 +1137,11 @@ void loadMeshData(Globals) {
 
       auto& object = createMeshObject(globals, currentMeshName);
 
+      if (currentMeshName == "rosebush") {
+        // @todo manage this deterministically
+        rotation.y = Gm_Random(0.f, Gm_TAU);
+      }
+
       object.position = position;
       object.rotation = rotation;
       object.color = color;

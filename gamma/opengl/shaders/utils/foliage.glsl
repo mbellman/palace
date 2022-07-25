@@ -19,9 +19,9 @@ vec3 getFlowerFoliageOffset(vec3 world_position) {
   float displacement_factor = min(1.0, pow(vertex_distance_from_ground / 1.5, 2));
 
   // @todo allow some of these magic numbers to be configurable
-  float offset_x = sin(rate + x_3 + z_3) + cos(rate * 3.1 + z_3) * 0.05;
+  float offset_x = sin(rate + x_3 + z_3) + sin(rate * 3.1 + z_3) * 0.2 + cos(rate * 4.0 + x_3 + z_3) * 0.1;
   float offset_y = 0.0;
-  float offset_z = sin(rate + x_3 + z_3) + sin(rate * 1.3 + x_3) * 0.4;
+  float offset_z = sin(rate + x_3 + z_3) + cos(rate * 1.3 + x_3) * 0.2 + sin(rate * 4.0 + x_3 + z_3) * 0.1;
 
   return vec3(offset_x, offset_y, offset_z) * displacement_factor;
 }

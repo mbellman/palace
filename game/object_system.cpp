@@ -65,7 +65,8 @@ const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
 
 const static std::map<std::string, std::vector<std::string>> compoundMeshMap = {
   {"tulips", { "tulip-petals" }},
-  {"arch", { "arch-vines" }}
+  {"arch", { "arch-vines" }},
+  {"rosebush", { "rosebush-flowers" }}
 };
 
 static void createGroundObject(Globals, const GridCoordinates& coordinates) {
