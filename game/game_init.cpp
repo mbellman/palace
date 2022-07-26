@@ -317,7 +317,8 @@ static void addMeshes(Globals) {
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
 
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
-  mesh("arch")->texture = "./game/textures/arch.png";
+  mesh("arch")->texture = "./game/textures/wood.png";
+  mesh("arch")->normalMap = "./game/textures/wood-normals.png";
 
   addMesh("arch-vines", 1000, Mesh::Model("./game/models/arch-vines.obj"));
   mesh("arch-vines")->type = MeshType::FOLIAGE;
@@ -339,11 +340,6 @@ static void addMeshes(Globals) {
   mesh("hedge")->normalMap = "./game/textures/hedge-normals.png";
 
   addMesh("stone-tile", 1000, Mesh::Model("./game/models/stone-tile.obj"));
-
-  addMesh("tall-grass", 1000, Mesh::Model("./game/models/tall-grass.obj"));
-  mesh("tall-grass")->type = MeshType::FOLIAGE;
-  mesh("tall-grass")->foliage.type = FoliageType::FLOWER;
-  mesh("tall-grass")->foliage.speed = 0.5f;
 
   addMesh("rosebush", 1000, Mesh::Model("./game/models/rosebush-leaves.obj"));
   mesh("rosebush")->type = MeshType::FOLIAGE;
@@ -390,7 +386,8 @@ static void addZones(Globals) {
       "grass",
       "hedge",
       "stone-tile",
-      "tall-grass"
+      "rosebush",
+      "rosebush-flowers"
     }
   };
 
