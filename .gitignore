@@ -13,3 +13,5 @@ x86/
 *.user
 *.userosscache
 *.sln.docstates
+
+*.blend1
