@@ -269,7 +269,7 @@ void Gm_HandleFreeCameraMode(GmContext* context, float dt) {
   auto& scene = context->scene;
   auto& camera = scene.camera;
   auto& input = scene.input;
-  const Orientation& orientation = camera.orientation;
+  const auto& orientation = camera.orientation;
   Vec3f direction;
 
   if (input.isKeyHeld(Key::A)) {

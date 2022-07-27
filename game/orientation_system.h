@@ -15,9 +15,9 @@ enum WorldOrientation {
 };
 
 struct WorldOrientationState {
-  float startTime = 0.f;
-  Gamma::Orientation orientationFrom;
-  Gamma::Orientation orientationTo;
+  float startTime = 0.f;               // @todo move to state.cameraState
+  Gamma::Orientation orientationFrom;  // @todo move to state.cameraState
+  Gamma::Orientation orientationTo;    // @todo move to state.cameraState
   Gamma::Vec3f movementPlane = Gamma::Vec3f(1.f, 0, 1.f);
   WorldOrientation worldOrientation = POSITIVE_Y_UP;
 };

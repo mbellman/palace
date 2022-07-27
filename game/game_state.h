@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Gamma.h"
+
 #include "move_queue.h"
 #include "movement_system.h"
 #include "orientation_system.h"

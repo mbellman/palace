@@ -63,15 +63,30 @@ using namespace Gamma;
   }
 #endif
 
+static void animateCameraToTargetOrientation(Globals, float dt) {
+  auto& camera = getCamera();
+  auto& from = camera.orientation;
+  auto& to = state.worldOrientationState.orientationTo;
+  float speed = 16.0f * dt;
+
+  if (speed > 1.f) speed = 1.f;
+
+  camera.orientation.roll = Gm_LerpCircularf(from.roll, to.roll, speed, Gm_PI);
+  camera.orientation.pitch = Gm_LerpCircularf(from.pitch, to.pitch, speed, Gm_PI);
+  camera.orientation.yaw = Gm_LerpCircularf(from.yaw, to.yaw, speed, Gm_PI);
+}
+
 void updateGame(Globals, float dt) {
   #if DEVELOPMENT == 1
     if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
       Gm_HandleFreeCameraMode(context, dt);
     } else {
       handlePlayerMovement(globals, dt);
+      animateCameraToTargetOrientation(globals, dt);
     }
   #else
     handlePlayerMovement(globals, dt);
+    animateCameraToTargetOrientation(globals, dt);
   #endif
 
   handleWorldOrientation(globals, dt);

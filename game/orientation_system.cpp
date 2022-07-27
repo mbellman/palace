@@ -101,34 +101,49 @@ void updateCameraFromMouseMoveEvent(Globals, const MouseMoveEvent& event) {
   auto& camera = getCamera();
   auto mDeltaY = event.deltaY / 1000.f;
   auto mDeltaX = event.deltaX / 1000.f;
+  auto isFreeCameraModeEnabled = Gm_IsFlagEnabled(FREE_CAMERA_MODE);
+
+  auto& orientation = isFreeCameraModeEnabled
+    // Update the camera orientation directly in free camera mode
+    ? camera.orientation
+    // Update the target orientation otherwise, so we can animate to it
+    // (@see game_update -> animateCameraToTargetOrientation)
+    : state.worldOrientationState.orientationTo;
 
   switch (state.worldOrientationState.worldOrientation) {
     case POSITIVE_Y_UP:
     case POSITIVE_X_UP:
     case NEGATIVE_X_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.yaw += mDeltaX;
+      orientation.pitch += mDeltaY;
+      orientation.yaw += mDeltaX;
       break;
     case NEGATIVE_Y_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.yaw -= mDeltaX;
+      orientation.pitch += mDeltaY;
+      orientation.yaw -= mDeltaX;
       break;
     case POSITIVE_Z_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.roll -= mDeltaX;
+      orientation.pitch += mDeltaY;
+      orientation.roll -= mDeltaX;
       break;
     case NEGATIVE_Z_UP:
-      camera.orientation.pitch += mDeltaY;
-      camera.orientation.roll += mDeltaX;
+      orientation.pitch += mDeltaY;
+      orientation.roll += mDeltaX;
       break;
   }
 
   // Wrap a value to within the [0, TAU] range
   #define wrap(n) n = n > Gm_TAU ? n - Gm_TAU : n < 0.f ? n + Gm_TAU : n
 
-  wrap(camera.orientation.pitch);
-  wrap(camera.orientation.yaw);
-  wrap(camera.orientation.roll);
+  wrap(orientation.pitch);
+  wrap(orientation.yaw);
+  wrap(orientation.roll);
+
+  if (isFreeCameraModeEnabled) {
+    // In free camera mode, set the target orientation
+    // to the immediate camera orientation to avoid a
+    // mismatch when reverting to standard camera mode
+    state.worldOrientationState.orientationTo = camera.orientation;
+  }
 }
 
 void setWorldOrientation(Globals, WorldOrientation targetWorldOrientation) {
@@ -235,6 +250,7 @@ void handleWorldOrientation(Globals, float dt) {
   alpha *= 2.f;
 
   if (state.worldOrientationState.startTime == 0.f) {
+    // @todo ensure that this doesn't require explicit user action
     camera.rotation = camera.orientation.toQuaternion();
 
     return;
