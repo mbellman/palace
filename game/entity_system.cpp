@@ -26,7 +26,7 @@ static void handleSwitchWhenActive(Globals, Switch* entity, float dt) {
 }
 
 static void handleLastPressedSwitchWhenInactive(Globals, float dt) {
-  state.lastPressedSwitch->pressedDuration -= dt * 5.f;
+  state.lastPressedSwitch->pressedDuration -= dt * 1.5f;
 }
 
 static void handleLastPressedSwitch(Globals, Switch* entity) {
