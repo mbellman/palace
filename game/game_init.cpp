@@ -352,7 +352,7 @@ static void addMeshes(Globals) {
   mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
 
   // Static world structures
-  addMesh("potm-front", 1, Mesh::Model("./game/models/potm-front.obj"));
+  addMesh("potm-facade", 1, Mesh::Model("./game/models/potm-facade.obj"));
 
   #if DEVELOPMENT == 1
     // Trigger entity indicators
@@ -389,7 +389,7 @@ static void addZones(Globals) {
       "stone-tile",
       "rosebush",
       "rosebush-flowers",
-      "potm-front"
+      "potm-facade"
     }
   };
 
@@ -765,19 +765,16 @@ void initializeGame(Globals) {
   addKeyHandlers(globals);
   // addOrientationTestLayout(globals);
 
-  #if DEVELOPMENT == 1
-    loadWorldGridData(globals);
-    loadMeshData(globals);
-    loadLightData(globals);
-
-    createLightIndicatorObjects(globals);
-  #else
-    loadWorldGridData(globals);
-    loadMeshData(globals);
-    loadLightData(globals);
-  #endif
+  loadWorldGridData(globals);
+  loadMeshData(globals);
+  loadStaticStructureData(globals);
+  loadLightData(globals);
 
   createGridEntityObjects(globals);
+
+  #if DEVELOPMENT == 1
+    createLightIndicatorObjects(globals);
+  #endif
 
   auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
 

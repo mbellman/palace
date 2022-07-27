@@ -100,6 +100,8 @@ struct WorldEditor {
   void saveLightData(Globals);
 #endif
 
+// @todo move these to world_system
 void loadWorldGridData(Globals);
 void loadMeshData(Globals);
+void loadStaticStructureData(Globals);
 void loadLightData(Globals);

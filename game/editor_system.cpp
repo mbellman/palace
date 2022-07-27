@@ -26,7 +26,7 @@ static const std::vector<std::string> placeableMeshNames = {
   "hedge",
   "stone-tile",
   "rosebush",
-  "potm-front"
+  "potm-facade"
 };
 
 #if DEVELOPMENT == 1
@@ -1010,6 +1010,43 @@ static const std::vector<std::string> placeableMeshNames = {
   }
 #endif
 
+// @todo move everything below to world_system
+static void createObjectFromData(Globals, const std::vector<std::string>& data, const std::string& meshName) {
+  Vec3f position = {
+    stof(data[0]),
+    stof(data[1]),
+    stof(data[2])
+  };
+
+  Vec3f rotation = {
+    stof(data[3]),
+    stof(data[4]),
+    stof(data[5])
+  };
+
+  pVec4 color = {
+    (u8)stoi(data[6]),
+    (u8)stoi(data[7]),
+    (u8)stoi(data[8])
+  };
+
+  Vec3f scale = stof(data[9]);
+
+  auto& object = createMeshObject(globals, meshName);
+
+  if (meshName == "rosebush") {
+    // @todo manage this deterministically
+    rotation.y = Gm_Random(0.f, Gm_TAU);
+  }
+
+  object.position = position;
+  object.rotation = rotation;
+  object.color = color;
+  object.scale = scale;
+
+  commit(object);
+}
+
 void loadWorldGridData(Globals) {
   auto& grid = state.world.grid;
   EntityType currentEntityType;
@@ -1114,43 +1151,34 @@ void loadMeshData(Globals) {
     } else {
       auto data = Gm_SplitString(line, ",");
 
-      Vec3f position = {
-        stof(data[0]),
-        stof(data[1]),
-        stof(data[2])
-      };
-
-      Vec3f rotation = {
-        stof(data[3]),
-        stof(data[4]),
-        stof(data[5])
-      };
-
-      pVec4 color = {
-        (u8)stoi(data[6]),
-        (u8)stoi(data[7]),
-        (u8)stoi(data[8])
-      };
-
-      Vec3f scale = stof(data[9]);
-
-      auto& object = createMeshObject(globals, currentMeshName);
-
-      if (currentMeshName == "rosebush") {
-        // @todo manage this deterministically
-        rotation.y = Gm_Random(0.f, Gm_TAU);
-      }
-
-      object.position = position;
-      object.rotation = rotation;
-      object.color = color;
-      object.scale = scale;
-
-      commit(object);
+      createObjectFromData(globals, data, currentMeshName);
     }
   }
 
   synchronizeCompoundMeshes(globals);
+}
+
+void loadStaticStructureData(Globals) {
+  std::ifstream file("./game/world/static_structure_data.txt");
+
+  if (file.fail()) {
+    return;
+  }
+
+  defer(file.close());
+
+  std::string line;
+  std::string currentMeshName;
+
+  while (std::getline(file, line)) {
+    if (line[0] == '@') {
+      currentMeshName = line.substr(1);
+    } else {
+      auto data = Gm_SplitString(line, ",");
+
+      createObjectFromData(globals, data, currentMeshName);
+    }
+  }
 }
 
 void loadLightData(Globals) {
