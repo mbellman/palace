@@ -292,6 +292,7 @@ static void addOrientationTestLayout(Globals) {
   light.isStatic = true;
 }
 
+// @todo define these in a config object somewhere
 static void addMeshes(Globals) {
   // Grid entity objects
   addMesh("ground", 0xffff, Mesh::Cube());
@@ -299,21 +300,18 @@ static void addMeshes(Globals) {
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
-  // Dirt floor mesh
+  // Decorative mesh objects
   addMesh("dirt-floor", 0xffff, Mesh::Plane(2));
   mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
   mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
 
-  // Dirt wall mesh
   addMesh("dirt-wall", 0xffff, Mesh::Model("./game/models/wall.obj"));
   mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
   mesh("dirt-wall")->normalMap = "./game/textures/dirt-normals.png";
 
-  // Water plane mesh
   addMesh("water", 1000, Mesh::Plane(2));
   mesh("water")->type = MeshType::WATER;
 
-  // Decorative mesh objects
   addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
 
   addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
@@ -353,6 +351,9 @@ static void addMeshes(Globals) {
   mesh("rosebush-flowers")->texture = "./game/textures/rose-petals.png";
   mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
 
+  // Static world structures
+  addMesh("potm-front", 1, Mesh::Model("./game/models/potm-front.obj"));
+
   #if DEVELOPMENT == 1
     // Trigger entity indicators
     addMesh("trigger-indicator", 0xffff, Mesh::Cube());
@@ -387,7 +388,8 @@ static void addZones(Globals) {
       "hedge",
       "stone-tile",
       "rosebush",
-      "rosebush-flowers"
+      "rosebush-flowers",
+      "potm-front"
     }
   };
 

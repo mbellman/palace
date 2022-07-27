@@ -25,7 +25,8 @@ static const std::vector<std::string> placeableMeshNames = {
   "grass",
   "hedge",
   "stone-tile",
-  "rosebush"
+  "rosebush",
+  "potm-front"
 };
 
 #if DEVELOPMENT == 1
