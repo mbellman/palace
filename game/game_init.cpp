@@ -775,6 +775,15 @@ void initializeGame(Globals) {
 
   #if DEVELOPMENT == 1
     createLightIndicatorObjects(globals);
+
+    Gm_WatchFile("./game/world/static_structure_data.txt", [context, &state]() {
+      // @todo iterate over static structure meshes
+      mesh("potm-facade")->objects.reset();
+
+      loadStaticStructureData(globals);
+
+      Console::log("Hot-reloaded static structure data");
+    });
   #endif
 
   auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);

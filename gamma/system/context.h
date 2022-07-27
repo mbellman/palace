@@ -22,6 +22,7 @@ struct GmContext {
   Gamma::AbstractRenderer* renderer = nullptr;
   u32 lastTick = 0;
   u64 frameStartMicroseconds = 0;
+  u32 lastWatchedFilesCheckTime = 0;
   // @todo debug-mode only
   Gamma::Averager<5, u32> fpsAverager;
   Gamma::Averager<5, u64> frameTimeAverager;

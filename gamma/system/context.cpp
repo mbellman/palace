@@ -10,6 +10,7 @@
 #include "system/assert.h"
 #include "system/console.h"
 #include "system/context.h"
+#include "system/file.h"
 #include "system/flags.h"
 #include "system/scene.h"
 
@@ -187,6 +188,12 @@ void Gm_HandleEvents(GmContext* context) {
     #if GAMMA_DEVELOPER_MODE
       context->commander.input.handleEvent(event);
     #endif
+  }
+
+  if (context->lastTick - context->lastWatchedFilesCheckTime > 1000) {
+    Gm_HandleWatchedFiles();
+
+    context->lastWatchedFilesCheckTime = context->lastTick;
   }
 }
 
