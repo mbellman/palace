@@ -262,7 +262,7 @@ namespace Gamma {
 
     // Camera projection/view/inverse matrices
     ctx.activeCamera = &gmContext->scene.camera;
-    ctx.matProjection = Matrix4f::glPerspective(internalResolution, 45.0f, 1.0f, 10000.0f).transpose();
+    ctx.matProjection = Matrix4f::glPerspective(internalResolution, ctx.activeCamera->fov, 1.0f, 10000.0f).transpose();
     ctx.matPreviousView = ctx.matView;
 
     ctx.matView = (
@@ -666,7 +666,7 @@ namespace Gamma {
         auto& upDirection = CUBE_MAP_UP_DIRECTIONS[i];
 
         // @optimize matLightProjection can be precomputed
-        Matrix4f matLightProjection = Matrix4f::glPerspective({ 1024, 1024 }, 90.0f, 1.0f, light.radius);
+        Matrix4f matLightProjection = Matrix4f::glPerspective({ 1024, 1024 }, 90.f, 1.f, light.radius);
         Matrix4f matLightView = Matrix4f::lookAt(light.position.gl(), direction, upDirection);
         Matrix4f lightMatrix = (matLightProjection * matLightView).transpose();
 

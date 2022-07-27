@@ -39,8 +39,11 @@ namespace Gamma {
     );
   }
 
-  static inline Matrix4f getLightProjectionMatrix(const Area<u32>& resolution) {
-    return Matrix4f::glPerspective(resolution, 90.0f * 0.5f, 1.0f, 10000.0f);
+  static inline Matrix4f getLightProjectionMatrix(const Area<u32>& resolution, const float fov) {
+    const static float near = 1.f;
+    const static float far = 10000.f;
+
+    return Matrix4f::glPerspective(resolution, fov, near, far);
   }
 
   void OpenGLLightDisc::init() {
@@ -52,11 +55,11 @@ namespace Gamma {
     Vec2f vertexPositions[DISC_SLICES * 3];
 
     for (u32 i = 0; i < DISC_SLICES; i++) {
-      constexpr static float sliceAngle = 360.0f / (float)DISC_SLICES;
+      constexpr static float sliceAngle = 360.f / (float)DISC_SLICES;
       u32 index = i * 3;
 
       // Add center vertex
-      vertexPositions[index] = Vec2f(0.0f);
+      vertexPositions[index] = Vec2f(0.f);
 
       // Add corners
       const float a1 = i * sliceAngle * DEGREES_TO_RADIANS;
@@ -133,9 +136,9 @@ namespace Gamma {
       // Light source behind the camera; scale to cover
       // screen when within range, and scale to 0 when
       // out of range
-      float scale = localLightPosition.magnitude() < light.radius ? 2.0f : 0.0f;
+      float scale = localLightPosition.magnitude() < light.radius ? 2.f : 0.f;
 
-      disc.offset = Vec2f(0.0f);
+      disc.offset = Vec2f(0.f);
       disc.scale = Vec2f(scale);
     }
   }
@@ -144,7 +147,7 @@ namespace Gamma {
     Disc discs[1];
     auto& disc = discs[0];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
-    Matrix4f matProjection = getLightProjectionMatrix(resolution);
+    Matrix4f matProjection = getLightProjectionMatrix(resolution, camera.fov);
     Matrix4f matView = getLightViewMatrix(camera);
 
     configureDisc(disc, light, matProjection, matView, aspectRatio);
@@ -160,7 +163,7 @@ namespace Gamma {
     // @todo avoid reallocating/freeing the disc array on each draw
     Disc* discs = new Disc[lights.size()];
     float aspectRatio = (float)resolution.width / (float)resolution.height;
-    Matrix4f matProjection = getLightProjectionMatrix(resolution);
+    Matrix4f matProjection = getLightProjectionMatrix(resolution, camera.fov);
     Matrix4f matView = getLightViewMatrix(camera);
 
     for (u32 i = 0; i < lights.size(); i++) {
