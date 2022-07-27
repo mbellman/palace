@@ -76,6 +76,13 @@ static void animateCameraToTargetOrientation(Globals, float dt) {
   camera.orientation.yaw = Gm_LerpCircularf(from.yaw, to.yaw, speed, Gm_PI);
 }
 
+static void handleCameraLightPosition(Globals) {
+  auto& camera = getCamera();
+  auto position = camera.position + camera.orientation.getDirection() * HALF_TILE_SIZE;
+
+  state.cameraLight->position = position;
+}
+
 void updateGame(Globals, float dt) {
   #if DEVELOPMENT == 1
     if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
@@ -91,6 +98,7 @@ void updateGame(Globals, float dt) {
 
   handleWorldOrientation(globals, dt);
   handleEntityBehavior(globals, dt);
+  handleCameraLightPosition(globals);
   handleZones(globals);
 
   #if DEVELOPMENT == 1

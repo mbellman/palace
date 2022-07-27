@@ -785,6 +785,14 @@ void initializeGame(Globals) {
   camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
   camera.fov = 55.f;
 
+  auto& cameraLight = createLight(POINT);
+
+  cameraLight.color = Vec3f(1.f, 0.8f, 0.5f);
+  cameraLight.radius = 30.f;
+  cameraLight.power = 0.25f;
+
+  state.cameraLight = &cameraLight;
+
   #if DEVELOPMENT == 1
     state.cameraStartPosition = camera.position;
     state.cameraTargetPosition = camera.position;

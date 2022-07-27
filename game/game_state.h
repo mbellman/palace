@@ -27,6 +27,7 @@ struct GameState {
 
   // Entity behavior
   Switch* lastPressedSwitch = nullptr;
+  Gamma::Light* cameraLight = nullptr;
 
   #if DEVELOPMENT == 1
     WorldEditor editor;
