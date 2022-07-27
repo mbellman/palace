@@ -227,6 +227,7 @@ static void handleNextMove(Globals) {
   auto nextMove = takeNextMove(state.moves);
   auto& currentMove = state.currentMove;
   auto currentGridCoordinates = worldPositionToGridCoordinates(camera.position);
+  // This will be mutated in the process of handling the move
   auto targetCameraPosition = gridCoordinatesToWorldPosition(currentGridCoordinates);
   auto timeSinceLastMoveInput = runningTime - state.lastMoveInputTime;
   auto timeSinceCurrentMoveBegan = runningTime - currentMove.startTime;

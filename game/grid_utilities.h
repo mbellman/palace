@@ -47,3 +47,9 @@ inline GridCoordinates worldPositionToGridCoordinates(const Gamma::Vec3f& positi
     s16(floorf(position.z / TILE_SIZE))
   };
 }
+
+inline Gamma::Vec3f getGridAlignedWorldPosition(const Gamma::Vec3f& position) {
+  auto coordinates = worldPositionToGridCoordinates(position);
+
+  return gridCoordinatesToWorldPosition(coordinates);
+}

@@ -601,10 +601,8 @@ static const std::vector<std::string> placeableMeshNames = {
     auto& preview = object("mesh-preview");
 
     if (editor.snapMeshesToGrid) {
-      auto placementPosition = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
-      // @todo alignWorldPositionToGrid()
-      auto gridCoordinates = worldPositionToGridCoordinates(placementPosition);
-      auto targetMeshPosition = gridCoordinatesToWorldPosition(gridCoordinates);
+      auto placementRay = camera.position + camera.orientation.getDirection() * TILE_SIZE * 4.f;
+      auto targetMeshPosition = getGridAlignedWorldPosition(placementRay);
 
       if (meshPlacementOffsetMap.find(editor.currentMeshName) != meshPlacementOffsetMap.end()) {
         targetMeshPosition += meshPlacementOffsetMap.at(editor.currentMeshName);
