@@ -417,6 +417,7 @@ static void addSwitchEntityEffects(Globals) {
 
   switchParticles.spread = TILE_SIZE;
   switchParticles.medianSpeed = 0.5f;
+  switchParticles.medianSize = 0.f;
   switchParticles.deviation = 2.f;
   switchParticles.path.push_back(Vec3f(0));
   switchParticles.path.push_back(Vec3f(0));
