@@ -301,7 +301,7 @@ static void handleNextMove(Globals) {
   currentMove.duration = powf(moveDistanceRatio, 1.f / 3.f);
 }
 
-static void movePlayer(Globals, float dt) {
+static void moveCamera(Globals, float dt) {
   auto& camera = getCamera();
   auto& move = state.currentMove;
   auto& from = move.from;
@@ -348,7 +348,7 @@ static void movePlayer(Globals, float dt) {
   }
 }
 
-void handlePlayerMovement(Globals, float dt) {
+void handlePlayerCameraMovement(Globals, float dt) {
   auto& camera = getCamera();
   auto& input = getInput();
   auto runningTime = getRunningTime();
@@ -376,6 +376,6 @@ void handlePlayerMovement(Globals, float dt) {
   }
 
   if (isMoving(globals)) {
-    movePlayer(globals, dt);
+    moveCamera(globals, dt);
   }
 }

@@ -81,11 +81,11 @@ void updateGame(Globals, float dt) {
     if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
       Gm_HandleFreeCameraMode(context, dt);
     } else {
-      handlePlayerMovement(globals, dt);
+      handlePlayerCameraMovement(globals, dt);
       animateCameraToTargetOrientation(globals, dt);
     }
   #else
-    handlePlayerMovement(globals, dt);
+    handlePlayerCameraMovement(globals, dt);
     animateCameraToTargetOrientation(globals, dt);
   #endif
 

@@ -10,6 +10,10 @@
 #include "game_entities.h"
 #include "build_flags.h"
 
+struct CameraState {
+  // @todo
+};
+
 struct GameState {
   // Tracking variables
   float lastMoveInputTime = 0.f;
@@ -19,6 +23,7 @@ struct GameState {
   WorldOrientationState worldOrientationState;
   MoveQueue moves;
   CurrentMove currentMove;
+  CameraState cameraState;
 
   // Entity behavior
   Switch* lastPressedSwitch = nullptr;
