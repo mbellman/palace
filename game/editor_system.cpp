@@ -17,6 +17,7 @@ using namespace Gamma;
 
 static const std::vector<std::string> placeableMeshNames = {
   "dirt-floor",
+  "tile-1",
   "dirt-wall",
   "water",
   "rock",
@@ -25,13 +26,13 @@ static const std::vector<std::string> placeableMeshNames = {
   "grass",
   "hedge",
   "stone-tile",
-  "rosebush",
-  "potm-facade"
+  "rosebush"
 };
 
 #if DEVELOPMENT == 1
   static const std::map<std::string, Vec3f> meshPlacementOffsetMap = {
     { "dirt-floor", Vec3f(0, -HALF_TILE_SIZE, 0) },
+    { "tile-1", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "rosebush", Vec3f(0, -HALF_TILE_SIZE, 0) }
   };

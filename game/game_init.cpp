@@ -305,6 +305,10 @@ static void addMeshes(Globals) {
   mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
   mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
 
+  addMesh("tile-1", 0xffff, Mesh::Plane(2));
+  mesh("tile-1")->texture = "./game/textures/tile-1.png";
+  mesh("tile-1")->normalMap = "./game/textures/tile-1-normals.png";
+
   addMesh("dirt-wall", 0xffff, Mesh::Model("./game/models/wall.obj"));
   mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
   mesh("dirt-wall")->normalMap = "./game/textures/dirt-normals.png";
@@ -398,7 +402,7 @@ static void addZones(Globals) {
     { -17, -32, 6 },
     { 17, 27, 67 },
     {
-      // @todo
+      "tile-1"
     }
   };
 
