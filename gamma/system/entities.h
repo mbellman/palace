@@ -302,6 +302,13 @@ namespace Gamma {
      * Configuration for foliage meshes.
      */
     Foliage foliage;
+    /**
+     * Controls how intensely mesh objects render in their
+     * natural color, without a light source contribution.
+     *
+     * @todo material parameters?
+     */
+    float emissivity = 0.f;
 
     static Mesh* Cube();
     static Mesh* Model(const char* path);

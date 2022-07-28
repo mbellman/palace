@@ -354,6 +354,7 @@ static void addMeshes(Globals) {
   mesh("rosebush-flowers")->foliage.type = FoliageType::FLOWER;
   mesh("rosebush-flowers")->texture = "./game/textures/rose-petals.png";
   mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
+  mesh("rosebush-flowers")->emissivity = 0.25f;
 
   // Static world structures
   addMesh("potm-facade", 1, Mesh::Model("./game/models/potm-facade.obj"));

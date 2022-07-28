@@ -489,6 +489,7 @@ namespace Gamma {
       if (glMesh->isMeshType(MeshType::NON_EMISSIVE)) {
         shaders.geometry.setBool("hasTexture", glMesh->hasTexture());
         shaders.geometry.setBool("hasNormalMap", glMesh->hasNormalMap());
+        shaders.geometry.setFloat("meshEmissivity", glMesh->getSourceMesh()->emissivity);
 
         glMesh->render(ctx.primitiveMode);
       }
@@ -506,10 +507,11 @@ namespace Gamma {
       if (glMesh->isMeshType(MeshType::FOLIAGE)) {
         auto& foliage = glMesh->getSourceMesh()->foliage;
 
-        shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
-        shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
         shaders.foliage.setInt("foliage.type", foliage.type);
         shaders.foliage.setFloat("foliage.speed", foliage.speed);
+        shaders.foliage.setBool("hasTexture", glMesh->hasTexture());
+        shaders.foliage.setBool("hasNormalMap", glMesh->hasNormalMap());
+        shaders.foliage.setFloat("meshEmissivity", glMesh->getSourceMesh()->emissivity);
 
         glMesh->render(ctx.primitiveMode);
       }
