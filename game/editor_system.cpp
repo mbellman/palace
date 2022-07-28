@@ -712,15 +712,26 @@ static const std::vector<std::string> placeableMeshNames = {
     editor.selectedLightDistance = 0.f;
 
     // Reset light indicator highlight colors
-    for (auto& indicator : lightIndicators) {
-      indicator.color = Vec3f(1.f);
+    for (u32 i = 0; i < scene.lights.size(); i++) {
+      auto* light = scene.lights[i];
 
-      commit(indicator);
+      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+        auto& indicator = lightIndicators[i];
+
+        indicator.color = light->color;
+        indicator.scale = 1.5f;
+
+        commit(indicator);
+      }
     }
 
     // Find a point/spot light by camera direction
     for (auto* light : scene.lights) {
-      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+      if (
+        light->type != DIRECTIONAL &&
+        light->type != DIRECTIONAL_SHADOWCASTER &&
+        light != state.cameraLight
+      ) {
         auto cameraToLight = light->position - camera.position;
         auto lightDistance = cameraToLight.magnitude();
         auto unitCameraToObject = cameraToLight / lightDistance;
@@ -745,6 +756,7 @@ static const std::vector<std::string> placeableMeshNames = {
 
       if (indicator != nullptr) {
         indicator->color = Vec3f(1.f, 0, 0);
+        indicator->scale = 2.f;
 
         commit(*indicator);
       }

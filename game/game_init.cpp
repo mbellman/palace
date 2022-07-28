@@ -489,6 +489,7 @@ static void createLightIndicatorObjects(Globals) {
 
       indicator.scale = 1.5f;
       indicator.position = light->position;
+      indicator.color = light->color;
 
       commit(indicator);
     }
