@@ -300,14 +300,10 @@ static void addMeshes(Globals) {
   addMesh("staircase", 0xffff, Mesh::Model("./game/models/staircase.obj"));
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
-  // Decorative mesh objects
+  // Lunar Garden
   addMesh("dirt-floor", 0xffff, Mesh::Plane(2));
   mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
   mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
-
-  addMesh("tile-1", 0xffff, Mesh::Plane(2));
-  mesh("tile-1")->texture = "./game/textures/tile-1.png";
-  mesh("tile-1")->normalMap = "./game/textures/tile-1-normals.png";
 
   addMesh("dirt-wall", 0xffff, Mesh::Model("./game/models/wall.obj"));
   mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
@@ -356,6 +352,13 @@ static void addMeshes(Globals) {
   mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
   mesh("rosebush-flowers")->emissivity = 0.25f;
 
+  // Palace of the Moon
+  addMesh("tile-1", 0xffff, Mesh::Plane(2));
+  mesh("tile-1")->texture = "./game/textures/tile-1.png";
+  mesh("tile-1")->normalMap = "./game/textures/tile-1-normals.png";
+
+  addMesh("column", 1000, Mesh::Model("./game/models/column.obj"));
+
   // Static world structures
   addMesh("potm-facade", 1, Mesh::Model("./game/models/potm-facade.obj"));
 
@@ -403,7 +406,8 @@ static void addZones(Globals) {
     { -17, -32, 6 },
     { 17, 27, 67 },
     {
-      "tile-1"
+      "tile-1",
+      "column"
     }
   };
 

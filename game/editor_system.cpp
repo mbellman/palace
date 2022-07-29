@@ -26,7 +26,8 @@ static const std::vector<std::string> placeableMeshNames = {
   "grass",
   "hedge",
   "stone-tile",
-  "rosebush"
+  "rosebush",
+  "column"
 };
 
 #if DEVELOPMENT == 1
@@ -34,7 +35,8 @@ static const std::vector<std::string> placeableMeshNames = {
     { "dirt-floor", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "tile-1", Vec3f(0, -HALF_TILE_SIZE, 0) },
     { "rock", Vec3f(0, -HALF_TILE_SIZE, 0) },
-    { "rosebush", Vec3f(0, -HALF_TILE_SIZE, 0) }
+    { "rosebush", Vec3f(0, -HALF_TILE_SIZE, 0) },
+    { "column", Vec3f(0, HALF_TILE_SIZE, 0) }
   };
 
   static void removeObjectAtPosition(Globals, ObjectPool& objects, const Vec3f& position) {
