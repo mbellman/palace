@@ -124,7 +124,7 @@ namespace Gamma {
     /**
      * Defines standard Meshes without any unique rendering properties.
      */
-    NON_EMISSIVE = 0xFF
+    DEFAULT = 0xFF
   };
 
   /**
@@ -278,7 +278,7 @@ namespace Gamma {
      *
      * @see MeshType
      */
-    u8 type = MeshType::NON_EMISSIVE;
+    u8 type = MeshType::DEFAULT;
     /**
      * Controls the maximum directional cascaded shadow
      * map that the mesh objects should be rendered to.

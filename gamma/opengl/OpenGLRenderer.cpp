@@ -482,11 +482,11 @@ namespace Gamma {
       }
     }
 
-    // Render non-emissive, non-reflective objects
-    glStencilMask(MeshType::NON_EMISSIVE);
+    // Render objects of the default mesh type
+    glStencilMask(MeshType::DEFAULT);
 
     for (auto* glMesh : glMeshes) {
-      if (glMesh->isMeshType(MeshType::NON_EMISSIVE)) {
+      if (glMesh->isMeshType(MeshType::DEFAULT)) {
         shaders.geometry.setBool("hasTexture", glMesh->hasTexture());
         shaders.geometry.setBool("hasNormalMap", glMesh->hasNormalMap());
         shaders.geometry.setFloat("meshEmissivity", glMesh->getSourceMesh()->emissivity);

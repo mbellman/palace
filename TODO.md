@@ -1,5 +1,4 @@
 ## Engine
-* rename NON_EMISSIVE -> STANDARD or DEFAULT
 * reduce ObjectPool memory usage (indices)
 * mesh roughness (will require a new g-buffer channel)
 * visibility culling dot threshold
@@ -13,7 +12,7 @@
 ## Game internals
 * move orientationTo/From/startTime to cameraState
 
-## World design:
+## World design
 * lower LoD for rose bushes
 * garden boundary hedges
 * change lighting upon entering palace 1
