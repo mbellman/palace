@@ -27,6 +27,7 @@ static const std::vector<std::string> placeableMeshNames = {
   "hedge",
   "stone-tile",
   "rosebush",
+  "gate-column",
   "column"
 };
 

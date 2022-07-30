@@ -352,6 +352,10 @@ static void addMeshes(Globals) {
   mesh("rosebush-flowers")->normalMap = "./game/textures/rose-petals-normals.png";
   mesh("rosebush-flowers")->emissivity = 0.25f;
 
+  addMesh("gate-column", 250, Mesh::Model("./game/models/gate-column.obj"));
+  mesh("gate-column")->texture = "./game/textures/brick.png";
+  mesh("gate-column")->normalMap = "./game/textures/brick-normals.png";
+
   // Palace of the Moon
   addMesh("tile-1", 0xffff, Mesh::Plane(2));
   mesh("tile-1")->texture = "./game/textures/tile-1.png";
@@ -397,6 +401,7 @@ static void addZones(Globals) {
       "stone-tile",
       "rosebush",
       "rosebush-flowers",
+      "gate-column",
       "potm-facade"
     }
   };

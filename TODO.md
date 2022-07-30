@@ -19,6 +19,7 @@
 ## World design
 * lower LoD for rose bushes
 * garden boundary hedges
+* garden boundary iron gates
 * change lighting upon entering palace 1
 * staircase mesh for palace 1
 * staircase railing mesh for palace 1
