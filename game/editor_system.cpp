@@ -390,6 +390,24 @@ static const std::vector<std::string> placeableMeshNames = {
     }
   }
 
+  static void resetLightIndicatorFocusStates(Globals) {
+    auto& scene = context->scene;
+    auto& lightIndicators = objects("light-indicator");
+
+    for (u32 i = 0; i < scene.lights.size(); i++) {
+      auto* light = scene.lights[i];
+
+      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+        auto& indicator = lightIndicators[i];
+
+        indicator.color = light->color;
+        indicator.scale = 1.5f;
+
+        commit(indicator);
+      }
+    }
+  }
+
   static void handleLightSelectionAction(Globals) {
     pointCameraAt(state.editor.selectedLight->position);
 
@@ -424,7 +442,9 @@ static const std::vector<std::string> placeableMeshNames = {
 
     editor.enabled = !editor.enabled;
 
-    if (!editor.enabled) {
+    if (editor.enabled) {
+      resetLightIndicatorFocusStates(globals);
+    } else {
       hideEntityPlacementPreview(globals);
 
       if (editor.isPlacingMesh) {
@@ -712,32 +732,20 @@ static const std::vector<std::string> placeableMeshNames = {
   }
 
   void showLightFinderPreview(Globals) {
-    #define MAX_FINDER_DISTANCE 100.f
+    #define MAX_LIGHT_FINDER_DISTANCE 100.f
 
     auto& editor = state.editor;
     auto& scene = context->scene;
     auto& camera = getCamera();
     auto& cameraDirection = camera.orientation.getDirection();
-    auto closestDistance = MAX_FINDER_DISTANCE;
+    auto closestDistance = MAX_LIGHT_FINDER_DISTANCE;
     auto& lightIndicators = objects("light-indicator");
 
     // Reset selected light values
     editor.selectedLight = nullptr;
     editor.selectedLightDistance = 0.f;
 
-    // Reset light indicator highlight colors
-    for (u32 i = 0; i < scene.lights.size(); i++) {
-      auto* light = scene.lights[i];
-
-      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
-        auto& indicator = lightIndicators[i];
-
-        indicator.color = light->color;
-        indicator.scale = 1.5f;
-
-        commit(indicator);
-      }
-    }
+    resetLightIndicatorFocusStates(globals);
 
     // Find a point/spot light by camera direction
     for (auto* light : scene.lights) {
