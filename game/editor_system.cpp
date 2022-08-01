@@ -397,7 +397,7 @@ static const std::vector<std::string> placeableMeshNames = {
     for (u32 i = 0; i < scene.lights.size(); i++) {
       auto* light = scene.lights[i];
 
-      if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+      if (light->serializable) {
         auto& indicator = lightIndicators[i];
 
         indicator.color = light->color;
@@ -1026,8 +1026,7 @@ static const std::vector<std::string> placeableMeshNames = {
     serialized << "point\n";
 
     for (auto* light : scene.lights) {
-      // @todo light->serializable instead of lightStore check
-      if (light->type == LightType::POINT && light != scene.lightStore.at("switch-light")) {
+      if (light->serializable) {
         auto& p = light->position;
         auto& c = light->color;
         auto radius = light->radius;

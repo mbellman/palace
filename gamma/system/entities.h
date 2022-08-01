@@ -38,6 +38,7 @@ namespace Gamma {
     float fov = 90.0f;
     u32 type = LightType::POINT;
     bool isStatic = false;
+    bool serializable = true;
     // @todo std::vector<u32> shadowMapMeshes (?)
   };
 

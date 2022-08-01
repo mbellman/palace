@@ -431,6 +431,7 @@ static void addSwitchEntityEffects(Globals) {
 
   switchLight.color = Vec3f(1.f, 0.2f, 0.1f);
   switchLight.power = 0.f;
+  switchLight.serializable = false;
 
   switchParticles.spread = TILE_SIZE;
   switchParticles.medianSpeed = 0.5f;
@@ -501,7 +502,7 @@ static void createGridEntityObjects(Globals) {
 
 static void createLightIndicatorObjects(Globals) {
   for (auto* light : context->scene.lights) {
-    if (light->type != DIRECTIONAL && light->type != DIRECTIONAL_SHADOWCASTER) {
+    if (light->serializable) {
       auto& indicator = createObjectFrom("light-indicator");
 
       indicator.scale = 1.5f;
@@ -791,6 +792,24 @@ void initializeGame(Globals) {
 
   createGridEntityObjects(globals);
 
+  auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
+
+  moonlight.direction = Vec3f(0.3f, 0.5f, 1.f).invert();
+  moonlight.color = Vec3f(0.8f, 0.8f, 1.f);
+  moonlight.serializable = false;
+
+  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
+  camera.fov = 55.f;
+
+  auto& cameraLight = createLight(POINT);
+
+  cameraLight.color = Vec3f(1.f, 0.8f, 0.5f);
+  cameraLight.radius = 30.f;
+  cameraLight.power = 0.25f;
+  cameraLight.serializable = false;
+
+  state.cameraLight = &cameraLight;
+
   #if DEVELOPMENT == 1
     createLightIndicatorObjects(globals);
 
@@ -802,25 +821,7 @@ void initializeGame(Globals) {
 
       Console::log("Hot-reloaded static structure data");
     });
-  #endif
 
-  auto& moonlight = createLight(DIRECTIONAL_SHADOWCASTER);
-
-  moonlight.direction = Vec3f(0.3f, 0.5f, 1.f).invert();
-  moonlight.color = Vec3f(0.8f, 0.8f, 1.f);
-
-  camera.position = gridCoordinatesToWorldPosition({ 2, -2, -14 });
-  camera.fov = 55.f;
-
-  auto& cameraLight = createLight(POINT);
-
-  cameraLight.color = Vec3f(1.f, 0.8f, 0.5f);
-  cameraLight.radius = 30.f;
-  cameraLight.power = 0.25f;
-
-  state.cameraLight = &cameraLight;
-
-  #if DEVELOPMENT == 1
     state.cameraStartPosition = camera.position;
     state.cameraTargetPosition = camera.position;
   #endif
