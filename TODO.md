@@ -2,7 +2,6 @@
 * reduce ObjectPool memory usage (indices)
 * mesh roughness (will require a new g-buffer channel)
 * visibility culling dot threshold
-* light.serializable
 * log mesh instance counts on init
 * 2D sprite rendering/UI system
 

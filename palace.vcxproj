@@ -122,6 +122,7 @@
     <ClCompile Include="game\entity_system.cpp" />
     <ClCompile Include="game\game_init.cpp" />
     <ClCompile Include="game\game_update.cpp" />
+    <ClCompile Include="game\game_world.cpp" />
     <ClCompile Include="game\main.cpp" />
     <ClCompile Include="game\movement_system.cpp" />
     <ClCompile Include="game\move_queue.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="game\game_macros.h" />
     <ClInclude Include="game\game_state.h" />
     <ClInclude Include="game\game_update.h" />
+    <ClInclude Include="game\game_world.h" />
     <ClInclude Include="game\gamma_flags.h" />
     <ClInclude Include="external\glew\include\eglew.h" />
     <ClInclude Include="external\glew\include\glew.h" />
