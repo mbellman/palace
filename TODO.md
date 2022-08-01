@@ -15,6 +15,7 @@
 * move orientationTo/From/startTime to cameraState
 * mesh config file
 * zone config file
+* procedures for console commands
 
 ## World design
 * lower LoD for rose bushes

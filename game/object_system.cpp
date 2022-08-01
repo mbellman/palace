@@ -56,6 +56,10 @@ const static std::map<std::string, ObjectParameters> meshObjectParametersMap = {
   {"rosebush", {
     scale(HALF_TILE_SIZE),
     color(0.3f, 1.f, 0.6f)
+  }},
+  {"gate", {
+    scale(HALF_TILE_SIZE),
+    color(0.2f)
   }}
 };
 

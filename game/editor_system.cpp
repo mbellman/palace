@@ -16,6 +16,7 @@
 using namespace Gamma;
 
 static const std::vector<std::string> placeableMeshNames = {
+  // Lunar Garden
   "dirt-floor",
   "tile-1",
   "dirt-wall",
@@ -28,6 +29,8 @@ static const std::vector<std::string> placeableMeshNames = {
   "stone-tile",
   "rosebush",
   "gate-column",
+  "gate",
+  // Palace of the Moon
   "column"
 };
 
@@ -656,13 +659,18 @@ static const std::vector<std::string> placeableMeshNames = {
   void createPlaceableMeshObjectFrom(Globals, const std::string& meshName) {
     if (Gm_VectorContains(placeableMeshNames, meshName)) {
       auto& editor = state.editor;
+      Vec3f defaultRotation = Vec3f(0.f);
 
-      // Remove the existing mesh preview when swapping it for a different mesh
-      if (
-        editor.isPlacingMesh &&
-        meshName != editor.currentMeshName
-      ) {
-        removeObject(object("mesh-preview"));
+      if (editor.isPlacingMesh) {
+        auto& existingPreview = object("mesh-preview");
+
+        if (meshName == editor.currentMeshName) {
+          // Preserve existing rotation when spawning more of the same mesh
+          defaultRotation = existingPreview.rotation;
+        } else {
+          // Remove the existing mesh preview when swapping it for a different mesh
+          removeObject(existingPreview);
+        }
       }
 
       editor.enabled = true;
@@ -675,6 +683,8 @@ static const std::vector<std::string> placeableMeshNames = {
       editor.isFindingLight = false;
 
       auto& object = createMeshObject(globals, meshName);
+
+      object.rotation = defaultRotation;
 
       saveObject("mesh-preview", object);
 
