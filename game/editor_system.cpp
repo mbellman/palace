@@ -393,12 +393,13 @@ static const std::vector<std::string> placeableMeshNames = {
   static void resetLightIndicatorFocusStates(Globals) {
     auto& scene = context->scene;
     auto& lightIndicators = objects("light-indicator");
+    u32 index = 0;
 
     for (u32 i = 0; i < scene.lights.size(); i++) {
       auto* light = scene.lights[i];
 
       if (light->serializable) {
-        auto& indicator = lightIndicators[i];
+        auto& indicator = lightIndicators[index++];
 
         indicator.color = light->color;
         indicator.scale = 1.5f;
@@ -749,11 +750,7 @@ static const std::vector<std::string> placeableMeshNames = {
 
     // Find a point/spot light by camera direction
     for (auto* light : scene.lights) {
-      if (
-        light->type != DIRECTIONAL &&
-        light->type != DIRECTIONAL_SHADOWCASTER &&
-        light != state.cameraLight
-      ) {
+      if (light->serializable) {
         auto cameraToLight = light->position - camera.position;
         auto lightDistance = cameraToLight.magnitude();
         auto unitCameraToObject = cameraToLight / lightDistance;
@@ -774,7 +771,7 @@ static const std::vector<std::string> placeableMeshNames = {
 
     // Highlight the selected light's corresponding indicator
     if (editor.selectedLight != nullptr) {
-      auto* indicator = findObjectByPosition(lightIndicators, state.editor.selectedLight->position);
+      auto* indicator = findObjectByPosition(lightIndicators, editor.selectedLight->position);
 
       if (indicator != nullptr) {
         indicator->color = Vec3f(1.f, 0, 0);
