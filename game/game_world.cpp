@@ -1,10 +1,65 @@
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "Gamma.h"
 
 #include "game_world.h"
 #include "game_state.h"
 #include "build_flags.h"
 
+#define CREATE(m) []() { return m; }
+#define CONFIGURE [](Mesh& m)
+
 using namespace Gamma;
+
+struct MeshConfig {
+  std::string meshName;
+  u16 maxInstances;
+  std::function<Mesh*()> create;
+  std::function<void(Mesh&)> configure = nullptr;
+};
+
+const static std::vector<MeshConfig> meshConfigs = {
+  {
+    "dirt-floor", 0xffff, CREATE(Mesh::Plane(2)),
+    CONFIGURE {
+      m.texture = "./game/textures/dirt-floor.png";
+      m.normalMap = "./game/textures/dirt-normals.png";
+    }
+  },
+  {
+    "dirt-wall", 0xffff, CREATE(Mesh::Model("./game/models/wall.obj")),
+    CONFIGURE {
+      m.texture = "./game/textures/dirt-wall.png";
+      m.normalMap = "./game/textures/dirt-normals.png";
+    }
+  },
+  {
+    "water", 1000, CREATE(Mesh::Plane(2)),
+    CONFIGURE {
+      m.type = MeshType::WATER;
+    }
+  },
+  {
+    "rock", 1000, CREATE(Mesh::Model("./game/models/rock.obj"))
+  },
+  {
+    "arch", 1000, CREATE(Mesh::Model("./game/models/arch.obj")),
+    CONFIGURE {
+      m.texture = "./game/textures/wood.png";
+      m.normalMap = "./game/textures/wood-normals.png";
+    }
+  },
+  {
+    "arch-vines", 1000, CREATE(Mesh::Model("./game/models/arch-vines.obj")),
+    CONFIGURE {
+      m.type = MeshType::FOLIAGE;
+      m.foliage.type = FoliageType::LEAF;
+      m.foliage.speed = 3.f;
+    }
+  }
+};
 
 void addMeshes(Globals) {
   // Grid entity objects
@@ -14,27 +69,13 @@ void addMeshes(Globals) {
   addMesh("switch", 1000, Mesh::Model("./game/models/switch.obj"));
 
   // Lunar Garden
-  addMesh("dirt-floor", 0xffff, Mesh::Plane(2));
-  mesh("dirt-floor")->texture = "./game/textures/dirt-floor.png";
-  mesh("dirt-floor")->normalMap = "./game/textures/dirt-normals.png";
+  for (auto& config : meshConfigs) {
+    addMesh(config.meshName, config.maxInstances, config.create());
 
-  addMesh("dirt-wall", 0xffff, Mesh::Model("./game/models/wall.obj"));
-  mesh("dirt-wall")->texture = "./game/textures/dirt-wall.png";
-  mesh("dirt-wall")->normalMap = "./game/textures/dirt-normals.png";
-
-  addMesh("water", 1000, Mesh::Plane(2));
-  mesh("water")->type = MeshType::WATER;
-
-  addMesh("rock", 1000, Mesh::Model("./game/models/rock.obj"));
-
-  addMesh("arch", 1000, Mesh::Model("./game/models/arch.obj"));
-  mesh("arch")->texture = "./game/textures/wood.png";
-  mesh("arch")->normalMap = "./game/textures/wood-normals.png";
-
-  addMesh("arch-vines", 1000, Mesh::Model("./game/models/arch-vines.obj"));
-  mesh("arch-vines")->type = MeshType::FOLIAGE;
-  mesh("arch-vines")->foliage.type = FoliageType::LEAF;
-  mesh("arch-vines")->foliage.speed = 3.f;
+    if (config.configure != nullptr) {
+      config.configure(*mesh(config.meshName));
+    }
+  }
 
   addMesh("tulips", 1000, Mesh::Model("./game/models/tulips.obj"));
   mesh("tulips")->type = MeshType::FOLIAGE;

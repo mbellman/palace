@@ -12,8 +12,7 @@
 
 ## Game internals
 * move orientationTo/From/startTime to cameraState
-* mesh config file
-* zone config file
+* finish up mesh/zone configs
 * procedures for console commands
 
 ## World design
