@@ -16,6 +16,7 @@
 * mesh config file
 * zone config file
 * procedures for console commands
+* a few bugs regarding stuck light indicator focus states
 
 ## World design
 * lower LoD for rose bushes
