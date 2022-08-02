@@ -8,95 +8,84 @@
 #include "game_state.h"
 #include "build_flags.h"
 
-#define CREATE(m) []() { return m; }
-#define CONFIGURE [](Mesh& m)
+#define create(m) []() { return Mesh::m; }
+#define configure() [](Mesh& m)
 
 using namespace Gamma;
 
 struct MeshBuilder {
   std::string meshName;
   u16 maxInstances;
-  std::function<Mesh*()> create;
-  std::function<void(Mesh&)> configure = nullptr;
+  std::function<Mesh*()> createMesh;
+  std::function<void(Mesh&)> configureMesh = nullptr;
 };
 
 const static std::vector<MeshBuilder> meshBuilders = {
   {
-    "dirt-floor", 0xffff,
-    CREATE(Mesh::Plane(2)),
-    CONFIGURE {
+    "dirt-floor", 0xffff, create(Plane(2)),
+    configure() {
       m.texture = "./game/textures/dirt-floor.png";
       m.normalMap = "./game/textures/dirt-normals.png";
     }
   },
   {
-    "dirt-wall", 0xffff,
-    CREATE(Mesh::Model("./game/models/wall.obj")),
-    CONFIGURE {
+    "dirt-wall", 0xffff, create(Model("./game/models/wall.obj")),
+    configure() {
       m.texture = "./game/textures/dirt-wall.png";
       m.normalMap = "./game/textures/dirt-normals.png";
     }
   },
   {
-    "water", 1000,
-    CREATE(Mesh::Plane(2)),
-    CONFIGURE {
+    "water", 1000, create(Plane(2)),
+    configure() {
       m.type = MeshType::WATER;
     }
   },
   {
-    "rock", 1000,
-    CREATE(Mesh::Model("./game/models/rock.obj"))
+    "rock", 1000, create(Model("./game/models/rock.obj"))
   },
   {
-    "arch", 1000,
-    CREATE(Mesh::Model("./game/models/arch.obj")),
-    CONFIGURE {
+    "arch", 1000, create(Model("./game/models/arch.obj")),
+    configure() {
       m.texture = "./game/textures/wood.png";
       m.normalMap = "./game/textures/wood-normals.png";
     }
   },
   {
-    "arch-vines", 1000,
-    CREATE(Mesh::Model("./game/models/arch-vines.obj")),
-    CONFIGURE {
+    "arch-vines", 1000, create(Model("./game/models/arch-vines.obj")),
+    configure() {
       m.type = MeshType::FOLIAGE;
       m.foliage.type = FoliageType::LEAF;
       m.foliage.speed = 3.f;
     }
   },
   {
-    "tulips", 1000,
-    CREATE(Mesh::Model("./game/models/tulips.obj")),
-    CONFIGURE {
+    "tulips", 1000, create(Model("./game/models/tulips.obj")),
+    configure() {
       m.type = MeshType::FOLIAGE;
       m.foliage.type = FoliageType::FLOWER;
     }
   },
   {
-    "tulip-petals", 1000,
-    CREATE(Mesh::Model("./game/models/tulip-petals.obj")),
-    CONFIGURE {
+    "tulip-petals", 1000, create(Model("./game/models/tulip-petals.obj")),
+    configure() {
       m.type = MeshType::FOLIAGE;
       m.foliage.type = FoliageType::FLOWER;
     }
   },
   {
-    "hedge", 1000,
-    CREATE(Mesh::Model("./game/models/hedge.obj")),
-    CONFIGURE {
+    "hedge", 1000, create(Model("./game/models/hedge.obj")),
+    configure() {
       m.texture = "./game/textures/hedge.png";
       m.normalMap = "./game/textures/hedge-normals.png";
     }
   },
   {
-    "stone-tile", 1000,
-    CREATE(Mesh::Model("./game/models/stone-tile.obj"))
+    "stone-tile", 1000, create(Model("./game/models/stone-tile.obj"))
   },
   {
-    "rosebush", 1000,
-    CREATE(Mesh::Model("./game/models/rosebush-leaves.obj")),
-    CONFIGURE {
+    "rosebush", 1000, create(Model("./game/models/rosebush-leaves.obj")),
+    configure() {
       m.type = MeshType::FOLIAGE;
       m.foliage.type = FoliageType::FLOWER;
       m.texture = "./game/textures/rose-leaves.png";
@@ -104,9 +93,8 @@ const static std::vector<MeshBuilder> meshBuilders = {
     }
   },
   {
-    "rosebush-flowers", 1000,
-    CREATE(Mesh::Model("./game/models/rosebush-flowers.obj")),
-    CONFIGURE {
+    "rosebush-flowers", 1000, create(Model("./game/models/rosebush-flowers.obj")),
+    configure() {
       m.type = MeshType::FOLIAGE;
       m.foliage.type = FoliageType::FLOWER;
       m.texture = "./game/textures/rose-petals.png";
@@ -115,28 +103,24 @@ const static std::vector<MeshBuilder> meshBuilders = {
     }
   },
   {
-    "gate-column", 250,
-    CREATE(Mesh::Model("./game/models/gate-column.obj")),
-    CONFIGURE {
+    "gate-column", 250, create(Model("./game/models/gate-column.obj")),
+    configure() {
       m.texture = "./game/textures/brick.png";
       m.normalMap = "./game/textures/brick-normals.png";
     }
   },
   {
-    "gate", 250,
-    CREATE(Mesh::Model("./game/models/gate.obj"))
+    "gate", 250, create(Model("./game/models/gate.obj"))
   },
   {
-    "tile-1", 0xffff,
-    CREATE(Mesh::Plane(2)),
-    CONFIGURE {
+    "tile-1", 0xffff, create(Plane(2)),
+    configure() {
       m.texture = "./game/textures/tile-1.png";
       m.normalMap = "./game/textures/tile-1-normals.png";
     }
   },
   {
-    "column", 1000,
-    CREATE(Mesh::Model("./game/models/column.obj"))
+    "column", 1000, create(Model("./game/models/column.obj"))
   }
 };
 
@@ -149,10 +133,10 @@ void addMeshes(Globals) {
 
   // Placeable meshes
   for (auto& builder : meshBuilders) {
-    addMesh(builder.meshName, builder.maxInstances, builder.create());
+    addMesh(builder.meshName, builder.maxInstances, builder.createMesh());
 
-    if (builder.configure != nullptr) {
-      builder.configure(*mesh(builder.meshName));
+    if (builder.configureMesh != nullptr) {
+      builder.configureMesh(*mesh(builder.meshName));
     }
   }
 
