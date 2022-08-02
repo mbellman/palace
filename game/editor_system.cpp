@@ -15,10 +15,10 @@
 
 using namespace Gamma;
 
+// @todo derive these from game_world.cpp -> meshBuilders instead
 static const std::vector<std::string> placeableMeshNames = {
   // Lunar Garden
   "dirt-floor",
-  "tile-1",
   "dirt-wall",
   "water",
   "rock",
@@ -31,6 +31,7 @@ static const std::vector<std::string> placeableMeshNames = {
   "gate-column",
   "gate",
   // Palace of the Moon
+  "tile-1",
   "column"
 };
 
