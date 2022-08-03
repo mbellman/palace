@@ -108,7 +108,7 @@ void updateCameraFromMouseMoveEvent(Globals, const MouseMoveEvent& event) {
     ? camera.orientation
     // Update the target orientation otherwise, so we can animate to it
     // (@see game_update -> animateCameraToTargetOrientation)
-    : state.worldOrientationState.orientationTo;
+    : state.cameraState.orientationTo;
 
   switch (state.worldOrientationState.worldOrientation) {
     case POSITIVE_Y_UP:
@@ -142,7 +142,7 @@ void updateCameraFromMouseMoveEvent(Globals, const MouseMoveEvent& event) {
     // In free camera mode, set the target orientation
     // to the immediate camera orientation to avoid a
     // mismatch when reverting to standard camera mode
-    state.worldOrientationState.orientationTo = camera.orientation;
+    state.cameraState.orientationTo = camera.orientation;
   }
 }
 
@@ -209,16 +209,17 @@ void setWorldOrientation(Globals, WorldOrientation targetWorldOrientation) {
 
   orientationHandler(to, camera.orientation);
 
-  state.worldOrientationState.startTime = getRunningTime();
   state.worldOrientationState.worldOrientation = targetWorldOrientation;
-  state.worldOrientationState.orientationFrom = camera.orientation;
-  state.worldOrientationState.orientationTo = to;
+
+  state.cameraState.tweenStartTime = getRunningTime();
+  state.cameraState.orientationFrom = camera.orientation;
+  state.cameraState.orientationTo = to;
 
   // Pre-emptively set the new camera orientation,
   // preventing movement bugs during the orientation
   // transition. The camera's rotation quaternion will
   // represent the apparent orientation in the meantime.
-  camera.orientation = state.worldOrientationState.orientationTo;
+  camera.orientation = state.cameraState.orientationTo;
 }
 
 void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation) {
@@ -237,20 +238,20 @@ void immediatelySetWorldOrientation(Globals, WorldOrientation worldOrientation) 
       break;
   }
 
-  state.worldOrientationState.startTime = 0.f;
-  state.worldOrientationState.orientationTo = camera.orientation;
+  state.cameraState.tweenStartTime = 0.f;
+  state.cameraState.orientationTo = camera.orientation;
 }
 
-void handleWorldOrientation(Globals, float dt) {
+void handleCameraOrientationOnUpdate(Globals, float dt) {
   auto& camera = getCamera();
-  auto& orientationFrom = state.worldOrientationState.orientationFrom;
-  auto& orientationTo = state.worldOrientationState.orientationTo;
-  auto alpha = getRunningTime() - state.worldOrientationState.startTime;
+  auto& orientationFrom = state.cameraState.orientationFrom;
+  auto& orientationTo = state.cameraState.orientationTo;
+  auto alpha = getRunningTime() - state.cameraState.tweenStartTime;
 
   // @todo change easing time based on rotation proximity
   alpha *= 2.f;
 
-  if (state.worldOrientationState.startTime == 0.f) {
+  if (state.cameraState.tweenStartTime == 0.f) {
     // @todo ensure that this doesn't require explicit user action
     camera.rotation = camera.orientation.toQuaternion();
 
@@ -259,7 +260,7 @@ void handleWorldOrientation(Globals, float dt) {
 
   if (alpha >= 1.f) {
     camera.orientation = orientationTo;
-    state.worldOrientationState.startTime = 0.f;
+    state.cameraState.tweenStartTime = 0.f;
 
     return;
   }

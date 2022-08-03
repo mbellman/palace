@@ -15,4 +15,4 @@ struct CurrentMove {
 
 struct GameState;
 
-void handlePlayerCameraMovement(Globals, float dt);
+void handlePlayerCameraMovementOnUpdate(Globals, float dt);

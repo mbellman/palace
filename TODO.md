@@ -11,7 +11,6 @@
 * point + spot light center darkening fix/energy conservation tweaks
 
 ## Game internals
-* move orientationTo/From/startTime to cameraState
 * finish up mesh/zone configs
 * procedures for console commands
 

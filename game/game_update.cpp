@@ -66,7 +66,7 @@ using namespace Gamma;
 static void animateCameraToTargetOrientation(Globals, float dt) {
   auto& camera = getCamera();
   auto& from = camera.orientation;
-  auto& to = state.worldOrientationState.orientationTo;
+  auto& to = state.cameraState.orientationTo;
   float speed = 16.0f * dt;
 
   if (speed > 1.f) speed = 1.f;
@@ -76,7 +76,7 @@ static void animateCameraToTargetOrientation(Globals, float dt) {
   camera.orientation.yaw = Gm_LerpCircularf(from.yaw, to.yaw, speed, Gm_PI);
 }
 
-static void handleCameraLightPosition(Globals) {
+static void handleCameraLightOnUpdate(Globals) {
   auto& camera = getCamera();
   auto position = camera.position + camera.orientation.getDirection() * HALF_TILE_SIZE;
 
@@ -88,18 +88,18 @@ void updateGame(Globals, float dt) {
     if (Gm_IsFlagEnabled(FREE_CAMERA_MODE)) {
       Gm_HandleFreeCameraMode(context, dt);
     } else {
-      handlePlayerCameraMovement(globals, dt);
+      handlePlayerCameraMovementOnUpdate(globals, dt);
       animateCameraToTargetOrientation(globals, dt);
     }
   #else
-    handlePlayerCameraMovement(globals, dt);
+    handlePlayerCameraMovementOnUpdate(globals, dt);
     animateCameraToTargetOrientation(globals, dt);
   #endif
 
-  handleWorldOrientation(globals, dt);
-  handleEntityBehavior(globals, dt);
-  handleCameraLightPosition(globals);
-  handleZones(globals);
+  handleCameraOrientationOnUpdate(globals, dt);
+  handleEntityBehaviorOnUpdate(globals, dt);
+  handleZonesOnUpdate(globals);
+  handleCameraLightOnUpdate(globals);
 
   #if DEVELOPMENT == 1
     if (state.editor.enabled) {

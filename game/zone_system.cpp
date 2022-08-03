@@ -23,7 +23,7 @@ static void toggleMeshesWithinZone(Globals, const Zone& zone, bool enabled) {
   }
 }
 
-void handleZones(Globals) {
+void handleZonesOnUpdate(Globals) {
   auto& camera = getCamera();
   auto& zones = state.world.zones;
   auto coordinates = worldPositionToGridCoordinates(camera.position);

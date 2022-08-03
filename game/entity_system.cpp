@@ -72,7 +72,7 @@ static void handleDynamicEntityBehavior(Globals, float dt) {
   // @todo
 }
 
-void handleEntityBehavior(Globals, float dt) {
+void handleEntityBehaviorOnUpdate(Globals, float dt) {
   handleGridEntityBehavior(globals, dt);
   handleDynamicEntityBehavior(globals, dt);
 }

@@ -6,4 +6,4 @@
 struct GmContext;
 struct GameState;
 
-void handleZones(Globals);
+void handleZonesOnUpdate(Globals);

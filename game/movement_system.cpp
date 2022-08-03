@@ -349,7 +349,7 @@ static void moveCamera(Globals, float dt) {
   }
 }
 
-void handlePlayerCameraMovement(Globals, float dt) {
+void handlePlayerCameraMovementOnUpdate(Globals, float dt) {
   auto& camera = getCamera();
   auto& input = getInput();
   auto runningTime = getRunningTime();

@@ -11,7 +11,9 @@
 #include "build_flags.h"
 
 struct CameraState {
-  // @todo
+  float tweenStartTime = 0.f;
+  Gamma::Orientation orientationFrom;
+  Gamma::Orientation orientationTo;
 };
 
 struct GameState {
