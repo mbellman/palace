@@ -266,6 +266,7 @@ static void handleNextMove(Globals) {
   targetCameraPosition += moveDelta;
 
   if (!isNextMoveValid(globals, currentGridCoordinates, targetCameraPosition)) {
+    // @todo animate the camera slightly toward the target and back to indicate that we cannot move here
     return;
   }
 
@@ -302,7 +303,7 @@ static void handleNextMove(Globals) {
   currentMove.duration = powf(moveDistanceRatio, 1.f / 3.f);
 }
 
-static void moveCamera(Globals, float dt) {
+static void movePlayerCamera(Globals, float dt) {
   auto& camera = getCamera();
   auto& move = state.currentMove;
   auto& from = move.from;
@@ -319,10 +320,13 @@ static void moveCamera(Globals, float dt) {
   auto alpha = ((getRunningTime() - move.startTime) + dt) / move.duration;
 
   if (move.easing == EasingType::EASE_IN_OUT) {
+    // Initial movement action
     alpha *= 3.f;
   } else if (move.easing == EasingType::LINEAR) {
+    // Continuous movement action
     alpha *= 4.f;
   } else if (move.easing == EasingType::EASE_OUT) {
+    // Slowdown movement action
     alpha *= 2.f;
   }
 
@@ -330,20 +334,41 @@ static void moveCamera(Globals, float dt) {
     camera.position = to;
     move.startTime = 0.f;
   } else {
-    #define easeCamera(easingFn)\
-      camera.position.x = easingFn(from.x, to.x, alpha);\
-      camera.position.y = easingFn(from.y, to.y, alpha);\
-      camera.position.z = easingFn(from.z, to.z, alpha);
-
     switch (move.easing) {
       case EasingType::EASE_IN_OUT:
-        easeCamera(easeInOut);
+        camera.position = Vec3f::lerp(from, to, easeInOut(0.f, 1.f, alpha));
         break;
-      case EasingType::LINEAR:
-        easeCamera(Gm_Lerpf);
+      case EasingType::LINEAR: {
+        auto deltaX = Gm_Absf(to.x - from.x);
+        auto deltaY = Gm_Absf(to.y - from.y);
+        auto deltaZ = Gm_Absf(to.z - from.z);
+
+        // Interpolate the position components independently.
+        // We want 90-degree changes in direction to swivel
+        // the camera more naturally, rather than instantly
+        // beginning a lerp to the new target coordinate.
+        // We use linear interpolation for the dominant
+        // component and a gradual ease-out for the less
+        // dominant component, imparting more of a curving
+        // motion to the movement.
+        if (deltaX > deltaY && deltaX > deltaZ) {
+          camera.position.x = Gm_Lerpf(from.x, to.x, alpha);
+          camera.position.y = easeOut(from.y, to.y, alpha);
+          camera.position.z = easeOut(from.z, to.z, alpha);
+        } else if (deltaY > deltaX && deltaY > deltaZ) {
+          camera.position.y = Gm_Lerpf(from.y, to.y, alpha);
+          camera.position.x = easeOut(from.x, to.x, alpha);
+          camera.position.z = easeOut(from.z, to.z, alpha);
+        } else {
+          camera.position.z = Gm_Lerpf(from.z, to.z, alpha);
+          camera.position.x = easeOut(from.x, to.x, alpha);
+          camera.position.y = easeOut(from.y, to.y, alpha);
+        }
+
         break;
+      }
       case EasingType::EASE_OUT:
-        easeCamera(easeOut);
+        camera.position = Vec3f::lerp(from, to, easeOut(0.f, 1.f, alpha));
         break;
     }
   }
@@ -377,6 +402,6 @@ void handlePlayerCameraMovementOnUpdate(Globals, float dt) {
   }
 
   if (isMoving(globals)) {
-    moveCamera(globals, dt);
+    movePlayerCamera(globals, dt);
   }
 }

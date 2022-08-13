@@ -13,8 +13,16 @@
 ## Game internals
 * finish up mesh/zone configs
 * procedures for console commands
+* rename CurrentMove.easing to CurrentMove.moveType
+
+# Game design
+* subtle animation when bumping into walls
+* switch platforms
+* elevators
 
 ## World design
+* tree in central Lunar Garden
+* switch statues on opposite sides of tree
 * lower LoD for rose bushes
 * garden boundary hedges
 * garden boundary iron gates
